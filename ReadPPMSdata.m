@@ -10,4 +10,4 @@ while length(data)~=length(Bits)+2
         break
     end
 end
-    
+data=data(3:end);
