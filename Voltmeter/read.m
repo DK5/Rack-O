@@ -1,6 +1,6 @@
 function [ vals ] = read( obj1 )
 %read returns array of readings from the voltmeter
-%   read does NOT stop the measure, it pauses it the restarting
+%   read does NOT stop the measure, it pauses it then restarting
 %   obj1 is the voltmeter object
 %   vals is the returned array
 
