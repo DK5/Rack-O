@@ -21,7 +21,7 @@ switch Status(k)
     case 1
         StatusTXT{k}='Normal stability at target temperature';
     case 2
-        StatusTXT{k}='Stable';
+        StatusTXT{k}='Tracking';
     case 5
         StatusTXT{k}='Within tolerance, waiting for equilibrium';
     case 6
