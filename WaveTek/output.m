@@ -19,6 +19,7 @@ end
 
 try
     fprintf(obj1, ['output ',val]);
+    execute(obj1);
 catch
     disp('Error');
 end

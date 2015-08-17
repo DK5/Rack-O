@@ -4,6 +4,7 @@ function freq( obj , freq )
 %   obj is the desired device
 try
     fprintf(obj, ['freq ',num2str(freq)]);   % write the frequency 
+    execute(obj);
 catch
     disp('Error')
 end

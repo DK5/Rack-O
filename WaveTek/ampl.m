@@ -4,6 +4,7 @@ function ampl( obj, ampl )
 %   ampl is the desired amplitude
 try
     fprintf(obj, ['ampl ',num2str(ampl)]);  % set amplitude to ampl
+    execute(obj);
 catch
     disp('Error')
 end
