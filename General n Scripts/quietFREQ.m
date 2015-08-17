@@ -5,7 +5,6 @@ lk = GPcon(2);  % lock-in
 fg = GPcon(25); % function generator
 
 setTrace(lk,1,7,0,0,0); % set trace 1 as Rn = magnitude noise
-refSRC(lk,'external');  % set reference source to external
 ampl(fg,1);             % set amplitude to 1V
 output(fg,'on50');      % set output to 50 ohm
 sampleRate(lk,'max');   % set sample rate to max
