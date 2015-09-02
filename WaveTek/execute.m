@@ -5,6 +5,6 @@ function execute( obj1 )
 try
     fprintf(obj1, 'execute');
 catch
-    disp('Error');
+    disp('Error executing');
 end
 
