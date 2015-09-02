@@ -1,4 +1,4 @@
-function autoGain( obj1 )
+function [sens] = autoGain( obj1 )
 %autoGain gets a measure from the lock-in and sets the proper sensetivity
 %   ampl is the measurement
 %   obj1 is the Lock-in object
@@ -8,7 +8,7 @@ level = [2e-9,5e-9,10e-9,20e-9,50e-9,100e-9,200e-9,500e-9...
     ,1e-3,2e-3,5e-3,10e-3,20e-3,50e-3,100e-3,200e-3,500e-3,1];
 scale = 0.9*level;
 
-ampl = str2double(query(obj1, 'outp? 4'));  % get data
+ampl = str2double(query(obj1, 'outp? 3'));  % get data
 
 logic = ampl<scale;     % find scale
 [~,ind] = max(logic);   % proper scale index is the first bigger
