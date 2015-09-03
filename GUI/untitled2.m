@@ -22,7 +22,7 @@ function varargout = untitled2(varargin)
 
 % Edit the above text to modify the response to help untitled2
 
-% Last Modified by GUIDE v2.5 03-Sep-2015 12:19:20
+% Last Modified by GUIDE v2.5 03-Sep-2015 15:33:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -92,12 +92,6 @@ index_selected = get(handles.listbox1, 'Value');
 
 
 add_item_to_list_box(handles.listbox1, ['Set field ',Destination_field, ' [Oe]' ], index_selected);
-
-
-
-
-
-
 
 
 function edit1_Callback(hObject, eventdata, handles)
@@ -342,7 +336,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-set(hObject, 'string', {'End sequence'});
+set(hObject, 'String', {'End sequence'});
 
 
 
@@ -428,7 +422,7 @@ list = get(handles.listbox1,'String');
 item_selected = list{index_selected} 
 
 
-add_item_to_list_box(handles.listbox1, ['###  ', Remark, '  ###' ], index_selected);
+add_item_to_list_box(handles.listbox1, ['%%%  ', Remark, '  %%%' ], index_selected);
 
 
 function txt_remark_Callback(hObject, eventdata, handles)
@@ -474,6 +468,9 @@ set(handles.txt_remark,'String','');   %Reset REMARK Field
 set(handles.txt_waiting_time,'String','1');    %Reset WAIT TIME field
 
 set(handles.listbox1, 'String', {'End sequence'});  %Reset LISTBOX
+
+cla(handles.axes1);                                   %Reset Graph
+
 % Update handles structure
 guidata(handles.figure1, handles);
 
@@ -491,7 +488,7 @@ function write_to_file_button_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-contents = get(handles.listbox1,'String') %extract all contents of listbox as cell array
+contents = get(handles.listbox1,'String'); %extract all contents of listbox as cell array
 
 FID = fopen('commands.m','w');
 formatSpec = '%s\r\n';
@@ -503,3 +500,37 @@ end
 fclose(FID);
 type commands.m
 
+
+% --- Executes on button press in draw_graph_button.
+function draw_graph_button_Callback(hObject, eventdata, handles)
+% hObject    handle to draw_graph_button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[X,Y] = meshgrid(-8:.5:8);
+R = sqrt(X.^2 + Y.^2) + eps;
+Z = sin(R)./R;
+mesh(Z)
+axis auto
+xlabel('X'); ylabel('Y'); zlabel('Z');
+
+
+
+
+% --- Executes on button press in execute_code_button.
+function execute_code_button_Callback(hObject, eventdata, handles)
+% hObject    handle to execute_code_button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[FileName,PathName] = uigetfile('*.m','Select the MATLAB file containing ppMS commands');
+if FileName==0
+    errordlg('Error Reading File','Error 0x002');
+    return
+end
+
+
+
+% --- Executes during object creation, after setting all properties.
+function execute_code_button_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to execute_code_button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
