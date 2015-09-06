@@ -22,7 +22,7 @@ function varargout = untitled2(varargin)
 
 % Edit the above text to modify the response to help untitled2
 
-% Last Modified by GUIDE v2.5 03-Sep-2015 15:33:51
+% Last Modified by GUIDE v2.5 06-Sep-2015 12:32:34
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -490,7 +490,13 @@ function write_to_file_button_Callback(hObject, eventdata, handles)
 
 contents = get(handles.listbox1,'String'); %extract all contents of listbox as cell array
 
-FID = fopen('commands.m','w');
+FileName=get(handles.file_name_edit,'String');
+
+if strcmp(FileName,'Enter File name')
+     errordlg('Please Enter a File Name!','Error 0x003');
+    return
+end
+FID = fopen([FileName,'.m'],'w');
 formatSpec = '%s\r\n';
 [nrows,ncols] = size(contents);
 for row = 1:nrows
@@ -498,7 +504,7 @@ for row = 1:nrows
 end
 
 fclose(FID);
-type commands.m
+% type commands.m   %show the file
 
 
 % --- Executes on button press in draw_graph_button.
@@ -506,14 +512,6 @@ function draw_graph_button_Callback(hObject, eventdata, handles)
 % hObject    handle to draw_graph_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[X,Y] = meshgrid(-8:.5:8);
-R = sqrt(X.^2 + Y.^2) + eps;
-Z = sin(R)./R;
-mesh(Z)
-axis auto
-xlabel('X'); ylabel('Y'); zlabel('Z');
-
-
 
 
 % --- Executes on button press in execute_code_button.
@@ -526,6 +524,10 @@ if FileName==0
     errordlg('Error Reading File','Error 0x002');
     return
 end
+FID = fopen(FileName,'a');  %get file id
+setappdata(0,'FileName',FileName);
+varargout = dialog(figure(dialog));   %open verification dialog
+
 
 
 
@@ -534,3 +536,97 @@ function execute_code_button_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to execute_code_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
+
+
+% --- Executes on selection change in graph_popup.
+function graph_popup_Callback(hObject, eventdata, handles)
+% hObject    handle to graph_popup (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns graph_popup contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from graph_popup
+contents = cellstr(get(hObject,'String'));
+selected_item=contents{get(hObject,'Value')};
+switch selected_item
+    
+    case 'sinc' 
+
+[X,Y] = meshgrid(-8:.5:8);
+R = sqrt(X.^2 + Y.^2) + eps;
+Z = sin(R)./R;
+mesh(Z)
+axis auto
+xlabel('X'); ylabel('Y'); zlabel('Z');
+
+    case 'heart' 
+            t = linspace(-pi,pi, 350);
+ X = t .* sin( pi * sin(t)./t);
+ Y = -abs(t) .* cos( pi * sin(t)./t);
+ plot(X,Y);
+ fill(X, Y, 'r');
+end        
+% --- Executes during object creation, after setting all properties.
+function graph_popup_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to graph_popup (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in set_mf_popup.
+function set_mf_popup_Callback(hObject, eventdata, handles)
+% hObject    handle to set_mf_popup (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns set_mf_popup contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from set_mf_popup
+
+
+% --- Executes during object creation, after setting all properties.
+function set_mf_popup_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to set_mf_popup (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushbutton17.
+function pushbutton17_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton17 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+function file_name_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to file_name_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of file_name_edit as text
+%        str2double(get(hObject,'String')) returns contents of file_name_edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function file_name_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to file_name_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
