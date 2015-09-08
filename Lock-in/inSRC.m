@@ -1,5 +1,5 @@
 function inSRC( obj1 , str )
-%refSRC sets the reference source of the lock-in
+%inSRC sets the input source of the lock-in
 %   str: A | A-B | I or 0|1|2 
 
 if ischar(str)  % cancel case sensetivity
