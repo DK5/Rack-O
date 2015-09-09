@@ -1,3 +1,5 @@
+% Bits are in the PPMS manual page 64
+
 function [data]=ReadPPMSdata(PPMSobj,Bits)
 CMD=['GETDAT? ',num2str(sum(2.^Bits))];
 [data]=GetValue(query(PPMSobj, CMD));
