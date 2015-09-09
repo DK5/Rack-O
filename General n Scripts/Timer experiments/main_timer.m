@@ -1,7 +1,7 @@
 %%  Connecting GPIB devices
-volt1obj = GPcon(7);    % first voltmeter object
-volt2obj = GPcon(6);    % seconed voltmeter object
-csobj = GPcon(8);       % current source object
+volt1obj = GPcon(9);	% first voltmeter object
+volt2obj = GPcon();     % seconed voltmeter object
+csobj = GPcon(10);      % current source object
 lockin = GPcon(12);     % lock-in object
 
 %%  Innitialization of DATA
@@ -37,13 +37,13 @@ stop(k_timer);
 stop(ppms_timer);
 
 %%  Generating raw data
-kData(isnan(kData(:,1))) = [];    % delete all NaN values where there is no time stamp
-klen = length(kData);             % get kData rows size
+kData(isnan(kData(:,1)),:) = [];    % delete all NaN values where there is no time stamp
+klen = size(kData,1);             % get kData rows size
 
-PPMS_data(isnan(PPMS_data(:,1))) = [];  % delete all NaN values where there is no time stamp
-ppms_len = length(PPMS_data);           % get kData rows size
+PPMS_data(isnan(PPMS_data(:,1)),:) = [];  % delete all NaN values where there is no time stamp
+ppms_len = size(PPMS_data,1);           % get kData rows size
 
-rawData = NaN(6,klen+ppms_len);         % generate raw data which will contain ppms & kData
+rawData = NaN(klen+ppms_len,6);         % generate raw data which will contain ppms & kData
 rawData(1:klen,1) = kData(:,1);         % insert time values of kData
 rawData(1:klen,4:6) = kData(:,2:end);   % insert data values of kData into proper cols
 rawData((klen+1):end,:) = PPMS_data;    % insert PPMS data (time&values)
