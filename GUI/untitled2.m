@@ -1,15 +1,15 @@
 function varargout = untitled2(varargin)
-% UNTITLED2 M-file for untitled2.fig
-%      UNTITLED2, by itself, creates a new UNTITLED2 or raises the existing
+% untitled2 M-file for untitled2.fig
+%      untitled2, by itself, creates a new untitled2 or raises the existing
 %      singleton*.
 %
-%      H = UNTITLED2 returns the handle to a new UNTITLED2 or the handle to
+%      H = untitled2 returns the handle to a new untitled2 or the handle to
 %      the existing singleton*.
 %
-%      UNTITLED2('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in UNTITLED2.M with the given input arguments.
+%      untitled2('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in untitled2.M with the given input arguments.
 %
-%      UNTITLED2('Property','Value',...) creates a new UNTITLED2 or raises the
+%      untitled2('Property','Value',...) creates a new untitled2 or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
 %      applied to the GUI before untitled2_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
@@ -22,7 +22,7 @@ function varargout = untitled2(varargin)
 
 % Edit the above text to modify the response to help untitled2
 
-% Last Modified by GUIDE v2.5 06-Sep-2015 12:32:34
+% Last Modified by GUIDE v2.5 06-Sep-2015 16:17:41
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -88,10 +88,10 @@ index_selected = get(handles.listbox1, 'Value');
 %list = get(handles.listbox1,'String'); %Get the cell array
 %item_selected = list{index_selected}; 
 
+method=cellstr(get(handles.set_mf_popup,'string'));
+method=method{get(handles.set_mf_popup,'Value')};
 
-
-
-add_item_to_list_box(handles.listbox1, ['Set field ',Destination_field, ' [Oe]' ], index_selected);
+add_item_to_list_box(handles.listbox1, ['Set field ',Destination_field, ' [Oe]' ,', while using:', method], index_selected);
 
 
 function edit1_Callback(hObject, eventdata, handles)
@@ -241,8 +241,16 @@ function Set_take_picture_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-index_selected = get(handles.listbox1, 'Value')
-add_item_to_list_box(handles.listbox1, 'moty',index_selected);
+%index_selected = get(handles.listbox1, 'Value')
+%add_item_to_list_box(handles.listbox1, 'moty',index_selected);
+
+ax_old = gca;
+f_new = figure;
+ax_new = copyobj(ax_old,f_new);
+set(ax_new,'Position','default')
+print(f_new,'AxesOnly','-dpng')
+close %'f_new'
+
 
 function h = add_item_to_list_box_end(h, newitem)
 % ADDITEMTOLISTBOX - add a new items to the listbox
@@ -286,9 +294,7 @@ function h = add_item_to_list_box(h, newitem, index)
     for j=1:space
         newitem = [' ', newitem];
     end
-    
-    
-    
+     
     if isempty(oldstring)
         newstring = {newitem};
 %     elseif ~iscell(oldstring)
@@ -299,13 +305,20 @@ function h = add_item_to_list_box(h, newitem, index)
     set(h, 'string', newstring); %Set the new cell array to the list box
 
 function h = del_item_from_list_box(h, index)
-% del_item_from_list_box - add a new items to the listbox
+% del_item_from_list_box - removes items to the listbox
 % H = del_item_from_list_box(H, index)
 % H listbox handle
-% index - index to remove (?)
+% index - index to remove 
 % STRING a new item to display
 
     oldstring = get(h, 'string');
+    if oldstring{index}=='End'
+        errordlg('Cannot delete End statement!','Error 0x004');
+        return
+    elseif oldstring{index}=='End Sequence'
+        errordlg('Cannot delete End Sequence statement!','Error 0x005');
+        return
+    end
     L=length(oldstring);
     if isempty(oldstring)
     elseif index==L 
@@ -469,7 +482,18 @@ set(handles.txt_waiting_time,'String','1');    %Reset WAIT TIME field
 
 set(handles.listbox1, 'String', {'End sequence'});  %Reset LISTBOX
 
+set(handles.file_name_edit,'String', 'Enter File name'); %Reset filename field
+
+set(handles.graph_popup,'Value',1);
+set(handles.set_mf_popup,'Value',1);               %Reset popups
+
 cla(handles.axes1);                                   %Reset Graph
+
+set(handles.H_text_status,'String', '---');
+set(handles.temp_text_status,'String', '---');        %Reset Live Data feed
+set(handles.helium_level_text_status,'String', '---');
+set(handles.vaccum_level_text_status,'String', '---');
+
 
 % Update handles structure
 guidata(handles.figure1, handles);
@@ -490,44 +514,35 @@ function write_to_file_button_Callback(hObject, eventdata, handles)
 
 contents = get(handles.listbox1,'String'); %extract all contents of listbox as cell array
 
-FileName=get(handles.file_name_edit,'String');
+FileName=get(handles.file_name_edit,'String');  %get the desired filename
 
-if strcmp(FileName,'Enter File name')
-     errordlg('Please Enter a File Name!','Error 0x003');
+if strcmp(FileName,'Enter File name')    %make sure the user has entered a filename
+     errordlg('Please Enter a File Name!','Error 0x003');  %user didnt
     return
 end
-FID = fopen([FileName,'.m'],'w');
+FID = fopen([FileName,'.m'],'w');   
 formatSpec = '%s\r\n';
 [nrows,ncols] = size(contents);
 for row = 1:nrows
-    fprintf(FID,formatSpec,contents{row,:});
-end
+    fprintf(FID,formatSpec,contents{row,:});   %write list in file - REWRITES EXISTING
+end                                            %to change, change w in fopen to a
 
 fclose(FID);
 % type commands.m   %show the file
-
-
-% --- Executes on button press in draw_graph_button.
-function draw_graph_button_Callback(hObject, eventdata, handles)
-% hObject    handle to draw_graph_button (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+msgbox('File Saved.','Attention','Help');
 
 
 % --- Executes on button press in execute_code_button.
 function execute_code_button_Callback(hObject, eventdata, handles)
+% Executes CURRENT code without file selection
 % hObject    handle to execute_code_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[FileName,PathName] = uigetfile('*.m','Select the MATLAB file containing ppMS commands');
-if FileName==0
-    errordlg('Error Reading File','Error 0x002');
-    return
-end
-FID = fopen(FileName,'a');  %get file id
-setappdata(0,'FileName',FileName);
-varargout = dialog(figure(dialog));   %open verification dialog
 
+
+contents = get(handles.listbox1,'String');
+varargout = my_dialog(figure(my_dialog)); %calls verification dialog
+%excecution function goes here
 
 
 
@@ -601,15 +616,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-% --- Executes on button press in pushbutton17.
-function pushbutton17_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton17 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-
 function file_name_edit_Callback(hObject, eventdata, handles)
 % hObject    handle to file_name_edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -630,3 +636,37 @@ function file_name_edit_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --------------------------------------------------------------------
+function uipushtool2_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to uipushtool2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+%saveas(hObject,'pic.jpg');
+
+fig = gcf;
+set(fig,'PaperPositionMode','auto');
+print('Full UI Screenpic','-dpng','-r0');
+
+% --------------------------------------------------------------------
+function uipushtool1_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to uipushtool1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in choose_file_btn.
+function choose_file_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to choose_file_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[FileName,PathName] = uigetfile('*.m','Select the MATLAB file containing ppMS commands');
+if FileName==0
+    errordlg('Error Reading File','Error 0x002');
+    return
+end
+FID = fopen(FileName,'a');  %get file id
+setappdata(0,'FileName',FileName);
+varargout = my_dialog(figure(my_dialog));   %open verification my_dialog

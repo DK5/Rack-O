@@ -1,26 +1,27 @@
-function varargout = dialog(varargin)
-% DIALOG MATLAB code for dialog.fig
-%      DIALOG, by itself, creates a new DIALOG or raises the existing
-%      singleton*.
+function varargout = my_dialog(varargin)
+% my_dialog MATLAB code for my_dialog.fig
 %
-%      H = DIALOG returns the handle to a new DIALOG or the handle to
+%      my_dialog, by itself, creates a new my_dialog or raises the existing
+%      singleton*.
+%      Code for Code Verification my_dialog before sending it to the ppMS.
+%      H = my_dialog returns the handle to a new my_dialog or the handle to
 %      the existing singleton*.
 %
-%      DIALOG('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in DIALOG.M with the given input arguments.
+%      my_dialog('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in my_dialog.M with the given input arguments.
 %
-%      DIALOG('Property','Value',...) creates a new DIALOG or raises the
+%      my_dialog('Property','Value',...) creates a new my_dialog or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before dialog_OpeningFcn gets called.  An
+%      applied to the GUI before my_dialog_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to dialog_OpeningFcn via varargin.
+%      stop.  All inputs are passed to my_dialog_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help dialog
+% Edit the above text to modify the response to help my_dialog
 
 % Last Modified by GUIDE v2.5 06-Sep-2015 12:06:23
 
@@ -28,8 +29,8 @@ function varargout = dialog(varargin)
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @dialog_OpeningFcn, ...
-                   'gui_OutputFcn',  @dialog_OutputFcn, ...
+                   'gui_OpeningFcn', @my_dialog_OpeningFcn, ...
+                   'gui_OutputFcn',  @my_dialog_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,28 +45,28 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before dialog is made visible.
-function dialog_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before my_dialog is made visible.
+function my_dialog_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to dialog (see VARARGIN)
+% varargin   command line arguments to my_dialog (see VARARGIN)
 
-% Choose default command line output for dialog
+% Choose default command line output for my_dialog
 handles.output = hObject;
 
-FileName=getappdata(0,'FileName');
-set(handles.text1,'String', fileread(FileName));
+FileName=getappdata(0,'FileName');   %get the filename of wanted file containing commands
+set(handles.text2,'String', fileread(FileName)); %display contents
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes dialog wait for user response (see UIRESUME)
+% UIWAIT makes my_dialog wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = dialog_OutputFcn(hObject, eventdata, handles) 
+function varargout = my_dialog_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -81,8 +82,10 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-%send contents to ppms
-close;
+%send contents to ppms%
+msgbox('Commands sent!','Attention','Warn');
+uiwait;  %wait for user to click ok in msgbox
+close; %close the window
 
 
 % --- Executes during object creation, after setting all properties.
