@@ -1,4 +1,4 @@
-function varargout = untitled2(varargin)
+function varargout = untitled2(varargin) 
 % untitled2 M-file for untitled2.fig
 %      untitled2, by itself, creates a new untitled2 or raises the existing
 %      singleton*.
@@ -22,9 +22,12 @@ function varargout = untitled2(varargin)
 
 % Edit the above text to modify the response to help untitled2
 
-% Last Modified by GUIDE v2.5 06-Sep-2015 16:17:41
+% Last Modified by GUIDE v2.5 09-Sep-2015 14:07:24
 
 % Begin initialization code - DO NOT EDIT
+%clear all
+%close all   %CLEANUP
+%clc
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
@@ -80,8 +83,9 @@ function Set_Field_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
           
 
-Destination_field = get(handles.txt_destination_field, 'String');
+Destination_field = get(handles.txt_Stop_field, 'String');
 index_selected = get(handles.listbox1, 'Value');
+rate=get(handles.mf_rate_edit, 'String');
 
 %index_selected = get(handles.listbox1, 'Value');
 
@@ -90,8 +94,20 @@ index_selected = get(handles.listbox1, 'Value');
 
 method=cellstr(get(handles.set_mf_popup,'string'));
 method=method{get(handles.set_mf_popup,'Value')};
-
-add_item_to_list_box(handles.listbox1, ['Set field ',Destination_field, ' [Oe]' ,', while using:', method], index_selected);
+%scan field step size check
+current_field = str2num(get(handles.H_text_status, 'String'));
+Stop_Field = str2num(get(handles.txt_Stop_field, 'String'));
+rate = str2num(get(handles.mf_rate_edit, 'String'));
+if(rate<=10.0)
+    errordlg('Rate must be bigger than 10!','Error 0x001')
+    set(handles.mf_rate_edit,'String',10);
+    return
+elseif(rate>187)
+    errordlg('Rate must be smaller that 187!','Error 0x005')
+    set(handles.mf_rate_edit,'String',187);
+    return
+end
+add_item_to_list_box(handles.listbox1, ['Set field ',Destination_field, ' [Oe]' ,', while using:', method, ', at rate of ',rate,' [Oe/sec]'], index_selected);
 
 
 function edit1_Callback(hObject, eventdata, handles)
@@ -148,7 +164,7 @@ function Set_scan_field_Callback(hObject, eventdata, handles)
 
 Start_Field = get(handles.txt_Start_field, 'String');
 Stop_Field = get(handles.txt_Stop_field, 'String');
-Num_of_steps = get(handles.txt_field_number_of_steps, 'String');
+Num_of_steps = get(handles.mf_rate_edit, 'String');
 
 index_selected = get(handles.listbox1, 'Value');
 add_item_to_list_box(handles.listbox1, 'End' , index_selected);
@@ -202,29 +218,18 @@ end
 
 
 
-function txt_field_number_of_steps_Callback(hObject, eventdata, handles)
-% hObject    handle to txt_field_number_of_steps (see GCBO)
+function mf_rate_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to mf_rate_edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of txt_field_number_of_steps as text
-%        str2double(get(hObject,'String')) returns contents of txt_field_number_of_steps as a double
-
-%scan field step size check
-Start_Field = str2num(get(handles.txt_Start_field, 'String'));
-Stop_Field = str2num(get(handles.txt_Stop_field, 'String'));
-Num_of_steps = str2num(get(handles.txt_field_number_of_steps, 'String'));
-if(((Stop_Field-Start_Field)/Num_of_steps)<=10.0)
-    errordlg('Each step must be bigger than 10!','Error 0x001')
-    min_steps= (Stop_Field-Start_Field)/10; %minimum num of steps possible
-    set(handles.txt_field_number_of_steps,'String', num2str(min_steps));
-    return
-end
+% Hints: get(hObject,'String') returns contents of mf_rate_edit as text
+%        str2double(get(hObject,'String')) returns contents of mf_rate_edit as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function txt_field_number_of_steps_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to txt_field_number_of_steps (see GCBO)
+function mf_rate_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to mf_rate_edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -312,10 +317,10 @@ function h = del_item_from_list_box(h, index)
 % STRING a new item to display
 
     oldstring = get(h, 'string');
-    if oldstring{index}=='End'
+    if strcmp(oldstring{index},'End')
         errordlg('Cannot delete End statement!','Error 0x004');
         return
-    elseif oldstring{index}=='End Sequence'
+    elseif strcmp(oldstring{index},'End Sequence')
         errordlg('Cannot delete End Sequence statement!','Error 0x005');
         return
     end
@@ -394,7 +399,7 @@ function btn_Set_del_line_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-index_selected = get(handles.listbox1, 'Value')
+index_selected = get(handles.listbox1, 'Value');
 
 del_item_from_list_box(handles.listbox1,index_selected);
 
@@ -470,11 +475,11 @@ initialize_gui(gcbf, handles, true);
 function initialize_gui(hObject, handles, isreset)
 % function used to reset all properies of gui
 
-set(handles.txt_destination_field , 'String','0');    %Reset DESTINATION field
+set(handles.txt_Stop_field,'String','100');  %Reset all H fields
+set(handles.mf_rate_edit,'String','10');
 
-set(handles.txt_Start_field,'String','0');
-set(handles.txt_Stop_field,'String','100');  %Reset all SCAN fields
-set(handles.txt_field_number_of_steps,'String','10');
+set(handles.target_temp_edit,'String', '290');
+set(handles.temp_rate_edit, 'String','12');      %Reset TEMP fields
 
 set(handles.txt_remark,'String','');   %Reset REMARK Field
 
@@ -485,14 +490,17 @@ set(handles.listbox1, 'String', {'End sequence'});  %Reset LISTBOX
 set(handles.file_name_edit,'String', 'Enter File name'); %Reset filename field
 
 set(handles.graph_popup,'Value',1);
-set(handles.set_mf_popup,'Value',1);               %Reset popups
+set(handles.set_mf_popup,'Value',1);
+set(handles.temprature_approach_popup,'Value',1);       %Reset popups
+set(handles.chamber_mode_popup,'Value',1);
+set(handles.mf_magnet_mode_popup,'Vaule',1);
 
 cla(handles.axes1);                                   %Reset Graph
 
-set(handles.H_text_status,'String', '---');
+set(handles.H_text_status,'String', '0');
 set(handles.temp_text_status,'String', '---');        %Reset Live Data feed
 set(handles.helium_level_text_status,'String', '---');
-set(handles.vaccum_level_text_status,'String', '---');
+set(handles.pressure_text_status,'String', '---');
 
 
 % Update handles structure
@@ -541,6 +549,8 @@ function execute_code_button_Callback(hObject, eventdata, handles)
 
 
 contents = get(handles.listbox1,'String');
+setappdata(0,'listbox_contents',contents);
+setappdata(0,'Button','Execute'); %let dialog know what button is calling it
 varargout = my_dialog(figure(my_dialog)); %calls verification dialog
 %excecution function goes here
 
@@ -669,4 +679,149 @@ if FileName==0
 end
 FID = fopen(FileName,'a');  %get file id
 setappdata(0,'FileName',FileName);
+setappdata(0,'Button','Choose'); %let dialog know what button is calling it
 varargout = my_dialog(figure(my_dialog));   %open verification my_dialog
+
+
+% --- Executes on selection change in chamber_mode_popup.
+function chamber_mode_popup_Callback(hObject, eventdata, handles)
+% hObject    handle to chamber_mode_popup (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns chamber_mode_popup contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from chamber_mode_popup
+
+
+% --- Executes during object creation, after setting all properties.
+function chamber_mode_popup_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to chamber_mode_popup (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in temprature_approach_popup.
+function temprature_approach_popup_Callback(hObject, eventdata, handles)
+% hObject    handle to temprature_approach_popup (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns temprature_approach_popup contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from temprature_approach_popup
+
+
+% --- Executes during object creation, after setting all properties.
+function temprature_approach_popup_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to temprature_approach_popup (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function target_temp_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to target_temp_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of target_temp_edit as text
+%        str2double(get(hObject,'String')) returns contents of target_temp_edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function target_temp_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to target_temp_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function temp_rate_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to temp_rate_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of temp_rate_edit as text
+%        str2double(get(hObject,'String')) returns contents of temp_rate_edit as a double
+
+% --- Executes during object creation, after setting all properties.
+function temp_rate_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to temp_rate_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in set_Temp_btn.
+function set_Temp_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to set_Temp_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+Destination_temp = get(handles.target_temp_edit, 'String');
+index_selected = get(handles.listbox1, 'Value');
+rate=str2num(get(handles.temp_rate_edit, 'String'));
+
+%index_selected = get(handles.listbox1, 'Value');
+
+%list = get(handles.listbox1,'String'); %Get the cell array
+%item_selected = list{index_selected}; 
+
+method=cellstr(get(handles.temprature_approach_popup,'string'));
+method=method{get(handles.temprature_approach_popup,'Value')};
+%rate size check 
+ if(rate<=0.0)
+    errordlg('Rate must be bigger than 0! Are you dumb?','Error 0x006')
+    set(handles.mf_rate_edit,'String',0);
+    return
+elseif(rate>12)
+    errordlg('Rate must be smaller that 12!','Error 0x007')
+    set(handles.mf_rate_edit,'String',12);
+    return
+ end
+rate=num2str(rate);
+add_item_to_list_box(handles.listbox1, ['Set Temprature ',Destination_temp, ' [°K]' ,', while using:', method, ', at rate of ',rate,' [°K/sec]'], index_selected);
+
+
+% --- Executes on selection change in mf_magnet_mode_popup.
+function mf_magnet_mode_popup_Callback(hObject, eventdata, handles)
+% hObject    handle to mf_magnet_mode_popup (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns mf_magnet_mode_popup contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from mf_magnet_mode_popup
+
+
+% --- Executes during object creation, after setting all properties.
+function mf_magnet_mode_popup_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to mf_magnet_mode_popup (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

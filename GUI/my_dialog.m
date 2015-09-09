@@ -57,7 +57,17 @@ function my_dialog_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 
 FileName=getappdata(0,'FileName');   %get the filename of wanted file containing commands
-set(handles.text2,'String', fileread(FileName)); %display contents
+
+btn=getappdata(0,'Button');
+setappdata(0,'Source',btn);
+switch btn
+    case 'Choose'
+        FileName=getappdata(0,'FileName');
+        txt_to_print=fileread(FileName);
+    case 'Execute'
+        txt_to_print=getappdata(0,'listbox_contents');
+end
+set(handles.text2,'String', txt_to_print); %display contents
 % Update handles structure
 guidata(hObject, handles);
 
@@ -83,6 +93,14 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 %send contents to ppms%
+source=getappdata(0,'Source')
+switch source
+    case 'Choose' %User wants to run a pre-written file
+        FileName=getappdata(0,'FileName');
+        type FileName;  %when time's come, remove the 'type' and just run the file
+    case 'Execute'  %user wants to execute the current sequence
+        txt_to_print=getappdata(0,'listbox_contents');
+end
 msgbox('Commands sent!','Attention','Warn');
 uiwait;  %wait for user to click ok in msgbox
 close; %close the window
