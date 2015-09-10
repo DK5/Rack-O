@@ -3,7 +3,7 @@ function [ obj1 ] = GPcon( address , NI_ind )
 %   Connect via GPIB a device with address
 
 % Find address a GPIB object.
-obj1 = instrfaddress('Type', 'gpib', 'Boardaddressex', NI_ind, 'PrimaryAddress', address, 'Tag', '');
+obj1 = instrfind('Type', 'gpib', 'Boardaddressex', NI_ind, 'PrimaryAddress', address, 'Tag', '');
 
 % Create the GPIB object if it does not exist
 % otherwise use the object that was found.

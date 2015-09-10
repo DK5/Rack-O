@@ -2,7 +2,7 @@ function closeCH (obj, R, C, S)
 % closeCH closes channel chosen by the user
 %   obj is the function object
 %   R is the row No. (1 to 6) - Current & Voltage Sources
-%   C is the column No. (1 to 16) - 
+%   C is the column No. (1 to 16) - Sample Terminals
 %   S is the slot No.
 
 % Default Slot No. %
