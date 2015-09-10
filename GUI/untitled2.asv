@@ -27,7 +27,7 @@ function varargout = untitled2(varargin)
 % Begin initialization code - DO NOT EDIT
 %clear all
 %close all   %CLEANUP
-clc
+%clc
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
