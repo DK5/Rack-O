@@ -32,10 +32,6 @@ ppms_timer.TimerFcn = ppmsActivity();
 start(k_timer);
 start(ppms_timer);
 
-%%  Stop timers
-stop(k_timer);
-stop(ppms_timer);
-
 %%  Generating raw data
 kData(isnan(kData(:,1)),:) = [];    % delete all NaN values where there is no time stamp
 klen = size(kData,1);             % get kData rows size
@@ -67,4 +63,10 @@ dataBlock = [];
 
 sortData(   ) = sortrows(rawData(:,1)); % sort by time (1st col) and get sorted rows indices
 
+%%  Stop timers
+stop(k_timer);
+stop(ppms_timer);
 
+%% Delete Timers
+delete k_timer;
+delete ppms_timer;
