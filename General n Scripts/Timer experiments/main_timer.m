@@ -1,7 +1,7 @@
 %%  Connecting GPIB devices
-volt1obj = GPcon(9);	% first voltmeter object
+volt1obj = GPcon(9,2);	% first voltmeter object
 volt2obj = GPcon();     % seconed voltmeter object
-csobj = GPcon(10);      % current source object
+csobj = GPcon(10,2);      % current source object
 lockin = GPcon(12);     % lock-in object
 
 %%  Innitialization of DATA

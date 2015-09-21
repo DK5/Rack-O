@@ -80,22 +80,22 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % set up 2182 for Delta Mode
-	fopen(obj2)
-	fprintf(obj2,':*RST')
-    fprintf(obj2,':SYST:PRES')
-	fprintf(obj2,':TRAC:CLE')
-    fprintf(obj2,':SENS:VOLT:DELT ON')
-    fprintf(obj2,':SENS:VOLT:NPLC 1')
-    fprintf(obj2,':TRIG:DEL 0.1')
-    fprintf(obj2,':TRIG:SOUR EXT')
-    fprintf(obj2,':TRAC:POIN 10')
-    fprintf(obj2,':TRAC:FEED:CONT NEXT')
-    fprintf(obj2,':STAT:MEAS:ENAB 512')
-    fprintf(obj2,':*SRE 1')
+ 	fopen(obj2)
+	fprintf(obj2,':*RST')                       % Reset
+    fprintf(obj2,':SYSTem:PRESet')              % Return to SYSTem:PRESet defaults    
+	fprintf(obj2,':TRACe:CLEar')                % Clear readings from buffer
+    fprintf(obj2,':SENSe:VOLTage:DELTa ON')     % Enable or disable Delta
+    fprintf(obj2,':SENSe:VOLTage:NPLCycles 1')  % Set integration rate in line cycles         
+    fprintf(obj2,':TRIGger:DELay 0.1')          % Set trigger delay
+    fprintf(obj2,':TRIGger:SOURce EXTernal')    % Select control source; IMMediate, TIMer, MANual, BUS, or EXTernal.
+    fprintf(obj2,':TRACe:POINts 1024')          % Specify size of buffer; 2 to 1024
+    fprintf(obj2,':TRACe:FEED:CONTrol NEver')   % Select buffer control mode (NEXT or NEVer)
+    fprintf(obj2,':STATus:MEASurement:ENABle 512')   % Program the enable register. 
+    fprintf(obj2,':*SRE 1')                     %     
 pause(3);
 % setup the 2400 to perform current reversal of +20uA & -20uA
-	fopen(obj1)
-	fprintf(obj1,':*RST')                       % reset
+ 	fopen(obj1)
+	fprintf(obj1,':*RST')                       % Reset
     fprintf(obj1,':SYSTem:AZERo:STATe OFF')     % Disable auto-zero
     fprintf(obj1,':TRIGger:SOURce TLINk')       % Specify control source as Trigger Link
     fprintf(obj1,':TRIGger:DIRection SOURce')   % Enable (SOURce) or disable (ACCeptor) bypass           
@@ -103,15 +103,17 @@ pause(3);
     fprintf(obj1,':TRIGger:DELay 0')            % Specify Trigger Delay
     fprintf(obj1,':TRIGger:COUNt 20')           % Specify trigger count (1 to 2500)
     fprintf(obj1,':SOURce:FUNCtion CURRent')    % Select SOURce Mode
-    fprintf(obj1,':SENSe:FUNCtion:CONCurrent OFF')    % Disable ability to measure more than one function simultaneously
+    fprintf(obj1,':SENSe:FUNCtion:CONCurrent OFF')          % Disable ability to measure more than one function simultaneously
     fprintf(obj1,':SENSe:FUNCtion "VOLT"')      % Specify functions to enable (VOLTage[:DC], CURRent[:DC], or RESistance)
-    fprintf(obj1,':SENS:VOLT:PROT:LEV 0.2')     % Specify voltage limit for I-Source 
-    fprintf(obj1,':SENS:VOLT:RANG 0.2')  
-    fprintf(obj1,':SENS:VOLT:NPLC 0.01')
-    fprintf(obj1,':SOUR:CURR:MODE LIST')
-    fprintf(obj1,':SOUR:LIST:CURR 20E-6,-20E-6') % current list
-    fprintf(obj1,':OUTP ON')
-    fprintf(obj1,':INIT')
+    fprintf(obj1,':SENSe:VOLTage:PROTection:LEVel 0.2')     % Specify voltage limit for I-Source 
+    fprintf(obj1,':SENSe:VOLTage:RANGe 0.2')    % Configure measurement range  
+    fprintf(obj1,':SENSe:VOLTage:NPLCycles 0.01')           % Specify integration rate (in line cycles):
+                                                            % 0.01 to 10.3
+    fprintf(obj1,':SOURce:CURRent:MODE LIST')   % Select I-Source mode (FIXed, SWEep, or LIST).
+    fprintf(obj1,':SOURce:LIST:CURRent 20E-6,-20E-6')       % Create list of I-Source values
+    fprintf(obj1,':OUTPut ON')                  % Turn source on
+    fprintf(obj1,':INITiate')                   % Initiate source-measure cycle(s).
+    
 
 		% Used the serail poll function to wait for SRQ from 2182
 		val = [1];          
@@ -158,3 +160,43 @@ fclose(obj2)
 delete(obj2)
 clear obj2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% Voltmeter
+%  	fopen(obj2)
+	fprintf(obj2,':*RST')                       % Reset
+    fprintf(obj2,':SYSTem:PRESet')              % Return to SYSTem:PRESet defaults    
+	fprintf(obj2,':TRACe:CLEar')                % Clear readings from buffer
+    fprintf(obj2,':SENSe:VOLTage:DELTa ON')     % Enable or disable Delta
+    fprintf(obj2,':SENSe:VOLTage:NPLCycles 1')  % Set integration rate in line cycles         
+    fprintf(obj2,':TRIGger:DELay 0.1')          % Set trigger delay
+    fprintf(obj2,':TRIGger:SOURce EXTernal')    % Select control source; IMMediate, TIMer, MANual, BUS, or EXTernal.
+    fprintf(obj2,':TRACe:POINts 1024')            % Specify size of buffer; 2 to 1024
+    fprintf(obj2,':TRACe:FEED:CONTrol NEver')    % Select buffer control mode (NEXT or NEVer)
+    fprintf(obj2,':STATus:MEASurement:ENABle 512')   % Program the enable register. 
+
+%% setup the 2400 to perform current reversal of +20uA & -20uA
+%  	fopen(obj1)
+	fprintf(obj1,':*RST')                       % Reset
+    fprintf(obj1,':SYSTem:AZERo:STATe OFF')     % Disable auto-zero
+    fprintf(obj1,':TRIGger:SOURce TLINk')       % Specify control source as Trigger Link
+    fprintf(obj1,':TRIGger:DIRection SOURce')   % Enable (SOURce) or disable (ACCeptor) bypass           
+    fprintf(obj1,':TRIGger:OUTPut SOURce')      % Output trigger after SOURce
+    fprintf(obj1,':TRIGger:DELay 0')            % Specify Trigger Delay
+    fprintf(obj1,':TRIGger:COUNt 20')           % Specify trigger count (1 to 2500)
+    fprintf(obj1,':SOURce:FUNCtion voltage')    % Select SOURce Mode
+    fprintf(obj1,':SENSe:FUNCtion:CONCurrent OFF')          % Disable ability to measure more than one function simultaneously
+    fprintf(obj1,':SENSe:FUNCtion "current"')      % Specify functions to enable (VOLTage[:DC], CURRent[:DC], or RESistance)
+    fprintf(obj1,':SENSe:VOLTage:PROTection:LEVel 0.2')     % Specify voltage limit for I-Source 
+    fprintf(obj1,':SENSe:current:RANGe 0.2')    % Configure measurement range  
+    fprintf(obj1,':SENSe:current:NPLCycles 0.01')           % Specify integration rate (in line cycles):
+                                                            % 0.01 to 10.3
+    fprintf(obj1,':SOURce:CURRent:MODE LIST')   % Select I-Source mode (FIXed, SWEep, or LIST).
+    fprintf(obj1,':SOURce:LIST:CURRent 20E-3,-20E-3')       % Create list of I-Source values
+    fprintf(obj1,':OUTPut ON')                  % Turn source on
+    fprintf(obj1,':INITiate')                   % Initiate source-measure cycle(s).
+    
+
+
+
+
