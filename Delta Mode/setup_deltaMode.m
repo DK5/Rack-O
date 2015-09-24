@@ -11,15 +11,15 @@ fprintf(volt_obj,':TRIGger:DELay 0');            % Set trigger delay
 fprintf(volt_obj,':TRIGger:SOURce EXTernal');    % Select control source; IMMediate, TIMer, MANual, BUS, or EXTernal.
 fprintf(volt_obj,':SYSTem:FAZero OFF');         % Disable Front Autozero (double speed of Delta)
 
-fprintf(volt_obj,':TRACe:POINts 100');             % Specify size of buffer; 2 (because delta takes at least 2 values) to 1024
-fprintf(volt_obj, ':trac:feed sens');           % Store raw input readings
-fprintf(volt_obj, ':trac:feed:cont next');      % Start storing readings
+fprintf(volt_obj,':TRACe:POINts 1024');             % Specify size of buffer; 2 (because delta takes at least 2 values) to 1024
+fprintf(volt_obj,':trace:feed sens');           % Store raw input readings
+fprintf(volt_obj,':trace:feed:cont next');      % Start storing readings
 
 %% setup the 2400 to perform current reversal of +current & -current
 fprintf(cs_obj,':SYSTem:AZERo:STATe OFF');     % Disable auto-zero
 fprintf(cs_obj,':TRIGger:SOURce IMMediate');   % Specify control source as immediate
 fprintf(cs_obj,':TRIGger:OUTPut SOURce');      % Output trigger after SOURce
-fprintf(cs_obj,':TRIGger:DELay 0.02');         % Specify Trigger Delay
+fprintf(cs_obj,':TRIGger:DELay 0.03');         % Specify Trigger Delay
 fprintf(cs_obj,[':TRIGger:COUNt ',num2str(samples*2)]);  % Specify trigger count (1 to 2500);
 
 fprintf(cs_obj,':SENSe:FUNCtion:CONCurrent OFF');% Disable ability to measure more than one function simultaneously

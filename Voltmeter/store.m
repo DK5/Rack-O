@@ -3,10 +3,10 @@ function [ ] = store( obj1 )
 %buffer
 %   obj1 is the voltmeter object
 
-fprintf(obj1, ':trac:cle');             % Clear buffer
-fprintf(obj1, ':trac:poin 1024');       % 
-fprintf(obj1, ':trac:feed sens');       % Store raw input readings
-fprintf(obj1, ':trac:feed:cont next');  % Start storing readings
+fprintf(obj1, ':trace:clear');             % Clear buffer
+fprintf(obj1, ':trace:points 1024');       % 
+fprintf(obj1, ':trace:feed sense');       % Store raw input readings
+fprintf(obj1, ':trace:feed:control next');  % Start storing readings
 
 end
 

@@ -31,9 +31,7 @@ end
 
 % Message %
 if state
-    disp('Channel ',channelStr,'is closed.');
+    disp(['Channel ',channelStr,'is closed.']);
 else
-    disp('Channel ',channelStr,'is opened.');
+    disp(['Channel ',channelStr,'is opened.']);
 end
-
-

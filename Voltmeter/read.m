@@ -4,9 +4,9 @@ function [ vals ] = read( obj1 )
 %   obj1 is the voltmeter object
 %   vals is the returned array
 
-fprintf(obj1, ':trac:feed:cont nev');   % Stop storing readings
-data = query(obj1, ':trac:data?');      % Request all stored readings
-vals = str2double(strsplit(data,','));  % Export readings to array
+fprintf(obj1, ':trace:feed:control never');   % Stop storing readings
+data = query(obj1, ':trace:data?');      % Request all stored readings
 store(obj1);                            % Clear and continue
+vals = str2double(strsplit(data,','));  % Export readings to array
 
 end
