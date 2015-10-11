@@ -1,9 +1,8 @@
 function wait4read( volt_obj )
-%UNTITLED4 Summary of this function goes here
-%   Detailed explanation goes here
+%wait4read( volt_obj ) pauses until voltmeter operation is complited
+%   volt_obj = voltmeter object
 
-opc = 0; % operation completed
+opc = 0;    % operation not completed
 while opc~=1
     opc = str2double(query(volt_obj,'*OPC?'));
 end
-
