@@ -1,4 +1,4 @@
-function sourceFunc( cs_obj , func)
+function measureFunc( cs_obj , func)
 % sourceFunc specifies source function - Voltage or Current
 %   func - 'c' = Current ; 'v' = Voltage
 
@@ -9,6 +9,6 @@ switch func
         str = '"VOLT"';
 end
 
-fprintf(cs_obj,[':SOURce:FUNCtion ',str]);	% Select SOURce Mode
+fprintf(cs_obj,[':sense:FUNCtion ',str]);	% Select SOURce Mode
 
 end
