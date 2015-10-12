@@ -13,7 +13,7 @@ function [ field_status ] = FieldQ( PPMSObj )
 CMD='FIELD?';
 data=str2num(query(PPMSObj, CMD));       %ask ppms for data
 field_status{1} = data(1);               %set field
-field_status{2} = data(2)                %set rate
+field_status{2} = data(2);               %set rate
 switch data(3)                           % approach coding
     case 0
         field_status{3} = 'Linear';

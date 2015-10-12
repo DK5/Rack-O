@@ -70,6 +70,7 @@ mainTimer.TimerFcn = {@timer_function,hObject,PPMSObj,handles};
 mainTimer.StartDelay = 1.5;
 start(mainTimer);
 % Update handles structure
+set(untitled2,'CloseRequestFcn',@my_closereq)
 guidata(hObject, handles);
 
 % UIWAIT makes untitled2 wait for user response (see UIRESUME)
@@ -873,3 +874,15 @@ set(handles.chamber_mode_status,'String', output.ChamberQ);
 %set(handles.helium_level_status,'String', num2str(output.Helium));
 guidata(hObject, handles);  %update data
 %se tu
+function my_closereq(src,callbackdata)
+% Close request function 
+% to display a question dialog box 
+   selection = questdlg('Close This Figure?',...
+      'Close Request Function',...
+      'Yes','No','Yes'); 
+   switch selection, 
+      case 'Yes',
+         delete(gcf)
+      case 'No'
+      return 
+   end

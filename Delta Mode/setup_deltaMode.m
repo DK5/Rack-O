@@ -8,6 +8,8 @@ function setup_deltaMode( cs_obj , volt_obj , samples , current, compliance)
 %   compliance = voltage protection level (max voltage)
 
 %% set 2182 voltmeter for delta mode
+terminal(cs_obj, 'rear');                       % set terminal to rear panel
+fprintf(cs_obj,':OUTPut OFF');                  % Turn source on
 fprintf(volt_obj,':TRACe:CLEar');               % Clear readings from buffer
 fprintf(volt_obj,':SENSe:VOLTage:DELTa ON');    % Enable or disable Delta
 fprintf(volt_obj,':SENSe:VOLTage:NPLCycles 1'); % Set integration rate in line cycles to minimun (0.01 to 50);
@@ -21,10 +23,17 @@ fprintf(volt_obj,':trace:feed sens');           % Store raw input readings
 fprintf(volt_obj,':trace:feed:cont next');      % Start storing readings
 
 %% setup the 2400 to perform current reversal of +current & -current
+
+current = current*10^-6;
+
 fprintf(cs_obj,':SYSTem:AZERo:STATe OFF');      % Disable auto-zero
+%{
 fprintf(cs_obj,':TRIGger:SOURce IMMediate');	% Specify control source as immediate
-fprintf(cs_obj,':TRIGger:OUTPut SOURce');       % Output trigger after SOURce
 fprintf(cs_obj,':TRIGger:DELay 0.03');          % Specify Trigger Delay
+%}
+fprintf(cs_obj,':TRIGger:SOURce tlink');     % Specify control source as external
+
+fprintf(cs_obj,':TRIGger:OUTPut SOURce');       % Output trigger after SOURce
 fprintf(cs_obj,[':TRIGger:COUNt ',num2str(samples*2)]);  % Specify trigger count (1 to 2500);
 
 fprintf(cs_obj,':SENSe:FUNCtion:CONCurrent OFF');   % Disable ability to measure more than one function simultaneously
@@ -34,8 +43,8 @@ fprintf(cs_obj,[':SENSe:VOLTage:RANGe ',num2str(compliance*2)]);    % Configure 
 
 fprintf(cs_obj,':SOURce:FUNCtion CURRent');    % Select SOURce Mode
 fprintf(cs_obj,':SOURce:CURRent:MODE LIST');   % Select I-Source mode (FIXed, SWEep, or LIST);
-
 currStr = num2str(current);
 fprintf(cs_obj,[':SOURce:LIST:CURRent ',currStr,',-',currStr]); % Create list of I-Source values
+fprintf(cs_obj,':FORM:ELEM CURR');     % Current reading only.
 
 end
