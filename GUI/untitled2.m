@@ -72,6 +72,7 @@ mainTimer.StartDelay = 1.5;
 %set closing request function
 %set(untitled2,'CloseRequestFcn',@my_closereq);
 % Update handles structure
+set(untitled2,'CloseRequestFcn',@my_closereq)
 guidata(hObject, handles);
 
 % UIWAIT makes untitled2 wait for user response (see UIRESUME)
@@ -874,6 +875,7 @@ set(handles.chamber_mode_status,'String', output.ChamberQ);
 %Helium
 %set(handles.helium_level_status,'String', num2str(output.Helium));
 guidata(hObject, handles);  %update data
+<<<<<<< HEAD
 %se tu (though not really)
 % --- Executes when user attempts to close figure1.
 function untitled2_CloseRequestFcn(hObject, eventdata, handles)
@@ -883,12 +885,26 @@ function untitled2_CloseRequestFcn(hObject, eventdata, handles)
 
 % Hint: delete(hObject) closes the figure
 selection = questdlg('Close This Figure?',...
+=======
+%se tu
+function my_closereq(src,callbackdata)
+% Close request function 
+% to display a question dialog box 
+   selection = questdlg('Close This Figure?',...
+>>>>>>> origin/PPMS
       'Close Request Function',...
       'Yes','No','Yes'); 
    switch selection, 
       case 'Yes',
+<<<<<<< HEAD
 %         fclose(PPMSObj);
          delete(gcf)
       case 'No'
       return 
    end
+=======
+         delete(gcf)
+      case 'No'
+      return 
+   end
+>>>>>>> origin/PPMS
