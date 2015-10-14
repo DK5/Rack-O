@@ -59,16 +59,18 @@ function untitled2_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 
 %CONNECT TO PPMS
-PPMSObj= GPcon(15,0);
+%PPMSObj= GPcon(15,0);
 % setappdata(0,'PPMS','PPMSObj');
 %timer
 mainTimer=timer;
 mainTimer.Name = 'Main GUI Timer';
 mainTimer.ExecutionMode = 'fixedRate';
 mainTimer.Period = 0.5;
-mainTimer.TimerFcn = {@timer_function,hObject,PPMSObj,handles};
+%mainTimer.TimerFcn = {@timer_function,hObject,PPMSObj,handles};
 mainTimer.StartDelay = 1.5;
-start(mainTimer);
+%start(mainTimer);
+%set closing request function
+%set(untitled2,'CloseRequestFcn',@my_closereq);
 % Update handles structure
 guidata(hObject, handles);
 
@@ -872,4 +874,21 @@ set(handles.chamber_mode_status,'String', output.ChamberQ);
 %Helium
 %set(handles.helium_level_status,'String', num2str(output.Helium));
 guidata(hObject, handles);  %update data
-%se tu
+%se tu (though not really)
+% --- Executes when user attempts to close figure1.
+function untitled2_CloseRequestFcn(hObject, eventdata, handles)
+% hObject    handle to figure1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: delete(hObject) closes the figure
+selection = questdlg('Close This Figure?',...
+      'Close Request Function',...
+      'Yes','No','Yes'); 
+   switch selection, 
+      case 'Yes',
+%         fclose(PPMSObj);
+         delete(gcf)
+      case 'No'
+      return 
+   end
