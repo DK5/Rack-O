@@ -22,7 +22,7 @@ function varargout = ChannelMatrix(varargin)
 
 % Edit the above text to modify the response to help ChannelMatrix
 
-% Last Modified by GUIDE v2.5 14-Oct-2015 14:42:27
+% Last Modified by GUIDE v2.5 14-Oct-2015 17:06:14
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -55,9 +55,10 @@ clc
 % Choose default command line output for ChannelMatrix
 handles.output = hObject;
 %CONNECT TO SWITCHER
-%matrixes=zeros(12,6,26);
-
-%setappdata(0,'Matrixes',matrixes);
+matrixes=cell(12,6,26);
+setappdata(0,'matrixes',matrixes);
+set(handles.listbox1,'Value',1);
+setappdata(0,'index_selected',1); %force Alpha for deafult selection
 % Update handles structure
 guidata(hObject, handles);
 
@@ -84,18 +85,18 @@ function uitable1_CellSelectionCallback(hObject, eventdata, handles)
 %	Indices: row and column indices of the cell(s) currently selecteds
 % handles    structure with handles and user data (see GUIDATA)
 % --- Executes when selected cell(s) is changed in uitable1.
-
-currow = eventdata.Indices(1);
-curcol = eventdata.Indices(2);
-adata=get(handles.uitable1,'Data');
-if adata{currow,curcol} == 'V'
-    adata{currow,curcol} = '';
-else 
-    adata{currow,curcol} = 'V';
-end
+try 
+    currow = eventdata.Indices(1);
+    curcol = eventdata.Indices(2);
+    adata=get(handles.uitable1,'Data');
+    if adata{currow,curcol} == 'V'
+      adata{currow,curcol} = '';
+    else 
+       adata{currow,curcol} = 'V';
+    end
     
-set(hObject,'Data',adata);
-
+    set(hObject,'Data',adata);
+end
 
 % --- Executes on button press in cls_ch.
 function cls_ch_Callback(hObject, eventdata, handles)
@@ -107,8 +108,8 @@ matrixes = getappdata(0,'matrixes'); %get current selection of measurments
 table = get(handles.uitable1,'data'); %get the selected channels for this measure
 for i=3:14
     for j=1:6
-        if table(i,j)=='V'
-            matrixes(i,j,index_selected)='V'; %preform scan and check - add to matrixes selcted values
+        if table{i-2,j}=='V'
+            matrixes{i-2,j,index_selected}='V'; %preform scan and check - add to matrixes selcted values
         end
     end
 end
@@ -123,13 +124,32 @@ function opn_ch_Callback(hObject, eventdata, handles)
 % hObject    handle to opn_ch (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+index_selected = getappdata(0,'index_selected');  %get the number of selected item in listbox
+matrixes = getappdata(0,'matrixes'); %get current selection of measurments
+table = get(handles.uitable1,'data'); %get the selected channels for this measure
+for i=3:14
+    for j=1:6
+        if table{i-2,j}=='V'
+            matrixes{i-2,j,index_selected}=''; %preform scan and check - add to matrixes selcted values
+        end
+    end
+end
+%save changes
+set(handles.uitable3,'Data',matrixes(:,:,index_selected)); 
+setappdata(0,'matrixes',matrixes);
+guidata(hObject, handles);
 
 % --- Executes on button press in opn_all.
 function opn_all_Callback(hObject, eventdata, handles)
 % hObject    handle to opn_all (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+matrixes=cell(12,6,26);
+setappdata(0,'matrixes',matrixes); %sets up a new matrix 
+set(handles.uitable1,'Data',cell(12,6)); 
+set(handles.uitable3,'Data',cell(12,6)); 
+set(handles.listbox1,'Value',1);
+guidata(hObject, handles);
 
 
 % --- Executes on button press in clr_selection_btn.
@@ -137,7 +157,7 @@ function clr_selection_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to clr_selection_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+set(handles.uitable1,'Data',cell(12,6));
 
 % --- Executes on selection change in listbox1.
 function listbox1_Callback(hObject, eventdata, handles)
@@ -147,9 +167,12 @@ function listbox1_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns listbox1 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from listbox1
-
+matrixes=getappdata(0,'matrixes');
 index_selected=get(hObject,'Value');
 setappdata(0,'index_selected',index_selected);
+set(handles.uitable3,'Data',matrixes(:,:,index_selected)); 
+set(handles.uitable1,'Data',cell(12,6)); 
+guidata(hObject, handles);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -163,4 +186,3 @@ function listbox1_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
