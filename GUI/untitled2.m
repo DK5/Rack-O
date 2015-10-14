@@ -22,12 +22,12 @@ function varargout = untitled2(varargin)
 
 % Edit the above text to modify the response to help untitled2
 
-% Last Modified by GUIDE v2.5 11-Oct-2015 15:47:06
+% Last Modified by GUIDE v2.5 12-Oct-2015 16:51:43
 
 % Begin initialization code - DO NOT EDIT
 %clear all
 %close all   %CLEANUP
-clc
+%clc
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
@@ -58,21 +58,7 @@ function untitled2_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for untitled2
 handles.output = hObject;
 
-%CONNECT TO PPMS
-%PPMSObj= GPcon(15,0);
-% setappdata(0,'PPMS','PPMSObj');
-%timer
-mainTimer=timer;
-mainTimer.Name = 'Main GUI Timer';
-mainTimer.ExecutionMode = 'fixedRate';
-mainTimer.Period = 0.5;
-%mainTimer.TimerFcn = {@timer_function,hObject,PPMSObj,handles};
-mainTimer.StartDelay = 1.5;
-%start(mainTimer);
-%set closing request function
-%set(untitled2,'CloseRequestFcn',@my_closereq);
 % Update handles structure
-set(untitled2,'CloseRequestFcn',@my_closereq)
 guidata(hObject, handles);
 
 % UIWAIT makes untitled2 wait for user response (see UIRESUME)
@@ -112,7 +98,7 @@ method=method{get(handles.set_mf_popup,'Value')};
 current_field = str2num(get(handles.H_text_status, 'String'));
 Stop_Field = str2num(get(handles.txt_Stop_field, 'String'));
 rate = str2num(get(handles.mf_rate_edit, 'String'));
-if(rate<9.9)
+if(rate<=10.0)
     errordlg('Rate must be bigger than 10!','Error 0x001')
     set(handles.mf_rate_edit,'String',10);
     return
@@ -121,7 +107,6 @@ elseif(rate>187)
     set(handles.mf_rate_edit,'String',187);
     return
 end
-rate=num2str(rate);
 add_item_to_list_box(handles.listbox1, ['Set field ',Destination_field, ' [Oe]' ,', while using:', method, ', at rate of ',rate,' [Oe/sec]'], index_selected);
 
 
@@ -707,11 +692,6 @@ function chamber_mode_popup_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns chamber_mode_popup contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from chamber_mode_popup
 
-%WHEN TIME'S COME: ADD THESE LINES:
-
-%action=contents{get(hObject,'Value')}; %id of selceted action
-% CHAMBER(PPMSObj,action-1);
-
 
 % --- Executes during object creation, after setting all properties.
 function chamber_mode_popup_CreateFcn(hObject, eventdata, handles)
@@ -770,6 +750,16 @@ function target_temp_edit_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+
+function temp_rate_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to temp_rate_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of temp_rate_edit as text
+%        str2double(get(hObject,'String')) returns contents of temp_rate_edit as a double
 
 % --- Executes during object creation, after setting all properties.
 function temp_rate_edit_CreateFcn(hObject, eventdata, handles)
@@ -836,75 +826,4 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-function [output] = timer_function(~,~,hObject,PPMSObj,handles)
-%Function that contains all Live Data functions for pulling information
-%about the ppms.
-% Function will return a structure with 6 fields:
-% output.Pressure - will contain the current pressure in the chamber
-% output.TempQ - will contain QUERY INFORMATION (set, rate and approach) regarding the temprature
-% output.Temp - will contain current temprature via ReadPPMSData
-% output.FieldQ - will contain QUERY INFORMATION (set, rate, approach and MagnetMode) regarding the magnetic field
-% output.Field - will contain current magnetic field via ReadPPMSData
-% output.ChamberQ - will contain QUERY information about current chamber valving status
 
-%Queries
-output.TempQ=TempQ(PPMSObj);
-output.FieldQ=FieldQ(PPMSObj);
-output.ChamberQ=ChamberQ(PPMSObj);
-%Data
-output.Pressure=ReadPPMSdata(PPMSObj,19);
-output.Temp=ReadPPMSdata(PPMSObj,1);
-output.Field=ReadPPMSdata(PPMSObj,2);
-%output.Helium=also get helium level
-%Done readind data, now printing
-%Magnetic field
-set(handles.mf_target_status,'String', num2str(output.FieldQ{1}));
-set(handles.mf_rate_status,'String', num2str(output.FieldQ{2}));
-set(handles.mf_approach_status,'String', output.FieldQ{3});
-set(handles.mf_magnet_mode_status,'String', output.FieldQ{4});
-set(handles.H_text_status,'String', num2str(output.Field));
-%Temp
-set(handles.temp_text_status,'String', num2str(output.Temp));
-set(handles.temp_target_status,'String', num2str(output.TempQ{1}));
-set(handles.temp_rate_status,'String', num2str(output.TempQ{2}));
-set(handles.temp_approach_status,'String', output.TempQ{1});
-%Pressure
-set(handles.pressure_text_status,'String', num2str(output.Pressure));
-%Chamber Status
-set(handles.chamber_mode_status,'String', output.ChamberQ);
-%Helium
-%set(handles.helium_level_status,'String', num2str(output.Helium));
-guidata(hObject, handles);  %update data
-<<<<<<< HEAD
-%se tu (though not really)
-% --- Executes when user attempts to close figure1.
-function untitled2_CloseRequestFcn(hObject, eventdata, handles)
-% hObject    handle to figure1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: delete(hObject) closes the figure
-selection = questdlg('Close This Figure?',...
-=======
-%se tu
-function my_closereq(src,callbackdata)
-% Close request function 
-% to display a question dialog box 
-   selection = questdlg('Close This Figure?',...
->>>>>>> origin/PPMS
-      'Close Request Function',...
-      'Yes','No','Yes'); 
-   switch selection, 
-      case 'Yes',
-<<<<<<< HEAD
-%         fclose(PPMSObj);
-         delete(gcf)
-      case 'No'
-      return 
-   end
-=======
-         delete(gcf)
-      case 'No'
-      return 
-   end
->>>>>>> origin/PPMS
