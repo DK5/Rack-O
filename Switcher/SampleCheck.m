@@ -9,16 +9,20 @@ CheckMatrix=zeros(12);
 
 for i=3:14
     for j=(i+1):14
-        switchCurrent (switch_obj, i, j, 1) % Switches between legs i and j <------------- This closes the channels! after measurement it needs to open up!!!
-%         sourceFunc( cs_obj , 'c')         % ??? Should apply current
-%         [ vals ] = readSM( cs_obj );      % Reads the current
-        if vals>0.95*current;               % Checks if current flows
+        switchCurrent (switch_obj,'on', i, j)% Switches between legs i and j
+        current( cs_obj,'on',0.01 );         % Apply current
+        
+        if complianceQ(cs_obj)==0;           % Checks not in compliance
             CheckMatrix(i-2,j-2)=0.5;
             CheckMatrix(j-2,i-2)=0.5;
-        else                                % Error of current doesn't flow
+        else                                 % Error of current doesn't flow
             CheckMatrix(i-2,j-2)=1;
             CheckMatrix(j-2,i-2)=1;
         end
-        image(64*CheckMatrix);              % Shows was is the situation at the moment
+        
+        current( cs_obj,'off',0.01 );        % Stops current
+        switchCurrent (switch_obj,'off', i, j)
+        
+        image(64*CheckMatrix);               % Shows was is the situation at the moment
     end
 end
