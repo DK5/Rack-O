@@ -1,9 +1,16 @@
-function [ inCompliance ] = complianceQ( sm_obj )
+function [ inCompliance ] = complianceQ( sm_obj, func )
 %complianceQ( sm_obj ) checks if the sourceMeter is in compliance
 %   sm_obj = source meter object
 %   returns 1 if in compliance; else 0
 
-inCompliance = query(sm_obj,':calculate2:limit:fail?');
+switch lower(func)
+    case 'c'
+        str = 'CURR';
+    case 'v'
+        str = 'VOLT';
+end
+
+inCompliance = str2double(query(sm_obj,[':sense:',str,':protection:tripped?']));
 
 end
 

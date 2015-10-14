@@ -4,9 +4,9 @@ function sourceFunc( cs_obj , func)
 
 switch lower(func)
     case 'c'
-        str = '"CURR"';
+        str = 'CURR';
     case 'v'
-        str = '"VOLT"';
+        str = 'VOLT';
 end
 
 fprintf(cs_obj,[':SOURce:FUNCtion ',str]);	% Select SOURce Mode
