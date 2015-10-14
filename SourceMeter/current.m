@@ -1,4 +1,4 @@
-function current( cs_obj , uamps, state )
+function current( cs_obj , state , uamps )
 %current( cs_obj , uamps ) supplies current from source meter
 %   cs_obj = current source object
 %   uamps = current level in uAmpere

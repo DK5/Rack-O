@@ -6,11 +6,11 @@ function compliance( sm_obj , func , limit)
 
 switch lower(func)
     case 'c'
-        str = 'CURR';
+        str = '"CURR"';
     case 'v'
-        str = 'VOLT';
+        str = '"VOLT"';
 end
 
-fprintf(sm_obj,[':SENSe:',str,':PROTection:LEVel ',num2str(limit)]);     % Specify voltage limit for I-Source 
+fprintf(sm_obj,[':SENSe:VOLTage:PROTection:LEVel ',num2str(limit)]);     % Specify voltage limit for I-Source 
 
 end

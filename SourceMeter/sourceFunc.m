@@ -2,7 +2,7 @@ function sourceFunc( cs_obj , func)
 % sourceFunc specifies source function - Voltage or Current
 %   func - 'c' = Current ; 'v' = Voltage
 
-switch func
+switch lower(func)
     case 'c'
         str = '"CURR"';
     case 'v'
