@@ -22,7 +22,7 @@ function varargout = untitled2(varargin)
 
 % Edit the above text to modify the response to help untitled2
 
-% Last Modified by GUIDE v2.5 09-Sep-2015 14:07:24
+% Last Modified by GUIDE v2.5 15-Oct-2015 15:12:54
 
 % Begin initialization code - DO NOT EDIT
 %clear all
@@ -58,9 +58,25 @@ function untitled2_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for untitled2
 handles.output = hObject;
 
-%CONNECT TO PPMS
-PPMSObj= GPcon(15,0);
-% setappdata(0,'PPMS','PPMSObj');
+%CONNECT TO devices
+try 
+    PPMSObj= GPcon(15,0);
+    setappdata(0,'PPMS',PPMSObj);
+catch
+    errordlg('Failed to initialize connection to PPMS!','Error 0x007');
+end
+try
+    switcher_obj = GPcon(16,0);
+    setappdata(0,'switcher_obj',swithcer_obj);
+catch
+     errordlg('Failed to initialize connection to switcher!','Error 0x009');
+end
+try
+    sc_obj=GPcon(10,0);
+    setappdata(0,'sc_obj',sc_obj);
+catch
+    errordlg('Failed to initialize connection to SourceMeter!','Error 0x010');
+end
 %timer
 mainTimer=timer;
 mainTimer.Name = 'Main GUI Timer';
@@ -873,3 +889,51 @@ set(handles.chamber_mode_status,'String', output.ChamberQ);
 %set(handles.helium_level_status,'String', num2str(output.Helium));
 guidata(hObject, handles);  %update data
 %se tu
+
+
+% --- Executes when user attempts to close figure1.
+function figure1_CloseRequestFcn(hObject, eventdata, handles)
+% hObject    handle to figure1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: delete(hObject) closes the figure
+selection = questdlg('Are you sure you want to quit?',...
+      'Close Request Function',...
+      'Yes','No','Yes'); 
+   switch selection, 
+      case 'Yes',
+          try
+             fclose(PPMSObj);
+          catch
+             errordlg('Failed to terminate connection to PPMS!','Error 0x008'); 
+          end
+          try
+             fclose(switcher_obj);
+          catch
+             errordlg('Failed to terminate connection to Switcher!','Error 0x011'); 
+          end
+          try
+             fclose(sc_obj);
+          catch
+             errordlg('Failed to terminate connection to ScourceMeter!','Error 0x012'); 
+          end
+          delete(hObject);
+      case 'No'
+      return 
+   end
+
+
+% --- Executes on button press in channel_matrix_btn.
+function channel_matrix_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to channel_matrix_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+ChannelMatrix(getappdata(0,'switcher_obj'));
+
+% --- Executes on button press in sample_chk_btn.
+function sample_chk_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to sample_chk_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+CheckMatrix(getappdata(0,'switcher_obj'),getappdata(0,'sc_obj')); %should be changed to samplecheck
