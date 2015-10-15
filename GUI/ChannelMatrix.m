@@ -85,7 +85,7 @@ function uitable1_CellSelectionCallback(hObject, eventdata, handles)
 %	Indices: row and column indices of the cell(s) currently selecteds
 % handles    structure with handles and user data (see GUIDATA)
 % --- Executes when selected cell(s) is changed in uitable1.
-try 
+if numel(eventdata.Indices~=0) 
     currow = eventdata.Indices(1);
     curcol = eventdata.Indices(2);
     adata=get(handles.uitable1,'Data');
