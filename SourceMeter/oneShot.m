@@ -4,12 +4,12 @@ function [ data ] = oneShot( cs_obj , func )
 %   func is the source function: 'c' - current ; 'v' - voltage
 switch lower(func)
     case 'c'
-        str = 'CURR?';
+        str = 'CURR';
     case 'v'
-        str = 'VOLT?';
+        str = 'VOLT';
+    case 'r'
+        str = 'resistance';
 end
-
-data = query(cs_obj,['measure:',str]);
-
+fprintf(cs_obj,[':form:elem ',str]);    % return only resistance
+data = str2double(query(cs_obj,['measure:',str,'?']));
 end
-

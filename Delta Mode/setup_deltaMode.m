@@ -38,7 +38,7 @@ fprintf(cs_obj,[':TRIGger:COUNt ',num2str(samples*2)]);  % Specify trigger count
 
 fprintf(cs_obj,':SENSe:FUNCtion:CONCurrent OFF');   % Disable ability to measure more than one function simultaneously
 fprintf(cs_obj,':SENSe:FUNCtion "current"');   % Specify functions to enable (VOLTage[:DC], CURRent[:DC], or RESistance);
-fprintf(cs_obj,':SENSe:VOLTage:PROTection:LEVel 0.2');  % Specify voltage limit for I-Source 
+fprintf(cs_obj,[':SENSe:VOLTage:PROTection:LEVel ',num2str(compliance)]);  % Specify voltage limit for I-Source 
 fprintf(cs_obj,[':SENSe:VOLTage:RANGe ',num2str(compliance*2)]);    % Configure measurement range  
 
 fprintf(cs_obj,':SOURce:FUNCtion CURRent');    % Select SOURce Mode

@@ -9,10 +9,10 @@ switch lower(func)
          fstr = 'c';
 end
 
-data = oneShot(cs_obj, fstr);
-targetVal = target(cs_obj, fstr);
+data = str2num(oneShot(cs_obj, fstr));
+targetVal = str2num(target(cs_obj, fstr));
     
-if data < 0.95*targetVal
+if data(2) < 0.95*targetVal
         inComp = 1;
     else
         inComp =0;
