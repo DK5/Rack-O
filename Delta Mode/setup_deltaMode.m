@@ -8,8 +8,6 @@ function setup_deltaMode( cs_obj , volt_obj , samples , current, compliance)
 %   compliance = voltage protection level (max voltage)
 
 %% set 2182 voltmeter for delta mode
-terminal(cs_obj, 'rear');                       % set terminal to rear panel
-fprintf(cs_obj,':OUTPut OFF');                  % Turn source on
 fprintf(volt_obj,':TRACe:CLEar');               % Clear readings from buffer
 fprintf(volt_obj,':SENSe:VOLTage:DELTa ON');    % Enable or disable Delta
 fprintf(volt_obj,':SENSe:VOLTage:NPLCycles 1'); % Set integration rate in line cycles to minimun (0.01 to 50);
@@ -26,6 +24,8 @@ fprintf(volt_obj,':trace:feed:cont next');      % Start storing readings
 
 current = current*10^-6;
 
+terminal(cs_obj, 'rear');                       % set terminal to rear panel
+fprintf(cs_obj,':OUTPut OFF');                  % Turn source on
 fprintf(cs_obj,':SYSTem:AZERo:STATe OFF');      % Disable auto-zero
 %{
 fprintf(cs_obj,':TRIGger:SOURce IMMediate');	% Specify control source as immediate

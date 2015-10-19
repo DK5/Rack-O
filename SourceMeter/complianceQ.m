@@ -10,7 +10,10 @@ switch lower(func)
         str = 'VOLT';
 end
 
-inCompliance = str2double(query(sm_obj,[':sense:',str,':protection:tripped?']));
-
+for i=1:10
+    inCompliance = str2double(query(sm_obj,[':sense:',str,':protection:tripped?']));
+    if inCompliance
+        break
+    end
 end
 

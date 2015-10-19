@@ -23,6 +23,6 @@ for i = 3:14
         current( cs_obj,'off',0.01 );        % Stops current
         switchCurrent (switch_obj,'off', i, j)
         image(3:14,3:14,64*CheckMatrix);               % Shows was is the situation at the moment
-        drawnow
+%         drawnow;
     end
 end
