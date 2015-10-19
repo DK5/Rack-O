@@ -6,5 +6,5 @@ res = oneShot(cs_obj,'r');
 if res < 1e6
         isShort = 1;
     else
-        isShort =0;
+        isShort = 0;
 end
