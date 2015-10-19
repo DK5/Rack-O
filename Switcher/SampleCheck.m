@@ -1,28 +1,47 @@
-function [ CheckMatrix ] = SampleCheck(switch_obj,cs_obj,Vcomp)
+function SampleCheck(switch_obj,cs_obj)
 % This function goes over all the permutation of the sample connections and
 % checks for cuts.
-% Blue  or 0   = Not checked (yet or at all)
-% Green or 0.5 = Checked and works well (short)
-% Red   or 1   = Checked and broken (cut)
-terminal( cs_obj, 'rear' )
-openAllCH(switch_obj);
-CheckMatrix = zeros(12);
-compliance( cs_obj , 'v' , Vcomp );
 
-for i = 3:14
-    for j = (i+1):14
-        switchCurrent (switch_obj,'on', i, j);% Switches between legs i and j
-        current( cs_obj,'on',0.01 );         % Apply current
-        if cutShort(cs_obj);                 % Checks not in compliance
-            CheckMatrix(i-2,j-2) = 0.5;
-            CheckMatrix(j-2,i-2) = 0.5;
-        else                                 % Error of current doesn't flow
-            CheckMatrix(i-2,j-2) = 1;
-            CheckMatrix(j-2,i-2) = 1;
+% Axis Properties
+limits = 2:14;
+label = num2str((limits)','%02d');
+fontSize = 14;
+
+set(gca,'XAxisLocation','top');
+set(gca,'YDir','reverse');
+set(gca,'XTick',(limits)');
+set(gca,'YTick',(limits)');
+set(gca,'XTickLabel',label);
+set(gca,'YTickLabel',label);
+set(gca,'FontSize',fontSize);
+axis([min(limits) max(limits) min(limits) max(limits)] + 0.5);
+axis square;
+
+% Channel Checking
+for i = limits
+    for j = (i+1):max(limits)
+        % Apply Current
+        switchCurrent (switch_obj,'on', i, j);  % Switches between legs i and j
+        current(cs_obj,'on',0.01);              % Apply current
+        
+        % Square Coordinates
+        x1 = [i i+1 i+1 i] + 0.5;
+        y1 = [j j j+1 j+1] + 0.5;
+        x2 = y1;
+        y2 = x1;
+        
+        % Compliance
+        if cutShort(cs_obj)                     % Short
+            patch(x1,y1,'green');
+            patch(x2,y2,'green');
+        else                                    % Cut
+            patch(x1,y1,'red');
+            patch(x2,y2,'red');
         end
-        current( cs_obj,'off',0.01 );        % Stops current
-        switchCurrent (switch_obj,'off', i, j)
-        image(3:14,3:14,64*CheckMatrix);               % Shows was is the situation at the moment
-%         drawnow;
+        
+        % Turn off current
+        current( cs_obj,'off',0.01 );       
+        switchCurrent (switch_obj,'off', i, j);
+        
     end
 end
