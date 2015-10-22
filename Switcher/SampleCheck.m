@@ -3,7 +3,7 @@ function SampleCheck(switch_obj,cs_obj)
 % checks for cuts.
 
 % Axis Properties
-limits = 2:14;
+limits = 3:15;
 label = num2str((limits)','%02d');
 fontSize = 14;
 
@@ -18,8 +18,8 @@ axis([min(limits) max(limits) min(limits) max(limits)] + 0.5);
 axis square;
 
 % Channel Checking
-for i = limits
-    for j = (i+1):max(limits)
+for i = limits(1:end-1)
+    for j = (i+1):max(limits-1)
         % Apply Current
         switchCurrent (switch_obj,'on', i, j);  % Switches between legs i and j
         current(cs_obj,'on',0.01);              % Apply current

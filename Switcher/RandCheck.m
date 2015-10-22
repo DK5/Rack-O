@@ -1,6 +1,8 @@
-limits = 2:14;
+clear all;
+clc;
+limits = 3:15;
 ax = get(gca);
-label = num2str((limits)','%02d');
+label = num2str((limits-1)','%02d');
 fontSize = 14;
 
 set(gca,'XAxisLocation','top');
@@ -13,8 +15,8 @@ set(gca,'FontSize',fontSize);
 axis([min(limits) max(limits) min(limits) max(limits)] + 0.5);
 axis square;
 
-for i = limits
-    for j = (i+1):max(limits)
+for i = limits(1:end-1)
+    for j = (i+1):max(limits-1)
         
         Q = randi(2,1)-1;
         x1 = [i i+1 i+1 i] + 0.5;
