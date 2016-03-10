@@ -1,8 +1,3 @@
-Scan field from 0 [Oe] to 100 [Oe] in 10 steps
-   %%%  LOLOLOL  %%%
-   Wait 1 [sec]
-End
-Set field 0 [Oe], while using:Don't O'shoot
-Set field 0 [Oe], while using:Quick Reach
-Set field 0 [Oe], while using:Quick Reach
+Set Temprature 290 [°K], while using:Fast Settle, at rate of 2 [°K/sec]
+Set field 100 [Oe], while using:Linear, at rate of 10 [Oe/sec]
 End sequence

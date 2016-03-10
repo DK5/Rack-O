@@ -67,7 +67,7 @@ set(obj2, 'RecordMode', 'overwrite');
 set(obj2, 'RecordName', 'record.txt');
 set(obj2, 'SecondaryAddress', 0);
 set(obj2, 'Tag', '');
-set(obj2, 'Timeout', 10);
+set(obj2, 'Timeout', 1);
 set(obj2, 'TimerFcn', '');
 set(obj2, 'TimerPeriod', 1);
 set(obj2, 'UserData', []);
