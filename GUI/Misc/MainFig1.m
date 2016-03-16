@@ -22,7 +22,7 @@ function varargout = MainFig(varargin)
 
 % Edit the above text to modify the response to help MainFig
 
-% Last Modified by GUIDE v2.5 15-Mar-2016 17:34:44
+% Last Modified by GUIDE v2.5 15-Mar-2016 16:45:33
 
 % Begin initialization code - DO NOT EDIT
 %clear all
@@ -307,10 +307,10 @@ function h = add_item_to_list_box(h, newitem, index)
 % H listbox handle
 % STRING a new item to display
 
-    oldstring = get(h, 'string'); % Get the cell array from the listbox. 
+    oldstring = get(h, 'string'); %Get the cell array from the listbox. 
     
     space = 0;
-    for i=1:(index-1) %% Move right the text according to the loops
+    for i=1:(index-1) %%Move right the text according to the loops
         item_selected = oldstring{i};
         L=length(item_selected);
         if L>(4+space)
@@ -344,7 +344,7 @@ function h = del_item_from_list_box(h, index)
 % index - index to remove 
 % STRING a new item to display
 
-    oldstring = get(h, 'string');   % listbox string cell array
+    oldstring = get(h, 'string');
     if strcmp(oldstring{index},'End')
         errordlg('Cannot delete End statement!','Error 0x004');
         return
@@ -352,9 +352,7 @@ function h = del_item_from_list_box(h, index)
         errordlg('Cannot delete End Sequence statement!','Error 0x005');
         return
     end
-    
-    L = length(oldstring);
-    
+    L=length(oldstring);
     if isempty(oldstring)
     elseif index==L 
     else
@@ -388,9 +386,9 @@ set(hObject, 'String', {'End sequence'});
 
 
 
-% --- Executes on button press in btnPause.
-function btnPause_Callback(hObject, eventdata, handles)
-% hObject    handle to btnPause (see GCBO)
+% --- Executes on button press in Set_wait.
+function Set_wait_Callback(hObject, eventdata, handles)
+% hObject    handle to Set_wait (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -423,9 +421,9 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in btnDeleteLine.
-function btnDeleteLine_Callback(hObject, eventdata, handles)
-% hObject    handle to btnDeleteLine (see GCBO)
+% --- Executes on button press in btn_Set_del_line.
+function btn_Set_del_line_Callback(hObject, eventdata, handles)
+% hObject    handle to btn_Set_del_line (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -457,9 +455,9 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in btnRemark.
-function btnRemark_Callback(hObject, eventdata, handles)
-% hObject    handle to btnRemark (see GCBO)
+% --- Executes on button press in btn_set_remark.
+function btn_set_remark_Callback(hObject, eventdata, handles)
+% hObject    handle to btn_set_remark (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -467,7 +465,7 @@ Remark = get(handles.txt_remark, 'String');
 index_selected = get(handles.listbox1, 'Value');
 
 list = get(handles.listbox1,'String');
-item_selected = list{index_selected};
+item_selected = list{index_selected} 
 
 
 add_item_to_list_box(handles.listbox1, ['%%%  ', Remark, '  %%%' ], index_selected);
@@ -963,45 +961,19 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
 end
 
 
-% --- Executes on button press in btnUp.
-function btnUp_Callback(hObject, eventdata, handles)
-% hObject    handle to btnUp (see GCBO)
+% --- Executes on button press in pushbutton22.
+function pushbutton22_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton22 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-index = get(handles.listbox1, 'Value');
-allstring = get(handles.listbox1, 'string');
-len = length(allstring);
-if index == 1
-    errordlg('Top line in program cannot be moved up','Error 0x');
-elseif index == len
-    errordlg('End of program cannot be moved','Error 0x');
-else
-    string = allstring{index};
-    del_item_from_list_box(handles.listbox1, index);
-    add_item_to_list_box(handles.listbox1, string, index-1);
-    set(handles.listbox1, 'Value',index-1);
-end
 
 
-
-% --- Executes on button press in btnDown.
-function btnDown_Callback(hObject, eventdata, handles)
-% hObject    handle to btnDown (see GCBO)
+% --- Executes on button press in pushbutton23.
+function pushbutton23_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton23 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-index = get(handles.listbox1, 'Value');
-allstring = get(handles.listbox1, 'string');
-string = allstring{index};
-len = length(allstring);
-if index == len-1
-    errordlg('Bottom line in program cannot be moved down','Error 0x');
-elseif index == len
-    errordlg('End of program cannot be moved','Error 0x');
-else
-    del_item_from_list_box(handles.listbox1, index);
-    add_item_to_list_box(handles.listbox1, string, index+1);
-    set(handles.listbox1, 'Value',index+1);
-end
+
 
 % --- Executes on selection change in popupmenu9.
 function popupmenu9_Callback(hObject, eventdata, handles)
@@ -1464,21 +1436,3 @@ function edtInitVal_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
-% --- Executes on button press in rdoSpace.
-function rdoSpace_Callback(hObject, eventdata, handles)
-% hObject    handle to rdoSpace (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of rdoSpace
-
-
-% --- Executes on button press in rdnSteps.
-function rdnSteps_Callback(hObject, eventdata, handles)
-% hObject    handle to rdnSteps (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of rdnSteps
