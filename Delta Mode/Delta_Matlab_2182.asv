@@ -45,8 +45,8 @@ if nargout > 0
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Create the instrument object for 2182.
-% obj2 = gpib('CEC', 0, 25);
-obj2=nV_obj;
+obj2 = gpib('NI', 2, 6);
+% obj2=nV_obj;
 
 % Set the 2182 property values.
 % set(obj2, 'BoardIndex', 2);
@@ -59,9 +59,9 @@ obj2=nV_obj;
 % set(obj2, 'EOSCharCode', 'LF');
 % set(obj2, 'EOSMode', 'read&write');
 % set(obj2, 'ErrorFcn', '');
-% set(obj2, 'InputBufferSize', 2000);
+set(obj2, 'InputBufferSize', 16384);
 % set(obj2, 'Name', 'GPIB0-24');
-% set(obj2, 'OutputBufferSize', 2000);
+set(obj2, 'OutputBufferSize', 16384);
 % set(obj2, 'OutputEmptyFcn', '');
 % set(obj2, 'PrimaryAddress', 25);
 % set(obj2, 'RecordDetail', 'compact');
@@ -131,13 +131,10 @@ end
  data=query(obj2, ':trace:free?')
    vals = str2double(strsplit(data,','));
         
-        while vals(2)./18<count-1 
-     data=query(obj2, ':trace:free?')
-   vals = str2double(strsplit(data,','));
-        
-    
-      
-end;
+while vals(2)./18<count-1 
+    data=query(obj2, ':trace:free?');
+    vals = str2double(strsplit(data,',')); 
+end
 
         fprintf(obj2,':trace:feed:cont nev');
         data = query(obj2, ':trace:data?');         % Request all stored readings

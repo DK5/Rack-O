@@ -1,6 +1,6 @@
 function terminal( sm_obj, term )
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%terminal( sm_obj, term ) sets the measurment terminal of the source meter
+%   term = 'front' || 'rear'
 
 fprintf(sm_obj, [':route:terminals ',term]);
 
