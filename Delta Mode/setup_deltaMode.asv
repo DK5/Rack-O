@@ -11,7 +11,7 @@ function setup_deltaMode( cs_obj , volt_obj , samples , current, compliance)
 % fprintf(volt_obj,'*rst');               % Clear readings from buffer
 % pause(3)
 fprintf(volt_obj,':TRACe:CLEar'); % Clear readings from buffer
-fprintf(volt_obj,':syst:pres');
+fprintf(volt_obj,':system:pres');
 fprintf(volt_obj,':SENSe:VOLTage:DELTa ON');    % Enable or disable Delta
 fprintf(volt_obj,':SENSe:VOLTage:NPLCycles 1'); % Set integration rate in line cycles to minimun (0.01 to 50);
                                                 % integration rate = nplc/frequency

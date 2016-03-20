@@ -49,6 +49,7 @@ end
 obj2=nV_obj;
 
 % Set the 2182 property values.
+<<<<<<< HEAD
 % set(obj2, 'BoardIndex', 2);
 % set(obj2, 'ByteOrder', 'littleEndian');
 % set(obj2, 'BytesAvailableFcn', '');
@@ -73,6 +74,32 @@ obj2=nV_obj;
 % set(obj2, 'TimerFcn', '');
 % set(obj2, 'TimerPeriod', 1);
 % set(obj2, 'UserData', []);
+=======
+set(obj2, 'BoardIndex', 0);
+set(obj2, 'ByteOrder', 'littleEndian');
+set(obj2, 'BytesAvailableFcn', '');
+set(obj2, 'BytesAvailableFcnCount', 48);
+set(obj2, 'BytesAvailableFcnMode', 'eosCharCode');
+set(obj2, 'CompareBits', 8);
+set(obj2, 'EOIMode', 'on');
+set(obj2, 'EOSCharCode', 'LF');
+set(obj2, 'EOSMode', 'read&write');
+set(obj2, 'ErrorFcn', '');
+set(obj2, 'InputBufferSize', 2000);
+set(obj2, 'Name', 'GPIB0-24');
+set(obj2, 'OutputBufferSize', 2000);
+set(obj2, 'OutputEmptyFcn', '');
+set(obj2, 'PrimaryAddress', 25);
+set(obj2, 'RecordDetail', 'compact');
+set(obj2, 'RecordMode', 'overwrite');
+set(obj2, 'RecordName', 'record.txt');
+set(obj2, 'SecondaryAddress', 0);
+set(obj2, 'Tag', '');
+set(obj2, 'Timeout', 1);
+set(obj2, 'TimerFcn', '');
+set(obj2, 'TimerPeriod', 1);
+set(obj2, 'UserData', []);
+>>>>>>> origin/PPMS
 
 if nargout > 0 
     out = [obj2]; 
@@ -221,8 +248,4 @@ clear obj2
     fprintf(obj1,':SOURce:LIST:CURRent 20E-3,-20E-3')       % Create list of I-Source values
     fprintf(obj1,':OUTPut ON')                  % Turn source on
     fprintf(obj1,':INITiate')                   % Initiate source-measure cycle(s).
-    
-
-
-
-
+   

@@ -4,7 +4,7 @@ function SampleCheck(switch_obj,cs_obj)
 
 % Axis Properties
 limits = 3:15;
-label = num2str((limits)','%02d');
+label = num2str((limits-1)','%02d');
 fontSize = 14;
 
 set(gca,'XAxisLocation','top');
@@ -38,7 +38,7 @@ for i = limits(1:end-1)
             patch(x1,y1,'red');
             patch(x2,y2,'red');
         end
-        
+        drawnow
         % Turn off current
         current( cs_obj,'off',0.01 );       
         switchCurrent (switch_obj,'off', i, j);

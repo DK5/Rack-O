@@ -1,7 +1,8 @@
 function [ data ] = oneShot( cs_obj , func )
 %oneShot gets the value of current/voltage at the moment
 %   cs_obj is the current source object
-%   func is the source function: 'c' - current ; 'v' - voltage
+%   func is the source function: 'c' - current ; 'v' - voltage ; 'r' -
+%   resistance
 
 switch lower(func)
     case 'c'

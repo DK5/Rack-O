@@ -16,5 +16,3 @@ end
 
 % Connect to instrument object, obj1.
 fopen(obj1);
-end
-
