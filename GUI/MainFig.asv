@@ -67,7 +67,7 @@ catch
 end
 try
     switcher_obj = GPcon(16,0);
-    setappdata(0,'switcher_obj',switcher_obj);
+    setappdata(0,'switcher_obj',swithcer_obj);
 catch
     errordlg('Failed to initialize connection to switcher!','Error 0x009');
 end
