@@ -58,6 +58,24 @@ function MainFig_OpeningFcn(hObject, ~, handles, varargin)
 % Choose default command line output for MainFig
 handles.output = hObject;
 
+%CLOSE DEVICES before opening them (just in case)
+try
+    fclose(PPMSObj)
+    clear PPMSObj
+end
+try
+    fclose(switcher_obj)
+    clear switcher_obj
+end
+try
+    fclose(sc_obj)
+    clear sc_obj
+end
+try
+    fclose(nV_obj)
+    clear nV_obj
+end
+
 %CONNECT TO devices
 try 
     PPMSObj= GPcon(15,0);
@@ -66,16 +84,22 @@ catch
     errordlg('Failed to initialize connection to PPMS!','Error 0x007');
 end
 try
-    switcher_obj = GPcon(16,0);
-    setappdata(0,'switcher_obj',swithcer_obj);
+    switcher_obj = GPcon(5,2);
+    setappdata(0,'switcher_obj',switcher_obj);
 catch
     errordlg('Failed to initialize connection to switcher!','Error 0x009');
 end
 try
-    sc_obj=GPcon(10,0);
+    sc_obj=GPcon(23,2);
     setappdata(0,'sc_obj',sc_obj);
 catch
     errordlg('Failed to initialize connection to SourceMeter!','Error 0x010');
+end
+try
+    nV_obj=GPcon(6,2);
+    setappdata(0,'nV_obj',nV_obj);
+catch
+    errordlg('Failed to initialize connection to nanoVoltmeter!','Error 0x011');
 end
 %timer
 mainTimer = timer;
@@ -905,21 +929,31 @@ selection = questdlg('Are you sure you want to quit?',...
       'Yes','No','Yes'); 
    switch selection, 
       case 'Yes',
-          try
-             fclose(PPMSObj);
-          catch
+        try
+            fclose(PPMSObj)
+            clear PPMSObj
+        catch
              errordlg('Failed to terminate connection to PPMS!','Error 0x008'); 
-          end
-          try
-             fclose(switcher_obj);
-          catch
+        end
+        try
+            fclose(switcher_obj)
+            clear switcher_obj
+        catch
              errordlg('Failed to terminate connection to Switcher!','Error 0x011'); 
-          end
-          try
-             fclose(sc_obj);
-          catch
+        end
+        try
+            fclose(sc_obj)
+            clear sc_obj
+        catch
              errordlg('Failed to terminate connection to ScourceMeter!','Error 0x012'); 
-          end
+        end
+        try
+            fclose(nV_obj)
+            clear nV_obj
+        catch
+             errordlg('Failed to terminate connection to nanoVoltmeter!','Error 0x012'); 
+        end
+
           delete(hObject);
       case 'No'
       return 
