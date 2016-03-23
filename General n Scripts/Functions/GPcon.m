@@ -14,5 +14,9 @@ else
     obj1 = obj1(1);
 end
 
+% Reducing timeout interval
+set(obj1, 'Timeout', 0.5);
 % Connect to instrument object, obj1.
 fopen(obj1);
+
+end

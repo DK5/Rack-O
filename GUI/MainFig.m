@@ -85,6 +85,16 @@ mainTimer.Period = 0.5;
 mainTimer.TimerFcn = 'live_data = timer_function(PPMSObj);';
 mainTimer.StartDelay = 1.5;
 start(mainTimer);
+
+% Create cell array to store all commands
+% every action on CommandList will be also on this cell array
+% the format will be {'Command1;','Command2;'}
+% to join all to one string - strjoin(CommandCell,'\n');
+cellCommands = cell(1);
+setappdata(0,'cellCommands',cellCommands);
+% kCommands = cell(1);
+% pCommands = cell(1);
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -102,6 +112,45 @@ function varargout = MainFig_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
+% --- Adds command line to the cell array
+function add_command_str(str,index)
+% str - command string
+% index - index of command line
+% activity - 'p'/'k'
+cellCommands = getappdata(0,'cellCommands');
+if isempty(cellCommands{1})
+    % no commands yet
+    cellCommands{1} = str;
+elseif size(cellCommands,1) < index
+    % put in the end of the array
+    cellCommands = {cellCommands{:};str};
+else
+    cellCommands = [cellCommands(1:index-1);{str};cellCommands(index:end)];
+end
+setappdata(0,'cellCommands',cellCommands);
+% % if activity == 'p'
+% %     % write to pCommands
+% % elseif activity = 'k'
+% %     % write to kCommands
+% % else
+% %     % error
+% % end
+
+% --- Adds command line to the cell array
+function delete_command_str(index)
+% str - command string
+% index - index of command line
+% activity - 'p'/'k'
+cellCommands = getappdata(0,'cellCommands');
+cellCommands(index) = [];
+setappdata(0,'cellCommands',cellCommands);
+% % if activity == 'p'
+% %     % write to pCommands
+% % elseif activity = 'k'
+% %     % write to kCommands
+% % else
+% %     % error
+% % end
 
 % --- Executes on button press in Set_Field.
 function Set_Field_Callback(hObject, eventdata, handles)
@@ -349,7 +398,7 @@ function h = del_item_from_list_box(h, index)
 % index - index to remove 
 % STRING a new item to display
 
-    oldstring = get(h, 'string');   % listbox string cell array
+    oldstring = get(h,'string');   % listbox string cell array
     if strcmp(oldstring{index},'End')
         errordlg('Cannot delete End statement!','Error 0x004');
         return
@@ -364,7 +413,7 @@ function h = del_item_from_list_box(h, index)
     elseif index==L 
     else
         newstring = {oldstring{1:(index-1)} oldstring{index+1:end}};
-        set(h, 'string', newstring);
+        set(h,'string',newstring);
     end
         
 % --- Executes on selection change in CommandList.
@@ -393,7 +442,6 @@ set(hObject, 'String', {'End sequence'});
 set(hObject, 'UserData',cell(1));
 
 
-
 % --- Executes on button press in btnPause.
 function btnPause_Callback(hObject, eventdata, handles)
 % hObject    handle to btnPause (see GCBO)
@@ -402,9 +450,8 @@ function btnPause_Callback(hObject, eventdata, handles)
 
 Waiting_time = get(handles.txt_waiting_time, 'String');
 index_selected = get(handles.CommandList, 'Value');
-add_item_to_list_box(handles.CommandList, ['Wait ',Waiting_time, ' [sec]' ], index_selected);
-
-
+add_item_to_list_box(handles.CommandList, ['Pause ',Waiting_time, ' [sec]' ], index_selected);
+add_command_str(['pause(',Waiting_time,')'],index_selected);
 
 
 function txt_waiting_time_Callback(hObject, eventdata, handles)
@@ -434,12 +481,9 @@ function btnDeleteLine_Callback(hObject, eventdata, handles)
 % hObject    handle to btnDeleteLine (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 index_selected = get(handles.CommandList, 'Value');
-
 del_item_from_list_box(handles.CommandList,index_selected);
-
-
+delete_command_str(index_selected);
 
 function edit9_Callback(hObject, eventdata, handles)
 % hObject    handle to edit9 (see GCBO)
@@ -448,7 +492,6 @@ function edit9_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of edit9 as text
 %        str2double(get(hObject,'String')) returns contents of edit9 as a double
-
 
 % --- Executes during object creation, after setting all properties.
 function edit9_CreateFcn(hObject, eventdata, handles)
@@ -472,8 +515,9 @@ function btnRemark_Callback(hObject, eventdata, handles)
 Remark = get(handles.txt_remark, 'String');         % get string
 index_selected = get(handles.CommandList, 'Value'); % get index selcted in listbox
 % add remark in the selected index
-add_item_to_list_box(handles.CommandList, ['%%%  ', Remark, '  %%%' ], index_selected);
-set(handles.txt_remark,'String','');
+add_item_to_list_box(handles.CommandList, ['%%% ', Remark, ' %%%' ], index_selected);
+set(handles.txt_remark,'String','');    % empty Edit Text
+add_command_str(['% ',Remark],index_selected);
 
 
 function txt_remark_Callback(hObject, eventdata, handles)
@@ -508,7 +552,9 @@ function Reset_button_Callback(hObject, eventdata, handles)
 % hObject    handle to Reset_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+set(handles.CommandList,'Value',1);
 set(handles.CommandList,'String','End sequence');
+setappdata(0,'cellCommands',cell(1));
 
 function initialize_gui(hObject, handles, isreset)
 % function used to reset all properies of gui
@@ -558,20 +604,28 @@ function write_to_file_button_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-contents = get(handles.CommandList,'String'); %extract all contents of listbox as cell array
-
+listContents = get(handles.CommandList,'String'); %extract all contents of listbox as cell array
+contents = getappdata(0,'cellCommands');
 FileName=get(handles.file_name_edit,'String');  %get the desired filename
 
-if strcmp(FileName,'Enter File name')    %make sure the user has entered a filename
-     errordlg('Please Enter a File Name!','Error 0x003');  %user didnt
+if strcmp(FileName,'Enter File name')    % make sure the user has entered a filename
+     errordlg('Please Enter a File Name!','Error 0x003');  % user didnt
     return
 end
 FID = fopen([FileName,'.m'],'w');   
 formatSpec = '%s\r\n';
-[nrows,ncols] = size(contents);
+[nrows,~] = size(contents);
 for row = 1:nrows
-    fprintf(FID,formatSpec,contents{row,:});   %write list in file - REWRITES EXISTING
-end                                            %to change, change w in fopen to a
+    if iscell(contents{row})
+        contents2 = contents{row};
+        for row2 = 1:size(contents2,1)
+            fprintf(FID,formatSpec,contents2{row2});   %write list in file - REWRITES EXISTING
+        end
+    else
+        fprintf(FID,formatSpec,contents{row});   %write list in file - REWRITES EXISTING
+        %to change, change w in fopen to a
+    end
+end
 
 fclose(FID);
 % type commands.m   %show the file
@@ -859,7 +913,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-function [output]=timer_function(PPMSObj)
+function [output] = timer_function(PPMSObj)
 %Function that contains all Live Data functions for pulling information
 %about the ppms.
 % Function will return a structure with 6 fields:
@@ -988,6 +1042,10 @@ else
     del_item_from_list_box(handles.CommandList, index);
     add_item_to_list_box(handles.CommandList, string, index-1);
     set(handles.CommandList, 'Value',index-1);
+    cellCommands = getappdata(0,'cellCommands');
+    command = cellCommands{index};
+    delete_command_str(index);
+    add_command_str(command,index-1);
 end
 
 
@@ -1009,6 +1067,10 @@ else
     del_item_from_list_box(handles.CommandList, index);
     add_item_to_list_box(handles.CommandList, string, index+1);
     set(handles.CommandList, 'Value',index+1);
+    cellCommands = getappdata(0,'cellCommands');
+    command = cellCommands{index};
+    delete_command_str(index);
+    add_command_str(command,index+1);
 end
 
 % --- Executes on selection change in popupmenu9.
@@ -1377,7 +1439,27 @@ function btnSetParam_Callback(hObject, eventdata, handles)
 % hObject    handle to btnSetParam (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+paramflag = get(handles.mnuParameter,'Value');
+targetStr = get(handles.edtSetVal,'String');
+rate = get(handles.edtRate,'String');
+switch paramflag
+    case 1
+        ParameterStr = 'Temprature';
+        functionStr = ['TEMP(PPMSObj,',targetStr,',',rate,',10,1);'];
+        indStr = 'k';
+    case 2
+        ParameterStr = 'Field';
+        functionStr = ['FIELD(PPMSobj,',targetStr,',',rate,',1,1);'];
+        indStr = 'j';
+end
 
+% update listbox
+commandStr = ['Set ',ParameterStr,' to ', targetStr,' in rate ',rate];
+index = get(handles.CommandList,'Value');
+add_item_to_list_box(handles.CommandList,commandStr,index);
+
+% update commands in script
+add_command_str(functionStr,index);
 
 
 function edtRate_Callback(hObject, eventdata, handles)
@@ -1431,21 +1513,40 @@ function btnScan_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 initValStr = get(handles.edtInitVal,'String');
 targetValStr = get(handles.edtTargetVal,'String');
-methodFlag = get(handles.rdnSteps,'Value');
-if methodFlag
-    methodStr = 'steps';
-else
-    methodStr = 'spacing';
-end
 methodVal = get(handles.edtStep,'String');
 paramflag = get(handles.mnuParameter,'Value');
 Options = get(handles.mnuParameter,'UserData');
-ParameterStr = Options{paramflag};
+methodFlag = get(handles.rdnSteps,'Value');
+switch paramflag
+    case 1
+        ParameterStr = 'Temp';
+        functionStr = 'TEMP(PPMSObj,Temp(j),10,1);';
+        indStr = 'k';
+    case 2
+        ParameterStr = 'H';
+        functionStr = 'FIELD(PPMSobj,H(j),10,1,1);';
+        indStr = 'j';
+end
+
+if methodFlag
+    methodStr = 'steps';
+    defStr = [ParameterStr,' = ',initValStr,':',methodVal,':',targetValStr,';'];
+else
+    methodStr = 'spacing';
+    defStr = [ParameterStr,' = ','linspace(',initValStr,',',targetValStr,',',methodVal,');'];
+end
+
+% update listbox
 commandStr = ['Scan ',ParameterStr,' from ',initValStr,' to ',...
     targetValStr,' by ',methodStr,' of ', methodVal];
 index = get(handles.CommandList,'Value');
 add_item_to_list_box(handles.CommandList,commandStr,index);
 add_item_to_list_box(handles.CommandList,'end',index+1);
+
+% update commands in script
+sendCommand = {defStr;['for ',indStr,'=1:length(',ParameterStr,')'];functionStr};
+add_command_str(sendCommand,index);
+add_command_str('end',index+1);
 
 
 function edtStep_Callback(hObject, eventdata, handles)
