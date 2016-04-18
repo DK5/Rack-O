@@ -1377,15 +1377,12 @@ function mnuVoltSet_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-data = cell(5,2);
-data{1,1} = 'Integration Time';
-data{1,2} = 'mA';
-data{2,1} = 'Apply Voltage';
-data{2,2} = 'mV';
-data{3,1} = 'Current List';
-data{3,2} = 'mA';
-data{4,1} = 'Measure Current';
-data{5,1} = 'Measure Voltage';
+data = cell(1,3);
+
+data{1,1} = 'Integration Time'; % name
+data{1,2} = 'IntegrationTime';  % function callback
+data{1,3} = 'mSec';             % units
+
 set(hObject,'UserData',data);
 
 % --- Executes on button press in btnVoltSet.
@@ -1393,6 +1390,16 @@ function btnVoltSet_Callback(hObject, eventdata, handles)
 % hObject    handle to btnVoltSet (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+funcFlag = get(handles.mnuVoltSet,'Value');  % Choice
+Options = get(handles.mnuVoltSet,'UserData');% get data from menu
+setValue = get(handles.edtVoltSet,'String');
+
+% add item to sequence
+commandLine = ['Set ',Options{funcFlag,1},' to ',setValue];
+index = get(handles.CommandList,'Value');
+add_item_to_list_box(handles.CommandList,commandLine,index);
+functionStr = [Options{funcFlag,2},'(nv_obj, ',setValue,');'];
+add_command_str(functionStr,index);
 
 
 % --- Executes on selection change in mnuVoltMeas.
@@ -1416,10 +1423,16 @@ function mnuVoltMeas_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-data = cell(5,2);
+data = cell(3,2);
 data{1,1} = '1 Shot Voltage';
+data{1,2} = '';
+
 data{2,1} = 'Continously';
+data{2,2} = 'read(nv_obj);';
+
 data{3,1} = 'Delta Mode';
+data{3,2} = '';
+
 set(hObject,'UserData',data);
 
 
@@ -1428,11 +1441,15 @@ function btnVoltAdd_Callback(hObject, eventdata, handles)
 % hObject    handle to btnVoltAdd (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-funcFlag = get(handles.mnuSM,'Value');
-Options = get(handles.mnuSM,'UserData');
-target = get(handles.edtSM,'String');
-commandLine = [Options{funcFlag,1},' of ',target,Options{funcFlag,2}];
-add_item_to_list_box(commandLine,index);
+funcFlag = get(handles.mnuVoltMeas,'Value');  % Choice
+Options = get(handles.mnuVoltMeas,'UserData');% get data from menu
+
+% add item to sequence
+commandLine = ['Measure Voltage ',Options{funcFlag,1}];
+index = get(handles.CommandList,'Value');
+add_item_to_list_box(handles.CommandList,commandLine,index);
+add_command_str(Options{funcFlag,2},index);
+
 
 
 function edtVoltSet_Callback(hObject, eventdata, handles)
