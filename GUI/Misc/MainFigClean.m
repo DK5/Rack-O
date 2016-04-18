@@ -1,4 +1,4 @@
-function varargout = MainFig(varargin) 
+function varargout = MainFigClean(varargin) 
 % MainFig M-file for MainFig.fig
 %      MainFig, by itself, creates a new MainFig or raises the existing
 %      singleton*.
@@ -72,8 +72,8 @@ catch
     errordlg('Failed to initialize connection to switcher!','Error 0x009');
 end
 try
-    sm_obj=GPcon(10,0);
-    setappdata(0,'sm_obj',sm_obj);
+    sc_obj=GPcon(10,0);
+    setappdata(0,'sc_obj',sc_obj);
 catch
     errordlg('Failed to initialize connection to SourceMeter!','Error 0x010');
 end
@@ -117,17 +117,15 @@ function add_command_str(str,index)
 % str - command string
 % index - index of command line
 % activity - 'p'/'k'
-cellCommands = getappdata(0,'cellCommands');
 if isempty(cellCommands{1})
     % no commands yet
     cellCommands{1} = str;
 elseif size(cellCommands,1) < index
     % put in the end of the array
-    cellCommands{end+1,1} = str;
+    cellCommands = {cellCommands{:};str};
 else
     cellCommands = [cellCommands(1:index-1);{str};cellCommands(index:end)];
 end
-setappdata(0,'cellCommands',cellCommands);
 % % if activity == 'p'
 % %     % write to pCommands
 % % elseif activity = 'k'
@@ -141,9 +139,7 @@ function delete_command_str(index)
 % str - command string
 % index - index of command line
 % activity - 'p'/'k'
-cellCommands = getappdata(0,'cellCommands');
 cellCommands(index) = [];
-setappdata(0,'cellCommands',cellCommands);
 % % if activity == 'p'
 % %     % write to pCommands
 % % elseif activity = 'k'
@@ -157,9 +153,22 @@ function Set_Field_Callback(hObject, eventdata, handles)
 % hObject    handle to Set_Field (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-approach = get(handles.set_mf_popup,'Value')-1;
+          
+
+Destination_field = get(handles.txt_Stop_field, 'String');
+index_selected = get(handles.CommandList, 'Value');
+rate=get(handles.mf_rate_edit, 'String');
+
+%index_selected = get(handles.CommandList, 'Value');
+
+%list = get(handles.CommandList,'String'); %Get the cell array
+%item_selected = list{index_selected}; 
+
+method = cellstr(get(handles.set_mf_popup,'string'));
+method = method{get(handles.set_mf_popup,'Value')};
 %scan field step size check
-StopField = str2num(get(handles.txt_Stop_field, 'String'));
+current_field = str2num(get(handles.H_text_status, 'String'));
+Stop_Field = str2num(get(handles.txt_Stop_field, 'String'));
 rate = str2num(get(handles.mf_rate_edit, 'String'));
 if(rate<10)
     errordlg('Rate must be bigger than 10!','Error 0x001')
@@ -170,7 +179,9 @@ elseif(rate>187)
     set(handles.mf_rate_edit,'String',187);
     return
 end
-FIELD(handles.PPMSObj,StopField,rate,approach,mode);
+rate=num2str(rate);
+add_item_to_list_box(handles.CommandList, ['Set field ',Destination_field, ' [Oe]' ,', while using:', method, ', at rate of ',rate,' [Oe/sec]'], index_selected);
+
 
 function edit1_Callback(hObject, eventdata, handles)
 % hObject    handle to edit1 (see GCBO)
@@ -192,6 +203,7 @@ function edit1_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
 
 
 function txt_destination_field_Callback(hObject, eventdata, handles)
@@ -221,14 +233,16 @@ function Set_scan_field_Callback(hObject, eventdata, handles)
 % hObject    handle to Set_scan_field (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
 Start_Field = get(handles.txt_Start_field, 'String');
 Stop_Field = get(handles.txt_Stop_field, 'String');
 Num_of_steps = get(handles.mf_rate_edit, 'String');
 
 index_selected = get(handles.CommandList, 'Value');
 add_item_to_list_box(handles.CommandList, 'End' , index_selected);
-add_item_to_list_box(handles.CommandList,...
-    ['Scan field from ',Start_Field, ' [Oe] to ', Stop_Field, ' [Oe] in ', Num_of_steps, ' steps'], index_selected);
+add_item_to_list_box(handles.CommandList, ['Scan field from ',Start_Field, ' [Oe] to ', Stop_Field, ' [Oe] in ', Num_of_steps, ' steps'], index_selected);
+%add_item_to_list_box(handles.CommandList, 'End' , index_selected+1);
 
 
 function txt_Start_field_Callback(hObject, eventdata, handles)
@@ -380,7 +394,7 @@ function h = del_item_from_list_box(h, index)
 % index - index to remove 
 % STRING a new item to display
 
-    oldstring = get(h,'string');   % listbox string cell array
+    oldstring = get(h, 'string');   % listbox string cell array
     if strcmp(oldstring{index},'End')
         errordlg('Cannot delete End statement!','Error 0x004');
         return
@@ -395,7 +409,7 @@ function h = del_item_from_list_box(h, index)
     elseif index==L 
     else
         newstring = {oldstring{1:(index-1)} oldstring{index+1:end}};
-        set(h,'string',newstring);
+        set(h, 'string', newstring);
     end
         
 % --- Executes on selection change in CommandList.
@@ -424,6 +438,7 @@ set(hObject, 'String', {'End sequence'});
 set(hObject, 'UserData',cell(1));
 
 
+
 % --- Executes on button press in btnPause.
 function btnPause_Callback(hObject, eventdata, handles)
 % hObject    handle to btnPause (see GCBO)
@@ -432,8 +447,9 @@ function btnPause_Callback(hObject, eventdata, handles)
 
 Waiting_time = get(handles.txt_waiting_time, 'String');
 index_selected = get(handles.CommandList, 'Value');
-add_item_to_list_box(handles.CommandList, ['Pause ',Waiting_time, ' [sec]' ], index_selected);
-add_command_str(['pause(',Waiting_time,');'],index_selected);
+add_item_to_list_box(handles.CommandList, ['Wait ',Waiting_time, ' [sec]' ], index_selected);
+
+
 
 
 function txt_waiting_time_Callback(hObject, eventdata, handles)
@@ -463,9 +479,9 @@ function btnDeleteLine_Callback(hObject, eventdata, handles)
 % hObject    handle to btnDeleteLine (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
 index_selected = get(handles.CommandList, 'Value');
 del_item_from_list_box(handles.CommandList,index_selected);
-delete_command_str(index_selected);
 
 function edit9_Callback(hObject, eventdata, handles)
 % hObject    handle to edit9 (see GCBO)
@@ -536,7 +552,6 @@ function Reset_button_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 set(handles.CommandList,'Value',1);
 set(handles.CommandList,'String','End sequence');
-setappdata(0,'cellCommands',cell(1));
 
 function initialize_gui(hObject, handles, isreset)
 % function used to reset all properies of gui
@@ -586,27 +601,20 @@ function write_to_file_button_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-contents = getappdata(0,'cellCommands');
-FileName = get(handles.file_name_edit,'String');  %get the desired filename
+contents = get(handles.CommandList,'String'); %extract all contents of listbox as cell array
 
-if strcmp(FileName,'Enter File name')    % make sure the user has entered a filename
-     errordlg('Please Enter a File Name!','Error 0x003');  % user didnt
+FileName=get(handles.file_name_edit,'String');  %get the desired filename
+
+if strcmp(FileName,'Enter File name')    %make sure the user has entered a filename
+     errordlg('Please Enter a File Name!','Error 0x003');  %user didnt
     return
 end
 FID = fopen([FileName,'.m'],'w');   
 formatSpec = '%s\r\n';
-[nrows,~] = size(contents); % number of commands 
+[nrows,ncols] = size(contents);
 for row = 1:nrows
-    if iscell(contents{row})
-        contents2 = contents{row};
-        for row2 = 1:size(contents2,1)
-            fprintf(FID,formatSpec,contents2{row2});   %write list in file - REWRITES EXISTING
-        end
-    else
-        fprintf(FID,formatSpec,contents{row});   %write list in file - REWRITES EXISTING
-        %to change, change w in fopen to a
-    end
-end
+    fprintf(FID,formatSpec,contents{row,:});   %write list in file - REWRITES EXISTING
+end                                            %to change, change w in fopen to a
 
 fclose(FID);
 % type commands.m   %show the file
@@ -624,7 +632,7 @@ function execute_code_button_Callback(hObject, eventdata, handles)
 contents = get(handles.CommandList,'String');
 setappdata(0,'listbox_contents',contents);
 setappdata(0,'Button','Execute'); %let dialog know what button is calling it
-varargout = load_file_dialog(figure(load_file_dialog)); %calls verification dialog
+varargout = my_dialog(figure(my_dialog)); %calls verification dialog
 %excecution function goes here
 
 
@@ -720,26 +728,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-% --------------------------------------------------------------------
-function uipushtool2_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to uipushtool2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-%saveas(hObject,'pic.jpg');
-
-fig = gcf;
-set(fig,'PaperPositionMode','auto');
-print('Full UI Screenpic','-dpng','-r0');
-
-% --------------------------------------------------------------------
-function uipushtool1_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to uipushtool1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
 % --- Executes on button press in choose_file_btn.
 function choose_file_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to choose_file_btn (see GCBO)
@@ -753,7 +741,7 @@ end
 FID = fopen(FileName,'a');  %get file id
 setappdata(0,'FileName',FileName);
 setappdata(0,'Button','Choose'); %let dialog know what button is calling it
-varargout = load_file_dialog(figure(load_file_dialog));   %open verification load_file_dialog
+varargout = my_dialog(figure(my_dialog));   %open verification my_dialog
 
 
 % --- Executes on selection change in chamber_mode_popup.
@@ -848,11 +836,19 @@ function set_Temp_btn_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 Destination_temp = get(handles.target_temp_edit, 'String');
+index_selected = get(handles.CommandList, 'Value');
 rate=str2num(get(handles.temp_rate_edit, 'String'));
-approach = get(handles.temprature_approach_popup,'Value')-1;
+
+%index_selected = get(handles.CommandList, 'Value');
+
+%list = get(handles.CommandList,'String'); %Get the cell array
+%item_selected = list{index_selected}; 
+
+method=cellstr(get(handles.temprature_approach_popup,'string'));
+method=method{get(handles.temprature_approach_popup,'Value')};
 %rate size check 
  if(rate<=0.0)
-    errordlg('Rate must be bigger than 0!','Error 0x006')
+    errordlg('Rate must be bigger than 0! Are you dumb?','Error 0x006')
     set(handles.mf_rate_edit,'String',0);
     return
 elseif(rate>12)
@@ -860,7 +856,8 @@ elseif(rate>12)
     set(handles.mf_rate_edit,'String',12);
     return
  end
-TEMP(handles.PPMSObj,Destination_temp,rate,approach);
+rate=num2str(rate);
+add_item_to_list_box(handles.CommandList, ['Set Temprature ',Destination_temp, ' [°K]' ,', while using:', method, ', at rate of ',rate,' [°K/sec]'], index_selected);
 
 
 % --- Executes on selection change in mf_magnet_mode_popup.
@@ -885,7 +882,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-function [output] = timer_function(PPMSObj)
+function [output]=timer_function(PPMSObj)
 %Function that contains all Live Data functions for pulling information
 %about the ppms.
 % Function will return a structure with 6 fields:
@@ -950,7 +947,7 @@ selection = questdlg('Are you sure you want to quit?',...
              errordlg('Failed to terminate connection to Switcher!','Error 0x011'); 
           end
           try
-             fclose(sm_obj);
+             fclose(sc_obj);
           catch
              errordlg('Failed to terminate connection to ScourceMeter!','Error 0x012'); 
           end
@@ -967,34 +964,13 @@ function channel_matrix_btn_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 ChannelMatrix(getappdata(0,'switcher_obj'));
 
+
 % --- Executes on button press in sample_chk_btn.
 function sample_chk_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to sample_chk_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-CheckMatrix(getappdata(0,'switcher_obj'),getappdata(0,'sm_obj')); %should be changed to samplecheck
-
-
-% --- Executes on slider movement.
-function slider2_Callback(hObject, eventdata, handles)
-% hObject    handle to slider2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
-
-% --- Executes during object creation, after setting all properties.
-function slider2_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to slider2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
+CheckMatrix(getappdata(0,'switcher_obj'),getappdata(0,'sc_obj')); %should be changed to samplecheck
 
 
 % --- Executes on button press in btnUp.
@@ -1002,25 +978,22 @@ function btnUp_Callback(hObject, eventdata, handles)
 % hObject    handle to btnUp (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-index = get(handles.CommandList, 'Value');  % get selected index
-allstring = get(handles.CommandList, 'string'); % get strings from listbox
-len = length(allstring);    % number of lines
+index = get(handles.CommandList, 'Value');
+allstring = get(handles.CommandList, 'string');
+len = length(allstring);
 if index == 1
 %     errordlg('Top line in program cannot be moved up','Error 0x');
 elseif index == len
 %     errordlg('End of program cannot be moved','Error 0x');
 else
-    string = allstring{index};  % get selcted string
-    del_item_from_list_box(handles.CommandList, index); % delete from index
-    add_item_to_list_box(handles.CommandList, string, index-1); % add to upper index
-    set(handles.CommandList,'Value',index-1);   % set selection to the moved line
-    
-    cellCommands = getappdata(0,'cellCommands');    % get commands cell array
-    command = cellCommands{index};  % get selcted commannd index
-    delete_command_str(index);  % delete from cell array
-    add_command_str(command,index-1);   % add to the new index
+    string = allstring{index};
+    del_item_from_list_box(handles.CommandList, index);
+    add_item_to_list_box(handles.CommandList, string, index-1);
+    set(handles.CommandList, 'Value',index-1);
+    command = cellCommands{index};
+    delete_command_str(index);
+    add_command_str(index-1);
 end
-
 
 
 % --- Executes on button press in btnDown.
@@ -1040,144 +1013,10 @@ else
     del_item_from_list_box(handles.CommandList, index);
     add_item_to_list_box(handles.CommandList, string, index+1);
     set(handles.CommandList, 'Value',index+1);
-    cellCommands = getappdata(0,'cellCommands');
     command = cellCommands{index};
     delete_command_str(index);
-    add_command_str(command,index+1);
+    add_command_str(index+1);
 end
-
-% --- Executes on selection change in popupmenu9.
-function popupmenu9_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu9 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu9 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu9
-
-
-% --- Executes during object creation, after setting all properties.
-function popupmenu9_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu9 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function edit17_Callback(hObject, eventdata, handles)
-% hObject    handle to edit17 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit17 as text
-%        str2double(get(hObject,'String')) returns contents of edit17 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit17_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit17 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in pushbutton27.
-function pushbutton27_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton27 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-
-function edit18_Callback(hObject, eventdata, handles)
-% hObject    handle to edit18 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit18 as text
-%        str2double(get(hObject,'String')) returns contents of edit18 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit18_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit18 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-% --- Executes during object creation, after setting all properties.
-function edit15_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit15 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in pushbutton24.
-function pushbutton24_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton24 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-
-function edit16_Callback(hObject, eventdata, handles)
-% hObject    handle to edit16 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit16 as text
-%        str2double(get(hObject,'String')) returns contents of edit16 as a double
-
-
-function edit19_Callback(hObject, eventdata, handles)
-% hObject    handle to edit19 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit19 as text
-%        str2double(get(hObject,'String')) returns contents of edit19 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit19_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit19 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in pushbutton28.
-function pushbutton28_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton28 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
 
 % --- Executes on selection change in mnuYaxis.
@@ -1235,20 +1074,6 @@ function btnWait4_Callback(hObject, eventdata, handles)
 % hObject    handle to btnWait4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-paramflag = get(handles.mnuParameter,'Value');
-Options = get(handles.mnuParameter,'UserData');
-switch paramflag
-    case 1
-        functionStr = 'wait4temp(PPMSObj);';
-    case 2
-        functionStr = 'wait4field(PPMSobj);';
-end
-
-commandStr = ['Wait for ',Options{paramflag}];
-index = get(handles.CommandList,'Value');
-add_item_to_list_box(handles.CommandList,commandStr,index);
-% update commands in script
-add_command_str(functionStr,index);
 
 
 % --- Executes on selection change in mnuSM.
@@ -1272,59 +1097,13 @@ function mnuSM_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-data = cell(6,3);
-% option 1
-data{1,1} = 'Apply Current';    % title
-data{1,2} = 'mA';               % units
-data{1,3} = 'current';          % function name
 
-% option 2
-data{2,1} = 'Apply Voltage';
-data{2,2} = 'mV';
-data{2,3} = 'voltage';
-
-% option 3
-data{3,1} = 'Current List';
-data{3,2} = 'mA';
-data{3,3} = '';
-
-% option 4
-data{4,1} = 'Measure Current';
-data{4,2} = 'c';
-
-% option 5
-data{5,1} = 'Measure Voltage';
-data{5,2} = 'v';
-
-% option 5
-data{6,1} = 'Measure Resistance';
-data{6,2} = 'r';
-
-set(hObject,'UserData',data);
 
 % --- Executes on button press in btnSMadd.
 function btnSMadd_Callback(hObject, eventdata, handles)
 % hObject    handle to btnSMadd (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-funcFlag = get(handles.mnuSM,'Value');
-Options = get(handles.mnuSM,'UserData');
-index = get(handles.CommandList,'Value');
-
-if funcFlag < 4
-    target = get(handles.edtSM,'String');
-    commandLine = [Options{funcFlag,1},' of ',target,Options{funcFlag,2}];
-    add_item_to_list_box(handles.CommandList,commandLine,index);
-    % add command line to file
-    functionStr = [Options{funcFlag,3},'(sm_obj, ''on'',',target,');'];
-    add_command_str(functionStr,index);
-else
-    commandLine = Options{funcFlag,1};
-    add_item_to_list_box(handles.CommandList,commandLine,index);
-    % add command line
-    functionStr = ['oneShot(sm_obj, ''',Options{funcFlag,2},''');'];
-    add_command_str(functionStr,index);
-end
 
 
 
@@ -1371,16 +1150,7 @@ function mnuVoltSet_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-data = cell(5,2);
-data{1,1} = 'Integration Time';
-data{1,2} = 'mA';
-data{2,1} = 'Apply Voltage';
-data{2,2} = 'mV';
-data{3,1} = 'Current List';
-data{3,2} = 'mA';
-data{4,1} = 'Measure Current';
-data{5,1} = 'Measure Voltage';
-set(hObject,'UserData',data);
+
 
 % --- Executes on button press in btnVoltSet.
 function btnVoltSet_Callback(hObject, eventdata, handles)
@@ -1410,11 +1180,6 @@ function mnuVoltMeas_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-data = cell(5,2);
-data{1,1} = '1 Shot Voltage';
-data{2,1} = 'Continously';
-data{3,1} = 'Delta Mode';
-set(hObject,'UserData',data);
 
 
 % --- Executes on button press in btnVoltAdd.
@@ -1422,11 +1187,7 @@ function btnVoltAdd_Callback(hObject, eventdata, handles)
 % hObject    handle to btnVoltAdd (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-funcFlag = get(handles.mnuSM,'Value');
-Options = get(handles.mnuSM,'UserData');
-target = get(handles.edtSM,'String');
-commandLine = [Options{funcFlag,1},' of ',target,Options{funcFlag,2}];
-add_item_to_list_box(commandLine,index);
+
 
 
 function edtVoltSet_Callback(hObject, eventdata, handles)
@@ -1479,28 +1240,7 @@ function btnSetParam_Callback(hObject, eventdata, handles)
 % hObject    handle to btnSetParam (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-paramflag = get(handles.mnuParameter,'Value');
-targetStr = get(handles.edtSetVal,'String');
-rate = get(handles.edtRate,'String');
-switch paramflag
-    case 1
-        ParameterStr = 'Temprature';
-        functionStr = ['TEMP(PPMSObj,',targetStr,',',rate,',10,1);'];
-        unitStr = '[°K';
-    case 2
-        ParameterStr = 'Field';
-        functionStr = ['FIELD(PPMSobj,',targetStr,',',rate,',1,1);'];
-        unitStr = '[Oe';
-end
 
-% update listbox
-commandStr = ['Set ',ParameterStr,' to ', targetStr,unitStr,']',...
-                ' in rate ',rate,unitStr,'/sec]'];
-index = get(handles.CommandList,'Value');
-add_item_to_list_box(handles.CommandList,commandStr,index);
-
-% update commands in script
-add_command_str(functionStr,index);
 
 
 function edtRate_Callback(hObject, eventdata, handles)
@@ -1554,42 +1294,21 @@ function btnScan_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 initValStr = get(handles.edtInitVal,'String');
 targetValStr = get(handles.edtTargetVal,'String');
+methodFlag = get(handles.rdnSteps,'Value');
+if methodFlag
+    methodStr = 'steps';
+else
+    methodStr = 'spacing';
+end
 methodVal = get(handles.edtStep,'String');
 paramflag = get(handles.mnuParameter,'Value');
 Options = get(handles.mnuParameter,'UserData');
-methodFlag = get(handles.rdnSteps,'Value');
-switch paramflag
-    case 1
-        ParameterStr = 'Temp';
-        functionStr = 'TEMP(PPMSObj,Temp(j),10,1);';
-        indStr = 'k';
-        unitStr = '[°K]';
-    case 2
-        ParameterStr = 'H';
-        functionStr = 'FIELD(PPMSobj,H(j),10,1,1);';
-        indStr = 'j';
-        unitStr = '[Oe]';
-end
-
-if methodFlag
-    methodStr = 'steps';
-    defStr = [ParameterStr,' = ',initValStr,':',methodVal,':',targetValStr,';'];
-else
-    methodStr = 'spacing';
-    defStr = [ParameterStr,' = ','linspace(',initValStr,',',targetValStr,',',methodVal,');'];
-end
-
-% update listbox
-commandStr = ['Scan ',Options{paramflag},' from ',initValStr,unitStr,' to ',...
-    targetValStr,unitStr,' by ',methodStr,' of ', methodVal,unitStr];
+ParameterStr = Options{paramflag};
+commandStr = ['Scan ',ParameterStr,' from ',initValStr,' to ',...
+    targetValStr,' by ',methodStr,' of ', methodVal];
 index = get(handles.CommandList,'Value');
 add_item_to_list_box(handles.CommandList,commandStr,index);
 add_item_to_list_box(handles.CommandList,'end',index+1);
-
-% update commands in script
-sendCommand = {defStr;['for ',indStr,'=1:length(',ParameterStr,')'];functionStr};
-add_command_str(sendCommand,index);
-add_command_str('end',index+1);
 
 
 function edtStep_Callback(hObject, eventdata, handles)
