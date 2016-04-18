@@ -22,7 +22,9 @@ function varargout = MainFig(varargin)
 
 % Edit the above text to modify the response to help MainFig
 
+
 % Last Modified by GUIDE v2.5 18-Mar-2016 11:20:41
+
 
 % Begin initialization code - DO NOT EDIT
 %clear all
@@ -58,31 +60,68 @@ function MainFig_OpeningFcn(hObject, ~, handles, varargin)
 % Choose default command line output for MainFig
 handles.output = hObject;
 
+%CLOSE DEVICES before opening them (just in case)
+try
+    try
+        fclose(handles.PPMSObj)
+%         PPMSObj = getappdata(0,'PPMSObj');
+%         fclose(PPMSObj);
+        
+    end
+%     handles = rmfield(handles, 'PPMSObj');
+end
+try
+    try
+        fclose(handles.switcher_obj)
+    end
+%     handles = rmfield(handles, 'switcher_obj');
+end
+try
+    try
+        fclose(handles.sc_obj)
+    end
+%     handles = rmfield(handles, 'sc_obj');
+end
+try
+    try
+        fclose(handles.nV_obj)
+    end
+%     handles = rmfield(handles, 'nV_obj');
+end
+
 %CONNECT TO devices
 try 
-    PPMSObj= GPcon(15,0);
-    setappdata(0,'PPMS',PPMSObj);
+    handles.PPMSObj= GPcon(15,2);
+%     PPMSObj = GPcon(15,0);
+%     setappdata(0,'PPMSObj',PPMSObj);
 catch
     errordlg('Failed to initialize connection to PPMS!','Error 0x007');
 end
 try
-    switcher_obj = GPcon(16,0);
-    setappdata(0,'switcher_obj',switcher_obj);
+    handles.switcher_obj = GPcon(5,2);
+%     setappdata(0,'handles.switcher_obj',handles.switcher_obj);
 catch
     errordlg('Failed to initialize connection to switcher!','Error 0x009');
 end
 try
-    sm_obj=GPcon(10,0);
-    setappdata(0,'sm_obj',sm_obj);
+    handles.sc_obj=GPcon(23,2);
+%     setappdata(0,'handles.sc_obj',handles.sc_obj);
 catch
     errordlg('Failed to initialize connection to SourceMeter!','Error 0x010');
 end
+try
+    handles.nV_obj=GPcon(6,2);
+%     setappdata(0,'handles.nV_obj',handles.nV_obj);
+catch
+    errordlg('Failed to initialize connection to nanoVoltmeter!','Error 0x011');
+end
+setappdata(0,'handles',handles)
 %timer
 mainTimer = timer;
 mainTimer.Name = 'Main GUI Timer';
 mainTimer.ExecutionMode = 'fixedRate';
 mainTimer.Period = 0.5;
-mainTimer.TimerFcn = 'live_data = timer_function(PPMSObj);';
+mainTimer.TimerFcn = 'timer_function';
 mainTimer.StartDelay = 1.5;
 start(mainTimer);
 
@@ -885,48 +924,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-function [output] = timer_function(PPMSObj)
-%Function that contains all Live Data functions for pulling information
-%about the ppms.
-% Function will return a structure with 6 fields:
-% output.Pressure - will contain the current pressure in the chamber
-% output.TempQ - will contain QUERY INFORMATION (set, rate and approach) regarding the temprature
-% output.Temp - will contain current temprature via ReadPPMSData
-% output.FieldQ - will contain QUERY INFORMATION (set, rate, approach and MagnetMode) regarding the magnetic field
-% output.Field - will contain current magnetic field via ReadPPMSData
-% output.ChamberQ - will contain QUERY information about current chamber valving status
-
-%Queries
-output.TempQ=TempQ(PPMSObj);
-output.FieldQ=FieldQ(PPMSObj);
-output.ChamberQ=ChamberQ(PPMSObj);
-%Data
-output.Pressure=ReadPPMSData(PPMSObj,19);
-output.Temp=ReadPPMSData(PPMSObj,1);
-output.Field=ReadPPMSData(PPMSObj,2);
-%output.Helium=also get helium level
-%Done readind data, now printing
-%Magnetic field
-set(handles.mf_target_status,'String', num2str(output.FieldQ{1}));
-set(handles.mf_rate_status,'String', num2str(output.FieldQ{2}));
-set(handles.mf_approach_status,'String', output.FieldQ{3});
-set(handles.mf_magnet_mode_status,'String', output.FieldQ{4});
-set(handles.H_text_status,'String', num2str(output.Field));
-%Temp
-set(handles.temp_text_status,'String', num2str(output.Temp));
-set(handles.temp_target_status,'String', num2str(output.TempQ{1}));
-set(handles.temp_rate_status,'String', num2str(output.TempQ{2}));
-set(handles.temp_approach_status,'String', output.TempQ{1});
-%Pressure
-set(handles.pressure_text_status,'String', num2str(output.Pressure));
-%Chamber Status
-set(handles.chamber_mode_status,'String', output.ChamberQ);
-%Helium
-%set(handles.helium_level_status,'String', num2str(output.Helium));
-guidata(hObject, handles);  %update data
-%se tu
-
-
 % --- Executes when user attempts to close figure1.
 function figure1_CloseRequestFcn(hObject, eventdata, handles)
 % hObject    handle to figure1 (see GCBO)
@@ -939,21 +936,30 @@ selection = questdlg('Are you sure you want to quit?',...
       'Yes','No','Yes'); 
    switch selection, 
       case 'Yes',
-          try
-             fclose(PPMSObj);
-          catch
-             errordlg('Failed to terminate connection to PPMS!','Error 0x008'); 
-          end
-          try
-             fclose(switcher_obj);
-          catch
-             errordlg('Failed to terminate connection to Switcher!','Error 0x011'); 
-          end
-          try
-             fclose(sm_obj);
-          catch
-             errordlg('Failed to terminate connection to ScourceMeter!','Error 0x012'); 
-          end
+        try
+            try
+                fclose(handles.PPMSObj)
+            end
+%             handles = rmfield(handles, 'PPMSObj');
+        end
+        try
+            try
+                fclose(handles.switcher_obj)
+            end
+%             handles = rmfield(handles, 'switcher_obj');
+        end
+        try
+            try
+                fclose(handles.sc_obj)
+            end
+%             handles = rmfield(handles, 'sc_obj');
+        end
+        try
+            try
+                fclose(handles.nV_obj)
+            end
+%             handles = rmfield(handles, 'nV_obj');
+        end
           delete(hObject);
       case 'No'
       return 
@@ -965,14 +971,14 @@ function channel_matrix_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to channel_matrix_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-ChannelMatrix(getappdata(0,'switcher_obj'));
+ChannelMatrix(getappdata(0,'handles.switcher_obj'));
 
 % --- Executes on button press in sample_chk_btn.
 function sample_chk_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to sample_chk_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-CheckMatrix(getappdata(0,'switcher_obj'),getappdata(0,'sm_obj')); %should be changed to samplecheck
+CheckMatrix(getappdata(0,'handles.switcher_obj'),getappdata(0,'handles.sc_obj')); %should be changed to samplecheck
 
 
 % --- Executes on slider movement.
@@ -1653,11 +1659,3 @@ function rdnSteps_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of rdnSteps
-
-
-% --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over txt_remark.
-function txt_remark_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to txt_remark (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
