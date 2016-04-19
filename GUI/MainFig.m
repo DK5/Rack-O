@@ -23,7 +23,7 @@ function varargout = MainFig(varargin)
 % Edit the above text to modify the response to help MainFig
 
 
-% Last Modified by GUIDE v2.5 18-Apr-2016 16:40:06
+% Last Modified by GUIDE v2.5 19-Apr-2016 18:13:14
 
 
 % Begin initialization code - DO NOT EDIT
@@ -625,8 +625,12 @@ function write_to_file_button_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-contents = getappdata(0,'cellCommands');
 FileName = get(handles.file_name_edit,'String');  %get the desired filename
+close_ind = getappdata(0,'close_ind');
+save(FileName,'close_ind');
+
+add_command_str(['load(',FileName,')'],1);
+contents = getappdata(0,'cellCommands');
 
 if strcmp(FileName,'Enter File name')    % make sure the user has entered a filename
      errordlg('Please Enter a File Name!','Error 0x003');  % user didnt
@@ -971,7 +975,20 @@ function channel_matrix_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to channel_matrix_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-ChannelMatrix(getappdata(0,'handles.switcher_obj'));
+uiwait(ChannelMatrix);  % open and wait for channel  selection
+matrixes = getappdata(0,'matrixes');    % get channels
+configs = ~cellfun(@isempty,matrixes);  % convert to logical array
+sums = sum(sum(configs,1),2);           % sum on every cofig
+sums(:,:,~sums) = [];                   % delete empty configs
+configs(:,:,~sums) = [];                % delete empty configs
+% setappdata(0,'configs',configs);        % set app data
+k = find(configs);                      % find non-zero elements -> linear index
+[row,col,~] = ind2sub(size(configs),k);	% sub-index
+close_ind = [row,col];                  % generate array
+sizes = squeeze(sums)';                 % size of each config
+cell_ind = mat2cell(close_ind,sizes);   % rows & cols ordered in cell array
+setappdata(0,'cell_ind',cell_ind);      % set app data
+
 
 % --- Executes on button press in sample_chk_btn.
 function sample_chk_btn_Callback(hObject, eventdata, handles)
@@ -1214,7 +1231,18 @@ function mnuParameter_Callback(hObject, eventdata, handles)
 % hObject    handle to mnuParameter (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+choice = get(hObject,'Value');
+units = get(hObject,'UserData');
+unit = units{choice,2};
+set(handles.txt_initValUnit,'String',unit);
+set(handles.txt_finalValUnit,'String',unit);
+set(handles.txt_SetUnit,'String',unit);
+set(handles.txtRate,'String',['Rate(1/',unit,'):']);
+methodFlag = get(handles.rdoSpace,'Value');
+if methodFlag
+    % steps
+    set(handles.txt_MethodUnit,'String',unit);
+end
 % Hints: contents = cellstr(get(hObject,'String')) returns mnuParameter contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from mnuParameter
 
@@ -1230,9 +1258,13 @@ function mnuParameter_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-data = cell(2,1);
-data{1} = 'Temprature';
-data{2} = 'Field';
+data = cell(2,2);
+data{1,1} = 'Temprature';   % title
+data{1,2} = '°K';           % units
+
+data{2,1} = 'Field';
+data{2,2} = 'Oe';
+
 set(hObject,'UserData',data);
 
 
@@ -1262,7 +1294,12 @@ function mnuSM_Callback(hObject, eventdata, handles)
 % hObject    handle to mnuSM (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+funcFlag = get(hObject,'Value');
+if funcFlag < 4
+    Options = get(hObject,'UserData');
+    unit = Options{funcFlag,2};
+    set(handles.txtSMval,'String',['Value - ',unit]);
+end
 % Hints: contents = cellstr(get(hObject,'String')) returns mnuSM contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from mnuSM
 
@@ -1361,7 +1398,10 @@ function mnuVoltSet_Callback(hObject, eventdata, handles)
 % hObject    handle to mnuVoltSet (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+choice = get(hObject,'Value');
+units = get(hObject,'UserData');
+unit = units{choice,3};
+set(handles.txtVoltSetUnit,'String',unit);
 % Hints: contents = cellstr(get(hObject,'String')) returns mnuVoltSet contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from mnuVoltSet
 
@@ -1381,7 +1421,7 @@ data = cell(1,3);
 
 data{1,1} = 'Integration Time'; % name
 data{1,2} = 'IntegrationTime';  % function callback
-data{1,3} = 'mSec';             % units
+data{1,3} = 'mS';             % units
 
 set(hObject,'UserData',data);
 
@@ -1580,7 +1620,7 @@ targetValStr = get(handles.edtTargetVal,'String');
 methodVal = get(handles.edtStep,'String');
 paramflag = get(handles.mnuParameter,'Value');
 Options = get(handles.mnuParameter,'UserData');
-methodFlag = get(handles.rdnSteps,'Value');
+methodFlag = get(handles.rdoSteps,'Value');
 switch paramflag
     case 1
         ParameterStr = 'Temp';
@@ -1596,10 +1636,10 @@ end
 
 if methodFlag
     methodStr = 'steps';
-    defStr = [ParameterStr,' = ',initValStr,':',methodVal,':',targetValStr,';'];
+    defStr = [ParameterStr,' = ','linspace(',initValStr,',',targetValStr,',',methodVal,');'];
 else
     methodStr = 'spacing';
-    defStr = [ParameterStr,' = ','linspace(',initValStr,',',targetValStr,',',methodVal,');'];
+    defStr = [ParameterStr,' = ',initValStr,':',methodVal,':',targetValStr,';'];
 end
 
 % update listbox
@@ -1661,18 +1701,42 @@ end
 
 
 % --- Executes on button press in rdoSpace.
+function rdoSteps_Callback(hObject, eventdata, handles)
+% hObject    handle to rdoSpace (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+set(handles.txt_MethodUnit,'String','');
+% Hint: get(hObject,'Value') returns toggle state of rdoSpace
+
+
+% --- Executes on button press in rdoSpace.
 function rdoSpace_Callback(hObject, eventdata, handles)
 % hObject    handle to rdoSpace (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+unit = get(handles.txt_initValUnit,'String');
+set(handles.txt_MethodUnit,'String',unit);
 % Hint: get(hObject,'Value') returns toggle state of rdoSpace
 
 
-% --- Executes on button press in rdnSteps.
-function rdnSteps_Callback(hObject, eventdata, handles)
-% hObject    handle to rdnSteps (see GCBO)
+% --- Executes on button press in btnScanSwitch.
+function btnScanSwitch_Callback(hObject, eventdata, handles)
+% hObject    handle to btnScanSwitch (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of rdnSteps
+% update listbox
+commandStr = 'Scan on switcher configurations';
+index = get(handles.CommandList,'Value');
+add_item_to_list_box(handles.CommandList,commandStr,index);
+add_item_to_list_box(handles.CommandList,'end',index+1);
+
+% update commands in script
+sendCommand = {'for s = 1:length(close_ind)';...
+                'rows = close_ind{s}(:,1);';...
+                'cols = close_ind{s}(:,2);';...
+                'for ch = 1:size(rows,1)';...
+                'closeCH(switcher_obj,rows(ch),cols(ch),1);';...
+                'end'};
+add_command_str(sendCommand,index);
+add_command_str('end',index+1);

@@ -22,7 +22,7 @@ function varargout = ChannelMatrix(varargin)
 
 % Edit the above text to modify the response to help ChannelMatrix
 
-% Last Modified by GUIDE v2.5 13-Mar-2016 14:48:57
+% Last Modified by GUIDE v2.5 19-Apr-2016 13:58:09
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -55,10 +55,10 @@ clc
 % Choose default command line output for ChannelMatrix
 handles.output = hObject;
 %CONNECT TO SWITCHER
-matrixes=cell(12,6,26);
+matrixes = cell(12,6,26);
 setappdata(0,'matrixes',matrixes);
 set(handles.listbox1,'Value',1);
-setappdata(0,'index_selected',1); %force Alpha for deafult selection
+setappdata(0,'index_selected',1); % force Alpha for deafult selection
 % Update handles structure
 guidata(hObject, handles);
 
@@ -134,6 +134,10 @@ for i=3:14
         end
     end
 end
+% [row,col,layer] = find(table=='V');
+% layer = layer*index_selected;
+% indices = [row,col,layer];
+% matrixes{indices}=''; %preform scan and check - add to matrixes selcted values
 %save changes
 set(handles.uitable3,'Data',matrixes(:,:,index_selected)); 
 setappdata(0,'matrixes',matrixes);
@@ -167,11 +171,11 @@ function listbox1_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns listbox1 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from listbox1
-matrixes=getappdata(0,'matrixes');
-index_selected=get(hObject,'Value');
+matrixes = getappdata(0,'matrixes');
+index_selected = get(hObject,'Value');
 setappdata(0,'index_selected',index_selected);
 set(handles.uitable3,'Data',matrixes(:,:,index_selected)); 
-set(handles.uitable1,'Data',cell(12,6)); 
+set(handles.uitable1,'Data',matrixes(:,:,index_selected)); 
 guidata(hObject, handles);
 
 
@@ -188,15 +192,47 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in pushbutton7.
-function pushbutton7_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton7 (see GCBO)
+% --- Executes on button press in btnLoad.
+function btnLoad_Callback(hObject, eventdata, handles)
+% hObject    handle to btnLoad (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[FileName,PathName] = uigetfile('*.mat','Select the Switch configurations file');
+if FileName==0
+    errordlg('Error Reading File','Error 0x002');
+    return
+end
+load(FileName);
+setappdata(0,'matrixes',matrixes);
+listbox1_Callback(handles.listbox1, eventdata, handles);
+
+
+% --- Executes on button press in btnSave.
+function btnSave_Callback(hObject, eventdata, handles)
+% hObject    handle to btnSave (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+name = get(handles.edtFileName,'String');
+matrixes = getappdata(0,'matrixes');
+save(name,'matrixes');
+
+function edtFileName_Callback(hObject, eventdata, handles)
+% hObject    handle to edtFileName (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Hints: get(hObject,'String') returns contents of edtFileName as text
+%        str2double(get(hObject,'String')) returns contents of edtFileName as a double
 
-% --- Executes on button press in pushbutton8.
-function pushbutton8_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton8 (see GCBO)
+
+% --- Executes during object creation, after setting all properties.
+function edtFileName_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edtFileName (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
