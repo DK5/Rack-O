@@ -166,6 +166,7 @@ elseif size(cellCommands,1) < index
 else
     cellCommands = [cellCommands(1:index-1);{str};cellCommands(index:end)];
 end
+cellCommands = cellTab(cellCommands);
 setappdata(0,'cellCommands',cellCommands);
 % % if activity == 'p'
 % %     % write to pCommands
@@ -409,6 +410,7 @@ function h = add_item_to_list_box(h, newitem, index)
         % Create the new cell array for the list box
         newstring = {oldstring{1:(index-1)},newitem,oldstring{index:end}};
     end
+    newstring = cellTab(newstring')';	% add TABs
     % Set the new cell array to the list box
     set(h, 'string', newstring);
 
@@ -626,10 +628,10 @@ function write_to_file_button_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 FileName = get(handles.file_name_edit,'String');  %get the desired filename
-close_ind = getappdata(0,'close_ind');
+close_ind = getappdata(0,'cell_ind');
 save(FileName,'close_ind');
 
-add_command_str(['load(',FileName,')'],1);
+add_command_str(['load ',FileName,'.mat'],1);
 contents = getappdata(0,'cellCommands');
 
 if strcmp(FileName,'Enter File name')    % make sure the user has entered a filename
@@ -652,7 +654,8 @@ for row = 1:nrows
 end
 
 fclose(FID);
-% type commands.m   %show the file
+
+eval(['edit ',FileName,'.m']);   %show the file
 msgbox('File Saved.','Attention','Help');
 
 
@@ -1237,7 +1240,7 @@ unit = units{choice,2};
 set(handles.txt_initValUnit,'String',unit);
 set(handles.txt_finalValUnit,'String',unit);
 set(handles.txt_SetUnit,'String',unit);
-set(handles.txtRate,'String',['Rate(1/',unit,'):']);
+set(handles.txtRate,'String',['Rate(',unit,'/sec):']);
 methodFlag = get(handles.rdoSpace,'Value');
 if methodFlag
     % steps
@@ -1318,7 +1321,7 @@ end
 data = cell(6,3);
 % option 1
 data{1,1} = 'Apply Current';    % title
-data{1,2} = 'mA';               % units
+data{1,2} = 'uA';               % units
 data{1,3} = 'current';          % function name
 
 % option 2
@@ -1328,7 +1331,7 @@ data{2,3} = 'voltage';
 
 % option 3
 data{3,1} = 'Current List';
-data{3,2} = 'mA';
+data{3,2} = 'uA';
 data{3,3} = '';
 
 % option 4
@@ -1465,13 +1468,13 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 data = cell(3,2);
 data{1,1} = '1 Shot Voltage';
-data{1,2} = '';
+data{1,2} = 'Add command';
 
 data{2,1} = 'Continously';
 data{2,2} = 'read(nv_obj);';
 
 data{3,1} = 'Delta Mode';
-data{3,2} = '';
+data{3,2} = 'A';
 
 set(hObject,'UserData',data);
 
@@ -1624,7 +1627,7 @@ methodFlag = get(handles.rdoSteps,'Value');
 switch paramflag
     case 1
         ParameterStr = 'Temp';
-        functionStr = 'TEMP(PPMSObj,Temp(j),10,1);';
+        functionStr = 'TEMP(PPMSObj,Temp(k),10,1);';
         indStr = 'k';
         unitStr = '[°K]';
     case 2
