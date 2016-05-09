@@ -410,7 +410,12 @@ function h = add_item_to_list_box(h, newitem, index)
         % Create the new cell array for the list box
         newstring = {oldstring{1:(index-1)},newitem,oldstring{index:end}};
     end
-    newstring = cellTab(newstring')';	% add TABs
+    try
+        newstring = cellTab(newstring')';	% add TABs
+    catch
+        errordlg('End statement cannot be above loop','Error 0x');
+        return;
+    end
     % Set the new cell array to the list box
     set(h, 'string', newstring);
 
@@ -1031,20 +1036,33 @@ function btnUp_Callback(hObject, eventdata, handles)
 index = get(handles.CommandList, 'Value');  % get selected index
 allstring = get(handles.CommandList, 'string'); % get strings from listbox
 len = length(allstring);    % number of lines
-if index == 1
-%     errordlg('Top line in program cannot be moved up','Error 0x');
-elseif index == len
-%     errordlg('End of program cannot be moved','Error 0x');
+cellCommands = getappdata(0,'cellCommands');    % get commands cell array
+
+if ~isempty(find(index==1))
+    errordlg('Top line in program cannot be moved up','Error 0x');
+elseif ~isempty(find(index==len))
+    errordlg('End of program cannot be moved','Error 0x');
 else
-    string = allstring{index};  % get selcted string
-    del_item_from_list_box(handles.CommandList, index); % delete from index
-    add_item_to_list_box(handles.CommandList, string, index-1); % add to upper index
-    set(handles.CommandList,'Value',index-1);   % set selection to the moved line
+    select = allstring(index);
+    allstring(index) = [];
+    allstring = [allstring(1:min(index-2));select;allstring(min(index-1):end)];
+    try
+        allstring = cellTab(allstring);
+        set(handles.CommandList,'String',allstring);   % set new order
+        set(handles.CommandList,'Value',(min(index-2)+(1:length(index))));   % set selection to the moved line
+    catch
+        errordlg('End statement can''t be above its loop');
+    end
     
-    cellCommands = getappdata(0,'cellCommands');    % get commands cell array
-    command = cellCommands{index};  % get selcted commannd index
-    delete_command_str(index);  % delete from cell array
-    add_command_str(command,index-1);   % add to the new index
+    commands = cellCommands(index);  % get selcted commannd index
+    cellCommands(index) = [];
+    cellCommands = [cellCommands(1:min(index-2));commands;cellCommands(min(index-1):end)];
+    try
+        cellCommands = cellTab(cellCommands);
+        setappdata(0,'cellCommands',cellCommands);
+    catch
+        errordlg('End statement can''t be above its loop');
+    end
 end
 
 
@@ -1058,19 +1076,38 @@ index = get(handles.CommandList, 'Value');
 allstring = get(handles.CommandList, 'string');
 string = allstring{index};
 len = length(allstring);
-if index == len-1
-%     errordlg('Bottom line in program cannot be moved down','Error 0x');
-elseif index == len
-%     errordlg('End of program cannot be moved','Error 0x');
+indLen = length(index);
+
+cellCommands = getappdata(0,'cellCommands');    % get commands cell array
+
+if ~isempty(find(index==len))
+    errordlg('End of program cannot be moved','Error 0x');
 else
-    del_item_from_list_box(handles.CommandList, index);
-    add_item_to_list_box(handles.CommandList, string, index+1);
-    set(handles.CommandList, 'Value',index+1);
-    cellCommands = getappdata(0,'cellCommands');
-    command = cellCommands{index};
-    delete_command_str(index);
-    add_command_str(command,index+1);
+    select = allstring(index);
+    allstring(index) = [];
+    ind = max(index) - indLen + 1;
+    if max(index)==len-1
+        ind = ind-1;    % don't move under END SEQENCE
+    end
+    allstring = [allstring(1:ind);select;allstring(ind+1:end)];
+    try
+        allstring = cellTab(allstring);
+        set(handles.CommandList,'String',allstring);   % set new order
+        set(handles.CommandList,'Value',(ind+(1:indLen)));   % set selection to the moved line
+    catch
+        errordlg('End statement can''t be above its loop');
+    end
+    commands = cellCommands(index);  % get selcted commannd index
+    cellCommands(index) = [];
+    cellCommands = [cellCommands(1:ind);commands;cellCommands(ind+1:end)];
+    try
+        cellCommands = cellTab(cellCommands);
+        setappdata(0,'cellCommands',cellCommands);
+    catch
+        errordlg('End statement can''t be above its loop');
+    end
 end
+
 
 % --- Executes on selection change in popupmenu9.
 function popupmenu9_Callback(hObject, eventdata, handles)

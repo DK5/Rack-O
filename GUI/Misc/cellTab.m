@@ -35,6 +35,9 @@ for i = 1:length(CommandsTab)
                 counter=counter+1;
             case 'end'
                 counter=counter-1;
+                if counter == -1
+                    error('End statement cannot be above loop');
+                end
                 TABS(i)=counter;
             otherwise
                 TABS(i)=counter;
