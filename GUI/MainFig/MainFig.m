@@ -159,7 +159,7 @@ function add_command_str(str,index)
 cellCommands = getappdata(0,'cellCommands');
 if isempty(cellCommands{1})
     % no commands yet
-    cellCommands{1} = str;
+    cellCommands = {str};
 elseif size(cellCommands,1) < index
     % put in the end of the array
     cellCommands{end+1,1} = str;
@@ -182,7 +182,11 @@ function delete_command_str(index)
 % index - index of command line
 % activity - 'p'/'k'
 cellCommands = getappdata(0,'cellCommands');
-cellCommands(index) = [];
+if size(cellCommands,1) == 1
+	cellCommands{index} = [];
+else
+    cellCommands(index) = [];
+end
 setappdata(0,'cellCommands',cellCommands);
 % % if activity == 'p'
 % %     % write to pCommands
@@ -425,24 +429,23 @@ function h = del_item_from_list_box(h, index)
 % H listbox handle
 % index - index to remove 
 % STRING a new item to display
+oldstring = get(h,'string');   % listbox string cell array
+if strcmp(oldstring{index},'End')
+    errordlg('Cannot delete End statement!','Error 0x004');
+    return
+elseif strcmp(oldstring{index},'End Sequence')
+    errordlg('Cannot delete End Sequence statement!','Error 0x005');
+    return
+end
 
-    oldstring = get(h,'string');   % listbox string cell array
-    if strcmp(oldstring{index},'End')
-        errordlg('Cannot delete End statement!','Error 0x004');
-        return
-    elseif strcmp(oldstring{index},'End Sequence')
-        errordlg('Cannot delete End Sequence statement!','Error 0x005');
-        return
-    end
-    
-    L = length(oldstring);
-    
-    if isempty(oldstring)
-    elseif index==L 
-    else
-        newstring = {oldstring{1:(index-1)} oldstring{index+1:end}};
-        set(h,'string',newstring);
-    end
+L = length(oldstring);
+
+if isempty(oldstring)
+elseif index==L 
+else
+    newstring = {oldstring{1:(index-1)} oldstring{index+1:end}};
+    set(h,'string',newstring);
+end
         
 % --- Executes on selection change in CommandList.
 function CommandList_Callback(hObject, eventdata, handles)
