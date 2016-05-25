@@ -445,7 +445,7 @@ for ind = 1:length(index)
     end
 end
 strings(index) = [];
-set(h,'value',min(ind)-1); 
+set(h,'value',min(min(ind)+1,length(strings))); 
 set(h,'string',strings); 
 
 
@@ -523,8 +523,11 @@ function btnDeleteLine_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 index_selected = get(handles.CommandList, 'Value');
-del_item_from_list_box(handles.CommandList,index_selected);
-delete_command_str(index_selected);
+try
+    del_item_from_list_box(handles.CommandList,index_selected);
+    delete_command_str(index_selected);
+catch
+end
 
 function edit9_Callback(hObject, eventdata, handles)
 % hObject    handle to edit9 (see GCBO)
@@ -1618,7 +1621,7 @@ index = get(handles.CommandList,'Value');
 add_item_to_list_box(handles.CommandList,commandStr,index);
 
 % update commands in script
-add_command_str(functionStr,index);
+add_command_str([functionStr,'    %',commandStr],index);
 
 
 function edtRate_Callback(hObject, eventdata, handles)
@@ -1692,9 +1695,19 @@ end
 if methodFlag
     methodStr = 'steps';
     defStr = [ParameterStr,' = ','linspace(',initValStr,',',targetValStr,',',methodVal,');'];
+    correct = floor(str2double(methodVal));
+    methodVal = num2str(correct);
+    set(handles.edtStep,'String',methodVal);
 else
     methodStr = 'spacing';
     defStr = [ParameterStr,' = ',initValStr,':',methodVal,':',targetValStr,';'];
+    initVal = str2double(initValStr);
+    targetVal = str2double(targetValStr);
+    space = str2double(methodVal);
+    interval = abs(initVal-targetVal);
+    space = interval/floor(interval/space);
+    methodVal = num2str(space);
+    set(handles.edtStep,'String',methodVal);
 end
 
 % update listbox
@@ -1787,7 +1800,8 @@ add_item_to_list_box(handles.CommandList,commandStr,index);
 add_item_to_list_box(handles.CommandList,'end',index+1);
 
 % update commands in script
-sendCommand = {'for s = 1:length(close_ind)';...
+sendCommand = { ['% ',commandStr];...
+                'for s = 1:length(close_ind)';...
                 'rows = close_ind{s}(:,1);';...
                 'cols = close_ind{s}(:,2);';...
                 'for ch = 1:size(rows,1)';...
