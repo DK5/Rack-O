@@ -63,7 +63,7 @@ handles.output = hObject;
 %CLOSE DEVICES before opening them (just in case)
 try
     try
-        fclose(handles.PPMSObj)
+        fclose(handles.PPMSObj);
 %         PPMSObj = getappdata(0,'PPMSObj');
 %         fclose(PPMSObj);
         
@@ -72,19 +72,19 @@ try
 end
 try
     try
-        fclose(handles.switcher_obj)
+        fclose(handles.switcher_obj);
     end
 %     handles = rmfield(handles, 'switcher_obj');
 end
 try
     try
-        fclose(handles.sc_obj)
+        fclose(handles.sc_obj);
     end
 %     handles = rmfield(handles, 'sc_obj');
 end
 try
     try
-        fclose(handles.nV_obj)
+        fclose(handles.nV_obj);
     end
 %     handles = rmfield(handles, 'nV_obj');
 end
@@ -637,7 +637,8 @@ function write_to_file_button_Callback(hObject, eventdata, handles)
 
 FileName = get(handles.file_name_edit,'String');  %get the desired filename
 close_ind = getappdata(0,'cell_ind');
-save(FileName,'close_ind');
+ListCommands = get(handles.CommandList,'string');
+save(FileName,'close_ind','ListCommands');
 
 add_command_str(['load ',FileName,'.mat'],1);
 contents = getappdata(0,'cellCommands');
@@ -646,6 +647,7 @@ if strcmp(FileName,'Enter File name')    % make sure the user has entered a file
      errordlg('Please Enter a File Name!','Error 0x003');  % user didnt
     return
 end
+
 FID = fopen([FileName,'.m'],'w');   
 formatSpec = '%s\r\n';
 [nrows,~] = size(contents); % number of commands 
@@ -657,7 +659,7 @@ for row = 1:nrows
         end
     else
         fprintf(FID,formatSpec,contents{row});   %write list in file - REWRITES EXISTING
-        %to change, change w in fopen to a
+        % to change, change w in fopen to a
     end
 end
 
@@ -673,8 +675,6 @@ function execute_code_button_Callback(hObject, eventdata, handles)
 % hObject    handle to execute_code_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-
 contents = get(handles.CommandList,'String');
 setappdata(0,'listbox_contents',contents);
 setappdata(0,'Button','Execute'); %let dialog know what button is calling it
@@ -799,16 +799,18 @@ function choose_file_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to choose_file_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[FileName,PathName] = uigetfile('*.m','Select the MATLAB file containing ppMS commands');
+[FileName,FilePath] = uigetfile('*.m','Select the MATLAB file containing Commands');
 if FileName==0
     errordlg('Error Reading File','Error 0x002');
     return
 end
-FID = fopen(FileName,'a');  %get file id
-setappdata(0,'FileName',FileName);
-setappdata(0,'Button','Choose'); %let dialog know what button is calling it
-varargout = load_file_dialog(figure(load_file_dialog));   %open verification load_file_dialog
-
+% setappdata(0,'FileName',FileName);
+% setappdata(0,'FilePath',FilePath);
+% setappdata(0,'Button','Choose'); %let dialog know what button is calling it
+% varargout = load_file_dialog(figure(load_file_dialog));   %open verification load_file_dialog
+FileName = [FilePath,FileName(1:end-2),'.mat'];
+load(FileName,'ListCommands');  % get listbox contents
+set(handles.CommandList,'string',ListCommands);
 
 % --- Executes on selection change in chamber_mode_popup.
 function chamber_mode_popup_Callback(hObject, eventdata, handles)
@@ -1077,7 +1079,6 @@ function btnDown_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 index = get(handles.CommandList, 'Value');
 allstring = get(handles.CommandList, 'string');
-string = allstring{index};
 len = length(allstring);
 indLen = length(index);
 

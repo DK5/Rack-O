@@ -23,7 +23,7 @@ function varargout = load_file_dialog(varargin)
 
 % Edit the above text to modify the response to help load_file_dialog
 
-% Last Modified by GUIDE v2.5 06-Sep-2015 12:06:23
+% Last Modified by GUIDE v2.5 25-May-2016 14:29:53
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -56,18 +56,20 @@ function load_file_dialog_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for load_file_dialog
 handles.output = hObject;
 
-FileName=getappdata(0,'FileName');   %get the filename of wanted file containing commands
-
-btn=getappdata(0,'Button');
+btn = getappdata(0,'Button');
 setappdata(0,'Source',btn);
 switch btn
     case 'Choose'
-        FileName=getappdata(0,'FileName');
-        txt_to_print=fileread(FileName);
+        FileName = getappdata(0,'FileName');
+        FilePath = getappdata(0,'FilePath');
+        FileName = [FilePath,FileName(1:end-2),'.mat'];
+        load(FileName,'ListCommands');  % get listbox contents
+        txt_to_print = strjoin(ListCommands','\n');
+        setappdata(0,'ListCommands',ListCommands);
     case 'Execute'
-        txt_to_print=getappdata(0,'listbox_contents');
+        txt_to_print = getappdata(0,'listbox_contents');
 end
-set(handles.text2,'String', txt_to_print); %display contents
+set(handles.text2,'String', txt_to_print);	% display contents
 % Update handles structure
 guidata(hObject, handles);
 
@@ -86,20 +88,23 @@ function varargout = load_file_dialog_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
-% --- Executes on button press in pushbutton1.
-function pushbutton1_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton1 (see GCBO)
+% --- Executes on button press in btn_send.
+function btn_send_Callback(hObject, eventdata, handles)
+% hObject    handle to btn_send (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 %send contents to ppms%
-source=getappdata(0,'Source')
+source = getappdata(0,'Source');
 switch source
     case 'Choose' %User wants to run a pre-written file
-        FileName=getappdata(0,'FileName');
-        type FileName;  %when time's come, remove the 'type' and just run the file
+        FileName = getappdata(0,'FileName');
+        FilePath = getappdata(0,'FilePath');
+        type([FilePath,FileName]);  %when time's come, remove the 'type' and just run the file
+        ListCommands = getappdata(0,'ListCommands');
+        set(handles.CommandList,'string',ListCommands); % update listbox
     case 'Execute'  %user wants to execute the current sequence
-        txt_to_print=getappdata(0,'listbox_contents');
+        txt_to_print = getappdata(0,'listbox_contents');
 end
 msgbox('Commands sent!','Attention','Warn');
 uiwait;  %wait for user to click ok in msgbox
@@ -119,3 +124,4 @@ function text1_ButtonDownFcn(hObject, eventdata, handles)
 % hObject    handle to text1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
