@@ -429,23 +429,33 @@ function h = del_item_from_list_box(h, index)
 % H listbox handle
 % index - index to remove 
 % STRING a new item to display
-oldstring = get(h,'string');   % listbox string cell array
-if strcmp(oldstring{index},'End')
-    errordlg('Cannot delete End statement!','Error 0x004');
-    return
-elseif strcmp(oldstring{index},'End Sequence')
-    errordlg('Cannot delete End Sequence statement!','Error 0x005');
-    return
+strings = get(h,'string');   % listbox string cell array
+if isempty(strings)
+    return;
 end
 
-L = length(oldstring);
-
-if isempty(oldstring)
-elseif index==L 
-else
-    newstring = {oldstring{1:(index-1)} oldstring{index+1:end}};
-    set(h,'string',newstring);
+for ind = 1:length(index)
+    lineStr = strings{index(ind)};
+    if strcmp(lineStr,'End')
+        errordlg('Cannot delete End statement!','Error 0x004');
+        return
+    elseif strcmp(lineStr,'End Sequence')
+        errordlg('Cannot delete End Sequence statement!','Error 0x005');
+        return
+    end
 end
+strings(index) = [];
+set(h,'value',min(ind)-1); 
+set(h,'string',strings); 
+
+
+% L = length(strings);
+% if isempty(strings)
+% elseif index==L 
+% else
+%     newstring = {strings{1:(index-1)} strings{index+1:end}};
+%     set(h,'string',newstring);
+% end
         
 % --- Executes on selection change in CommandList.
 function CommandList_Callback(hObject, eventdata, handles)
@@ -638,10 +648,10 @@ function write_to_file_button_Callback(hObject, eventdata, handles)
 FileName = get(handles.file_name_edit,'String');  %get the desired filename
 close_ind = getappdata(0,'cell_ind');
 ListCommands = get(handles.CommandList,'string');
-save(FileName,'close_ind','ListCommands');
+contents = getappdata(0,'cellCommands');
+save(FileName,'close_ind','ListCommands','contents');
 
 add_command_str(['load ',FileName,'.mat'],1);
-contents = getappdata(0,'cellCommands');
 
 if strcmp(FileName,'Enter File name')    % make sure the user has entered a filename
      errordlg('Please Enter a File Name!','Error 0x003');  % user didnt
@@ -809,8 +819,9 @@ end
 % setappdata(0,'Button','Choose'); %let dialog know what button is calling it
 % varargout = load_file_dialog(figure(load_file_dialog));   %open verification load_file_dialog
 FileName = [FilePath,FileName(1:end-2),'.mat'];
-load(FileName,'ListCommands');  % get listbox contents
+load(FileName,'ListCommands','contents');  % get listbox contents
 set(handles.CommandList,'string',ListCommands);
+setappdata(0,'cellCommands',contents);
 
 % --- Executes on selection change in chamber_mode_popup.
 function chamber_mode_popup_Callback(hObject, eventdata, handles)
@@ -1515,7 +1526,7 @@ data{2,1} = 'Continously';
 data{2,2} = 'read(nv_obj);';
 
 data{3,1} = 'Delta Mode';
-data{3,2} = 'A';
+data{3,2} = 'DeltaMode();';
 
 set(hObject,'UserData',data);
 

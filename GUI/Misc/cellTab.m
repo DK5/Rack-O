@@ -1,4 +1,4 @@
-function [ CommandsTab] = cellTab( CommandsCell)
+function [CommandsTab] = cellTab( CommandsCell)
 %Tab identation
 
 CommandsTab = strtrim(CommandsCell); % remove all tabs
