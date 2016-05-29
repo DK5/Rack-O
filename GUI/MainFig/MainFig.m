@@ -1481,11 +1481,19 @@ switch paramflag
         functionStr = 'TEMP(PPMSObj,Temp(k),10,1);';
         indStr = 'k';
         unitStr = '[°K]';
+        if str2double(initValStr)<1.7 || str2double(targetValStr)<1.7
+            errordlg('Temperature can''t go below 1.7K');
+            return;
+        end
     case 2
         ParameterStr = 'H';
         functionStr = 'FIELD(PPMSobj,H(j),10,1,1);';
         indStr = 'j';
         unitStr = '[Oe]';
+        if str2double(initValStr) > 9e4 || str2double(targetValStr) > 9e4
+            errordlg('Magnetic field can''t go above 90,000 Oe (= 9T)');
+            return;
+        end
 end
 
 if methodFlag
