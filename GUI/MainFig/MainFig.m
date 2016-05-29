@@ -478,9 +478,11 @@ function txt_waiting_time_Callback(hObject, eventdata, handles)
 % hObject    handle to txt_waiting_time (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of txt_waiting_time as text
-%        str2double(get(hObject,'String')) returns contents of txt_waiting_time as a double
+currChar = get(handles.figure1,'CurrentCharacter');
+if isequal(currChar,char(13)) % char(13) = enter key
+   %call the pushbutton callback
+   btnPause_Callback(hObject, eventdata, handles);
+end
 
 
 % --- Executes during object creation, after setting all properties.
@@ -527,9 +529,6 @@ function txt_remark_Callback(hObject, eventdata, handles)
 % hObject    handle to txt_remark (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of txt_remark as text
-%        str2double(get(hObject,'String')) returns contents of txt_remark as a double
 currChar = get(handles.figure1,'CurrentCharacter');
 if isequal(currChar,char(13)) %char(13) == enter key
    %call the pushbutton callback
@@ -722,9 +721,11 @@ function file_name_edit_Callback(hObject, eventdata, handles)
 % hObject    handle to file_name_edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of file_name_edit as text
-%        str2double(get(hObject,'String')) returns contents of file_name_edit as a double
+currChar = get(handles.figure1,'CurrentCharacter');
+if isequal(currChar,char(13)) % char(13) = enter key
+   %call the pushbutton callback
+   write_to_file_button_Callback(hObject, eventdata, handles);
+end
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1229,9 +1230,12 @@ function edtSM_Callback(hObject, eventdata, handles)
 % hObject    handle to edtSM (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+currChar = get(handles.figure1,'CurrentCharacter');
+if isequal(currChar,char(13)) %char(13) == enter key
+   %call the pushbutton callback
+   btnSMadd_Callback(hObject, eventdata, handles);
+end
 
-% Hints: get(hObject,'String') returns contents of edtSM as text
-%        str2double(get(hObject,'String')) returns contents of edtSM as a double
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1289,7 +1293,7 @@ Options = get(handles.mnuVoltSet,'UserData');% get data from menu
 setValue = get(handles.edtVoltSet,'String');
 
 % add item to sequence
-commandLine = ['Set ',Options{funcFlag,1},' to ',setValue];
+commandLine = ['Set ',Options{funcFlag,1},' to ',setValue,Options{funcFlag,3}];
 index = get(handles.CommandList,'Value');
 add_item_to_list_box(handles.CommandList,commandLine,index);
 functionStr = [Options{funcFlag,2},'(nv_obj, ',setValue,');'];
@@ -1350,9 +1354,11 @@ function edtVoltSet_Callback(hObject, eventdata, handles)
 % hObject    handle to edtVoltSet (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edtVoltSet as text
-%        str2double(get(hObject,'String')) returns contents of edtVoltSet as a double
+currChar = get(handles.figure1,'CurrentCharacter');
+if isequal(currChar,char(13)) %char(13) == enter key
+   %call the pushbutton callback
+   btnVoltSet_Callback(hObject, eventdata, handles);
+end
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1373,10 +1379,11 @@ function edtSetVal_Callback(hObject, eventdata, handles)
 % hObject    handle to edtSetVal (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edtSetVal as text
-%        str2double(get(hObject,'String')) returns contents of edtSetVal as a double
-
+currChar = get(handles.figure1,'CurrentCharacter');
+if isequal(currChar,char(13)) % char(13) = enter key
+   %call the pushbutton callback
+   btnSetParam_Callback(hObject, eventdata, handles);
+end
 
 % --- Executes during object creation, after setting all properties.
 function edtSetVal_CreateFcn(hObject, eventdata, handles)
@@ -1424,9 +1431,11 @@ function edtRate_Callback(hObject, eventdata, handles)
 % hObject    handle to edtRate (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edtRate as text
-%        str2double(get(hObject,'String')) returns contents of edtRate as a double
+currChar = get(handles.figure1,'CurrentCharacter');
+if isequal(currChar,char(13)) % char(13) = enter key
+   %call the pushbutton callback
+   btnSetParam_Callback(hObject, eventdata, handles);
+end
 
 
 % --- Executes during object creation, after setting all properties.

@@ -11,16 +11,19 @@ for i = 1:length(CommandsTab)
         % it is cell
         CommandsTabCell = CommandsTab{i,1};
         for j = 1:length(CommandsTabCell)
+            if length(CommandsTabCell{j,1}) < 3
+                continue;
+            end
             str = CommandsTabCell{j,1}(1:3);
             switch str
                 case {'for','Sca'}
-                    TABS(i)=counter;
-                    counter = counter+1;
+                    TABS(i) = counter;
+                    counter = counter + 1;
                 case 'end'
-                    counter = counter-1;
-                    TABS(i)=counter;
+                    counter = counter - 1;
+                    TABS(i) = counter;
                 otherwise
-                    TABS(i)=counter;
+                    TABS(i) = counter;
             end
             tab = repmat('    ',1,TABS(i));
             CommandsTabCell{j,1} = [tab, CommandsTabCell{j,1}];
@@ -28,13 +31,16 @@ for i = 1:length(CommandsTab)
         CommandsTab{i,1} = CommandsTabCell;
     else
         % write TAB
+        if length(CommandsTab{i,1}) < 3
+            continue;
+        end
         str = CommandsTab{i,1}(1:3);
         switch str
             case {'for','Sca'}
-                TABS(i)=counter;
-                counter=counter+1;
+                TABS(i) = counter;
+                counter = counter + 1;
             case 'end'
-                counter=counter-1;
+                counter = counter - 1;
                 if counter == -1
                     error('End statement cannot be above loop');
                 end
