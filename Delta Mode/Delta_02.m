@@ -49,7 +49,7 @@ end
 obj2=nV_obj;
 
 % Set the 2182 property values.
-<<<<<<< HEAD
+% <<<<<<< HEAD
 % set(obj2, 'BoardIndex', 2);
 % set(obj2, 'ByteOrder', 'littleEndian');
 % set(obj2, 'BytesAvailableFcn', '');
@@ -74,7 +74,7 @@ obj2=nV_obj;
 % set(obj2, 'TimerFcn', '');
 % set(obj2, 'TimerPeriod', 1);
 % set(obj2, 'UserData', []);
-=======
+% =======
 set(obj2, 'BoardIndex', 0);
 set(obj2, 'ByteOrder', 'littleEndian');
 set(obj2, 'BytesAvailableFcn', '');
@@ -99,7 +99,7 @@ set(obj2, 'Timeout', 1);
 set(obj2, 'TimerFcn', '');
 set(obj2, 'TimerPeriod', 1);
 set(obj2, 'UserData', []);
->>>>>>> origin/PPMS
+% >>>>>>> origin/PPMS
 
 if nargout > 0 
     out = [obj2]; 

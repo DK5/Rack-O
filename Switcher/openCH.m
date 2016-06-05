@@ -15,9 +15,9 @@ if R < 1 || R > 6
     error('Error - Row number must be between 1 to 6');
 end
 
-if C < 3 || C > 14
-    error('Error - Column number must be between 3 to 14');
-end
+% if C < 3 || C > 14
+%     error('Error - Column number must be between 3 to 14');
+% end
 
 % Execution %
 try 

@@ -1,11 +1,10 @@
-function [ sample ] = deltaMode( cs_obj , volt_obj )
-%UNTITLED4 Summary of this function goes here
-%   Detailed explanation goes here
+volt_obj = GPcon(6,0);
+cs_obj = GPcon(23,0);
 
 %% set 2182 voltmeter for delta mode
 fprintf(volt_obj,':TRACe:CLEar');                % Clear readings from buffer
 fprintf(volt_obj,':SENSe:VOLTage:DELTa ON');     % Enable or disable Delta
-fprintf(volt_obj,':SENSe:VOLTage:NPLCycles 1');% Set integration rate in line cycles to minimun (0.01 to 50);
+fprintf(volt_obj,':SENSe:VOLTage:NPLCycles 1'); % Set integration rate in line cycles to minimun (0.01 to 50);
                                                 % integration rate = nplc/frequency
 fprintf(volt_obj,':TRIGger:DELay 0');            % Set trigger delay
 fprintf(volt_obj,':TRIGger:SOURce EXTernal');    % Select control source; IMMediate, TIMer, MANual, BUS, or EXTernal.
@@ -30,7 +29,7 @@ fprintf(cs_obj,':SENSe:VOLTage:RANGe 0.2');    % Configure measurement range
 fprintf(cs_obj,':SOURce:FUNCtion CURRent');    % Select SOURce Mode
 fprintf(cs_obj,':SOURce:CURRent:MODE LIST');   % Select I-Source mode (FIXed, SWEep, or LIST);
 
-fprintf(cs_obj,':SOURce:LIST:CURRent 20E-6,-20E-6');       % Create list of I-Source values
+fprintf(cs_obj,':SOURce:LIST:CURRent 20E-6,-20E-6,50e-6,-50e-6');       % Create list of I-Source values
 fprintf(cs_obj,':OUTPut ON');                  % Turn source on
 fprintf(cs_obj,':INITiate');                   % Initiate source-measure cycle(s);.
 
@@ -45,4 +44,5 @@ end
 
 sample = read(volt_obj);
 
-end
+
+

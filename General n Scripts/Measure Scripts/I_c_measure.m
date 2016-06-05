@@ -1,10 +1,10 @@
 %close all;
 %clear;
 
-switch_obj  =GPcon(5,2);    % Connects to the 3706A-S Switch
-nV_obj      =GPcon(6,2);    % Connects to the 2182A nano-Voltmeter
-src_obj     =GPcon(23,2);   % Connects to the 2401  Sourcemeter
-PPMS    =GPcon(15,2);   % Connects to the PPMS
+switch_obj  =GPcon(5,0);    % Connects to the 3706A-S Switch
+nV_obj      =GPcon(6,0);    % Connects to the 2182A nano-Voltmeter
+src_obj     =GPcon(23,0);   % Connects to the 2401  Sourcemeter
+PPMS    =GPcon(15,0);   % Connects to the PPMS
 
 % go to required temperature
 % TEMP(PPMS_obj,15,6,0);

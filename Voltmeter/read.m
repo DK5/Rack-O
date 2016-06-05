@@ -5,9 +5,9 @@ function [ vals ] = read( obj1 )
 %   vals = returned array
 
 fprintf(obj1, ':trace:feed:control never');	% Stop storing readings
-data = query(obj1, ':data:data?');         % Request all stored readings
+data = query(obj1, ':data:data?');          % Request all stored readings
 % data=fscanf(obj1)                           % Request all stored readings
-length(data)
+% length(data)
 store(obj1);                                % Clear and continue
 vals = str2double(strsplit(data,','));      % Export readings to array
 vals(isnan(vals))=[];                       % Deletes all NaN

@@ -12,7 +12,7 @@
 % be used as current source.
 % e.g.:     ExtraInstrument(Switch,'I','ON')
 
-function ExtraInstrument(Switch_Obj,instrument,state)
+function ExtraInstrument(Switch,instrument,state)
 switch lower(instrument)
     case 'i'
         x=1;
