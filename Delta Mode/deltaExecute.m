@@ -1,4 +1,4 @@
-function [reads] = deltaExecute( volt_obj , cs_obj , samples , currentList)
+function [reads] = deltaExecute( volt_obj , cs_obj , current, samples)
 %dektaExecute( cs_obj , volt_obj , samples , currentList, compliance) 
 % executes delta mode measuring routine
 %   cs_obj = current source object
@@ -10,11 +10,12 @@ function [reads] = deltaExecute( volt_obj , cs_obj , samples , currentList)
 fprintf(volt_obj,':TRACe:CLEar');	% Clear readings from buffer
 
 %% current source
-currentList(2,:) = -currentList(1,:);   % prepare to delta: +-
-listStr = num2str(currentList(:)');
-listStr = strrep(listStr,repmat(' ',1,7),',');
-listStr = strrep(listStr,repmat(' ',1,6),',');
-fprintf(cs_obj,[':TRIGger:COUNt ',num2str(samples*size(currentList,2))]);	% Specify trigger count (1 to 2500);
+% current(2) = -current(1);   % prepare to delta: +-
+listStr = [num2str(current),',',num2str(-current)];
+% listStr = num2str(current);
+% listStr = strrep(listStr,repmat(' ',1,7),',');
+% listStr = strrep(listStr,repmat(' ',1,6),',');
+fprintf(cs_obj,[':TRIGger:COUNt ',num2str(samples*size(current,2))]);	% Specify trigger count (1 to 2500);
 fprintf(cs_obj,[':SOURce:LIST:CURRent ',listStr]);	% Create list of I-Source values
 fprintf(cs_obj,':OUTPut ON');	% Turn source on
 fprintf(cs_obj,':INITiate');	% Initiate source-measure cycle(s);.
