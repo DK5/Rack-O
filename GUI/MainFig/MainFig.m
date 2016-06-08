@@ -23,7 +23,7 @@ function varargout = MainFig(varargin)
 % Edit the above text to modify the response to help MainFig
 
 
-% Last Modified by GUIDE v2.5 19-Apr-2016 18:13:14
+% Last Modified by GUIDE v2.5 05-Jun-2016 16:53:30
 
 
 % Begin initialization code - DO NOT EDIT
@@ -1507,20 +1507,20 @@ end
 
 if methodFlag
     methodStr = 'steps';
-    defStr = [ParameterStr,' = ','linspace(',initValStr,',',targetValStr,',',methodVal,');'];
-    correct = floor(str2double(methodVal));
+    correct = floor(abs(str2double(methodVal)));	% steps must be natural number
     methodVal = num2str(correct);
-    set(handles.edtStep,'String',methodVal);
+    set(handles.edtStep,'String',methodVal);    % rewrite value
+    defStr = [ParameterStr,' = ','linspace(',initValStr,',',targetValStr,',',methodVal,');'];
 else
     methodStr = 'spacing';
-    defStr = [ParameterStr,' = ',initValStr,':',methodVal,':',targetValStr,';'];
     initVal = str2double(initValStr);
     targetVal = str2double(targetValStr);
     space = str2double(methodVal);
     interval = abs(initVal-targetVal);
-    space = interval/floor(interval/space);
+    space = interval/floor(interval/space); % there must be natural number of steps
     methodVal = num2str(space);
     set(handles.edtStep,'String',methodVal);
+    defStr = [ParameterStr,' = ',initValStr,':',methodVal,':',targetValStr,';'];
 end
 
 % update listbox
@@ -1622,3 +1622,10 @@ sendCommand = { ['% ',commandStr];...
                 'end'};
 add_command_str(sendCommand,index);
 add_command_str('end',index+1);
+
+
+% --- Executes on button press in pushbutton36.
+function pushbutton36_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton36 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
