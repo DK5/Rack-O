@@ -263,20 +263,6 @@ function txt_Start_field_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of txt_Start_field as a double
 
 
-% --- Executes during object creation, after setting all properties.
-function txt_Start_field_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to txt_Start_field (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
 function txt_Stop_field_Callback(hObject, eventdata, handles)
 % hObject    handle to txt_Stop_field (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -286,20 +272,6 @@ function txt_Stop_field_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of txt_Stop_field as a double
 
 
-% --- Executes during object creation, after setting all properties.
-function txt_Stop_field_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to txt_Stop_field (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
 function mf_rate_edit_Callback(hObject, eventdata, handles)
 % hObject    handle to mf_rate_edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -307,36 +279,6 @@ function mf_rate_edit_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of mf_rate_edit as text
 %        str2double(get(hObject,'String')) returns contents of mf_rate_edit as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function mf_rate_edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to mf_rate_edit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in Set_take_picture.
-function Set_take_picture_Callback(hObject, eventdata, handles)
-% hObject    handle to Set_take_picture (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-%index_selected = get(handles.CommandList, 'Value')
-%add_item_to_list_box(handles.CommandList, 'moty',index_selected);
-
-ax_old = gca;
-f_new = figure;
-ax_new = copyobj(ax_old,f_new);
-set(ax_new,'Position','default')
-print(f_new,'AxesOnly','-dpng')
-close %'f_new'
 
 
 function h = add_item_to_list_box_end(h, newitem)
@@ -631,15 +573,8 @@ function execute_code_button_Callback(hObject, eventdata, handles)
 contents = get(handles.CommandList,'String');
 setappdata(0,'listbox_contents',contents);
 setappdata(0,'Button','Execute'); %let dialog know what button is calling it
-varargout = load_file_dialog(figure(load_file_dialog)); %calls verification dialog
+varargout = load_file_dialog(figure(load_file_dialog)); % calls verification dialog
 %excecution function goes here
-
-
-% --- Executes during object creation, after setting all properties.
-function execute_code_button_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to execute_code_button (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
 
 
 % --- Executes on selection change in set_mf_popup.
@@ -688,25 +623,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --------------------------------------------------------------------
-function uipushtool2_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to uipushtool2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-%saveas(hObject,'pic.jpg');
-
-fig = gcf;
-set(fig,'PaperPositionMode','auto');
-print('Full UI Screenpic','-dpng','-r0');
-
-% --------------------------------------------------------------------
-function uipushtool1_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to uipushtool1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
 % --- Executes on button press in choose_file_btn.
 function choose_file_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to choose_file_btn (see GCBO)
@@ -737,7 +653,7 @@ function chamber_mode_popup_Callback(hObject, eventdata, handles)
 
 %WHEN TIME'S COME: ADD THESE LINES:
 
-action=contents{get(hObject,'Value')}; %id of selceted action
+action = contents{get(hObject,'Value')}; %id of selceted action
 CHAMBER(PPMSObj,action-1);
 
 
@@ -775,7 +691,6 @@ function temprature_approach_popup_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 
 function target_temp_edit_Callback(hObject, eventdata, handles)
@@ -1005,50 +920,6 @@ else
 end
 
 
-% --- Executes on selection change in mnuYaxis.
-function mnuYaxis_Callback(hObject, eventdata, handles)
-% hObject    handle to mnuYaxis (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns mnuYaxis contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from mnuYaxis
-
-
-% --- Executes during object creation, after setting all properties.
-function mnuYaxis_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to mnuYaxis (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in mnuParameter.
-function mnuParameter_Callback(hObject, eventdata, handles)
-% hObject    handle to mnuParameter (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-choice = get(hObject,'Value');
-units = get(hObject,'UserData');
-unit = units{choice,2};
-set(handles.txt_initValUnit,'String',unit);
-set(handles.txt_finalValUnit,'String',unit);
-set(handles.txt_SetUnit,'String',unit);
-set(handles.txtRate,'String',['Rate(',unit,'/sec):']);
-methodFlag = get(handles.rdoSpace,'Value');
-if methodFlag
-    % steps
-    set(handles.txt_MethodUnit,'String',unit);
-end
-% Hints: contents = cellstr(get(hObject,'String')) returns mnuParameter contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from mnuParameter
-
-
 % --- Executes during object creation, after setting all properties.
 function mnuParameter_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to mnuParameter (see GCBO)
@@ -1091,62 +962,6 @@ add_item_to_list_box(handles.CommandList,commandStr,index);
 add_command_str(functionStr,index);
 
 
-% --- Executes on selection change in mnuSM.
-function mnuSM_Callback(hObject, eventdata, handles)
-% hObject    handle to mnuSM (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-funcFlag = get(hObject,'Value');
-if funcFlag < 4
-    Options = get(hObject,'UserData');
-    unit = Options{funcFlag,2};
-    set(handles.txtSMval,'String',['Value - ',unit]);
-end
-% Hints: contents = cellstr(get(hObject,'String')) returns mnuSM contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from mnuSM
-
-
-% --- Executes during object creation, after setting all properties.
-function mnuSM_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to mnuSM (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-data = cell(6,3);
-% option 1
-data{1,1} = 'Apply Current';    % title
-data{1,2} = 'uA';               % units
-data{1,3} = 'current';          % function name
-
-% option 2
-data{2,1} = 'Apply Voltage';
-data{2,2} = 'mV';
-data{2,3} = 'voltage';
-
-% option 3
-data{3,1} = 'Current List';
-data{3,2} = 'uA';
-data{3,3} = '';
-
-% option 4
-data{4,1} = 'Measure Current';
-data{4,2} = 'c';
-
-% option 5
-data{5,1} = 'Measure Voltage';
-data{5,2} = 'v';
-
-% option 5
-data{6,1} = 'Measure Resistance';
-data{6,2} = 'r';
-
-set(hObject,'UserData',data);
-
 % --- Executes on button press in btnSMadd.
 function btnSMadd_Callback(hObject, eventdata, handles)
 % hObject    handle to btnSMadd (see GCBO)
@@ -1172,7 +987,6 @@ else
 end
 
 
-
 function edtSM_Callback(hObject, eventdata, handles)
 % hObject    handle to edtSM (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -1182,7 +996,6 @@ if isequal(currChar,char(13)) %char(13) == enter key
    %call the pushbutton callback
    btnSMadd_Callback(hObject, eventdata, handles);
 end
-
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1296,7 +1109,6 @@ add_item_to_list_box(handles.CommandList,commandLine,index);
 add_command_str(Options{funcFlag,2},index);
 
 
-
 function edtVoltSet_Callback(hObject, eventdata, handles)
 % hObject    handle to edtVoltSet (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -1319,7 +1131,6 @@ function edtVoltSet_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 
 function edtSetVal_Callback(hObject, eventdata, handles)
@@ -1581,19 +1392,6 @@ function edtRateSet_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of edtRateSet as a double
 
 
-% --- Executes during object creation, after setting all properties.
-function edtRateSet_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edtRateSet (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
 % --- Executes on selection change in popupmenu18.
 function popupmenu18_Callback(hObject, eventdata, handles)
 % hObject    handle to popupmenu18 (see GCBO)
@@ -1602,26 +1400,6 @@ function popupmenu18_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns popupmenu18 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from popupmenu18
-
-
-% --- Executes during object creation, after setting all properties.
-function popupmenu18_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu18 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in pushbutton40.
-function pushbutton40_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton40 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
 
 % --- Executes on selection change in mnuScan.
@@ -1645,7 +1423,28 @@ function mnuScan_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+data = cell(6,3);
+% option 1
+data{1,1} = 'Temperature';    % title
+data{1,2} = '°K';               % units
+data{1,3} = 'current';          % function name
 
+% option 2
+data{2,1} = 'Field';
+data{2,2} = 'Oe';
+data{2,3} = 'FIELD';
+
+% option 3
+data{3,1} = 'Current List';
+data{3,2} = 'uA';
+data{3,3} = 'current';
+
+% option 4
+data{4,1} = 'Voltage';
+data{4,2} = 'uV';
+data{4,3} = 'voltage';
+
+set(hObject,'UserData',data);
 
 
 function edtRateScan_Callback(hObject, eventdata, handles)
@@ -1655,19 +1454,6 @@ function edtRateScan_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of edtRateScan as text
 %        str2double(get(hObject,'String')) returns contents of edtRateScan as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edtRateScan_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edtRateScan (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
 
 
 % --- Executes on button press in btnOpenPlot.
