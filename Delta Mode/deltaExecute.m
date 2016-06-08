@@ -15,7 +15,7 @@ listStr = [num2str(current),',',num2str(-current)];
 % listStr = num2str(current);
 % listStr = strrep(listStr,repmat(' ',1,7),',');
 % listStr = strrep(listStr,repmat(' ',1,6),',');
-fprintf(cs_obj,[':TRIGger:COUNt ',num2str(samples*size(current,2))]);	% Specify trigger count (1 to 2500);
+fprintf(cs_obj,[':TRIGger:COUNt ',num2str(samples)]);	% Specify trigger count (1 to 2500);
 fprintf(cs_obj,[':SOURce:LIST:CURRent ',listStr]);	% Create list of I-Source values
 fprintf(cs_obj,':OUTPut ON');	% Turn source on
 fprintf(cs_obj,':INITiate');	% Initiate source-measure cycle(s);.
