@@ -23,7 +23,7 @@ function varargout = MainFig2(varargin)
 % Edit the above text to modify the response to help MainFig
 
 
-% Last Modified by GUIDE v2.5 08-Jun-2016 16:54:03
+% Last Modified by GUIDE v2.5 11-Jun-2016 16:41:46
 
 
 % Begin initialization code - DO NOT EDIT
@@ -63,12 +63,12 @@ handles.output = hObject;
 %CLOSE DEVICES before opening them (just in case)
 try
     try
-        fclose(handles.PPMSObj);
-%         PPMSObj = getappdata(0,'PPMSObj');
-%         fclose(PPMSObj);
+        fclose(handles.PPMS_obj);
+%         PPMS_obj = getappdata(0,'PPMS_obj');
+%         fclose(PPMS_obj);
         
     end
-%     handles = rmfield(handles, 'PPMSObj');
+%     handles = rmfield(handles, 'PPMS_obj');
 end
 try
     try
@@ -91,9 +91,9 @@ end
 
 %CONNECT TO devices
 try 
-    handles.PPMSObj= GPcon(15,2);
-%     PPMSObj = GPcon(15,0);
-%     setappdata(0,'PPMSObj',PPMSObj);
+    handles.PPMS_obj= GPcon(15,2);
+%     PPMS_obj = GPcon(15,0);
+%     setappdata(0,'PPMS_obj',PPMS_obj);
 catch
     errordlg('Failed to initialize connection to PPMS!','Error 0x007');
 end
@@ -214,7 +214,7 @@ elseif(rate>187)
     set(handles.mf_rate_edit,'String',187);
     return
 end
-FIELD(handles.PPMSObj,StopField,rate,approach,mode);
+FIELD(handles.PPMS_obj,StopField,rate,approach,mode);
 
 
 function txt_destination_field_Callback(hObject, eventdata, handles)
@@ -524,13 +524,13 @@ set(handles.pressure_text_status,'String', '---');
 guidata(handles.figure1, handles);
 
 
-% --- Executes on button press in write_to_file_button.
-function write_to_file_button_Callback(hObject, eventdata, handles)
-% hObject    handle to write_to_file_button (see GCBO)
+% --- Executes on button press in btnSaveFile.
+function btnSaveFile_Callback(hObject, eventdata, handles)
+% hObject    handle to btnSaveFile (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-FileName = get(handles.file_name_edit,'String');  %get the desired filename
+FileName = get(handles.file_name_edit,'String');  % get the desired filename
 close_ind = getappdata(0,'cell_ind');
 ListCommands = get(handles.CommandList,'string');
 contents = getappdata(0,'cellCommands');
@@ -606,7 +606,7 @@ function file_name_edit_Callback(hObject, eventdata, handles)
 currChar = get(handles.figure1,'CurrentCharacter');
 if isequal(currChar,char(13)) % char(13) = enter key
    %call the pushbutton callback
-   write_to_file_button_Callback(hObject, eventdata, handles);
+   btnSaveFile_Callback(hObject, eventdata, handles);
 end
 
 
@@ -654,7 +654,7 @@ function chamber_mode_popup_Callback(hObject, eventdata, handles)
 %WHEN TIME'S COME: ADD THESE LINES:
 
 action = contents{get(hObject,'Value')}; %id of selceted action
-CHAMBER(PPMSObj,action-1);
+CHAMBER(PPMS_obj,action-1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -745,7 +745,7 @@ elseif(rate>12)
     set(handles.mf_rate_edit,'String',12);
     return
  end
-TEMP(handles.PPMSObj,Destination_temp,rate,approach);
+TEMP(handles.PPMS_obj,Destination_temp,rate,approach);
 
 
 % --- Executes on selection change in mf_magnet_mode_popup.
@@ -784,9 +784,9 @@ selection = questdlg('Are you sure you want to quit?',...
       case 'Yes',
         try
             try
-                fclose(handles.PPMSObj)
+                fclose(handles.PPMS_obj)
             end
-%             handles = rmfield(handles, 'PPMSObj');
+%             handles = rmfield(handles, 'PPMS_obj');
         end
         try
             try
@@ -950,9 +950,9 @@ paramflag = get(handles.mnuParameter,'Value');
 Options = get(handles.mnuParameter,'UserData');
 switch paramflag
     case 1
-        functionStr = 'wait4temp(PPMSObj);';
+        functionStr = 'wait4temp(PPMS_obj);';
     case 2
-        functionStr = 'wait4field(PPMSobj);';
+        functionStr = 'wait4field(PPMS_obj);';
 end
 
 commandStr = ['Wait for ',Options{paramflag}];
@@ -1011,22 +1011,22 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in mnuVoltSet.
-function mnuVoltSet_Callback(hObject, eventdata, handles)
-% hObject    handle to mnuVoltSet (see GCBO)
+% --- Executes on selection change in mnuConfig.
+function mnuConfig_Callback(hObject, eventdata, handles)
+% hObject    handle to mnuConfig (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 choice = get(hObject,'Value');
 units = get(hObject,'UserData');
 unit = units{choice,3};
 set(handles.txtVoltSetUnit,'String',unit);
-% Hints: contents = cellstr(get(hObject,'String')) returns mnuVoltSet contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from mnuVoltSet
+% Hints: contents = cellstr(get(hObject,'String')) returns mnuConfig contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from mnuConfig
 
 
 % --- Executes during object creation, after setting all properties.
-function mnuVoltSet_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to mnuVoltSet (see GCBO)
+function mnuConfig_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to mnuConfig (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1035,11 +1035,23 @@ function mnuVoltSet_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-data = cell(1,3);
+data = cell(4,3);
 
-data{1,1} = 'Integration Time'; % name
-data{1,2} = 'IntegrationTime';  % function callback
-data{1,3} = 'mS';             % units
+data{1,1} = 'Compliance'; % name
+data{1,2} = 'compliance';  % function callback
+data{1,3} = 'uV';             % units
+
+data{2,1} = 'Terminal'; % name
+data{2,2} = 'terminal';  % function callback
+data{2,3} = '';             % units
+
+data{3,1} = 'Integration Time'; % name
+data{3,2} = 'IntegrationTime';  % function callback
+data{3,3} = 'mS';             % units
+
+data{4,1} = 'Points'; % name
+data{4,2} = 'xPointM';  % function callback
+data{4,3} = '';             % units
 
 set(hObject,'UserData',data);
 
@@ -1048,8 +1060,8 @@ function btnConfig_Callback(hObject, eventdata, handles)
 % hObject    handle to btnConfig (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-funcFlag = get(handles.mnuVoltSet,'Value');  % Choice
-Options = get(handles.mnuVoltSet,'UserData');% get data from menu
+funcFlag = get(handles.mnuConfig,'Value');  % Choice
+Options = get(handles.mnuConfig,'UserData');% get data from menu
 setValue = get(handles.edtVoltSet,'String');
 
 % add item to sequence
@@ -1167,11 +1179,11 @@ rate = get(handles.edtRate,'String');
 switch paramflag
     case 1
         ParameterStr = 'Temprature';
-        functionStr = ['TEMP(PPMSObj,',targetStr,',',rate,',10,1);'];
+        functionStr = ['TEMP(PPMS_obj,',targetStr,',',rate,',10,1);'];
         unitStr = '[°K';
     case 2
         ParameterStr = 'Field';
-        functionStr = ['FIELD(PPMSobj,',targetStr,',',rate,',1,1);'];
+        functionStr = ['FIELD(PPMS_obj,',targetStr,',',rate,',1,1);'];
         unitStr = '[Oe';
 end
 
@@ -1182,7 +1194,7 @@ index = get(handles.CommandList,'Value');
 add_item_to_list_box(handles.CommandList,commandStr,index);
 
 % update commands in script
-add_command_str([functionStr,'    %',commandStr],index);
+add_command_str([functionStr,'    % ',commandStr],index);
 
 
 function edtTargetVal_Callback(hObject, eventdata, handles)
@@ -1221,7 +1233,7 @@ methodFlag = get(handles.rdoSteps,'Value');
 switch paramflag
     case 1
         ParameterStr = 'Temp';
-        functionStr = 'TEMP(PPMSObj,Temp(k),10,1);';
+        functionStr = 'TEMP(PPMS_obj,Temp(k),10,1);';
         indStr = 'k';
         unitStr = '[°K]';
         if str2double(initValStr)<1.7 || str2double(targetValStr)<1.7
@@ -1230,7 +1242,7 @@ switch paramflag
         end
     case 2
         ParameterStr = 'H';
-        functionStr = 'FIELD(PPMSobj,H(j),10,1,1);';
+        functionStr = 'FIELD(PPMS_obj,H(j),10,1,1);';
         indStr = 'j';
         unitStr = '[Oe]';
         if str2double(initValStr) > 9e4 || str2double(targetValStr) > 9e4
@@ -1349,9 +1361,18 @@ function mnuSet_Callback(hObject, eventdata, handles)
 % hObject    handle to mnuSet (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns mnuSet contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from mnuSet
+options = get(hObject,'UserData');
+paramflag = get(handles.mnuSet,'Value');
+unitStr = options{paramflag,2};
+set(handles.txtUnitTargetSet,'string',unitStr);
+if paramflag==1 || paramflag==2
+    set(handles.edtRateSet,'Enable','on');
+    set(handles.txtUnitRateSet,'Enable','on');
+    set(handles.txtUnitRateSet,'string',[unitStr,'/sec']);
+else
+	set(handles.edtRateSet,'Enable','off');
+    set(handles.txtUnitRateSet,'Enable','off');
+end
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1365,6 +1386,29 @@ function mnuSet_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+data = cell(4,4);
+
+data{1,1} = 'Temperature'; % name
+data{1,2} = '°K';       % units
+data{1,3} = 'TEMP';     % function callback
+data{1,4} = 'PPMS_obj';	% object
+
+data{2,1} = 'Field'; % name
+data{2,2} = 'Oe';       % units
+data{2,3} = 'FIELD';     % function callback
+data{2,4} = 'PPMS_obj';	% object
+
+data{3,1} = 'Current'; % name
+data{3,2} = 'uA';       % units
+data{3,3} = 'current';	% function callback
+data{3,4} = 'cs_obj';	% object
+
+data{4,1} = 'Voltage'; % name
+data{4,2} = 'uV';       % units
+data{4,3} = 'voltage';     % function callback
+data{4,4} = 'cs_obj';	% object
+
+set(hObject,'UserData',data);
 
 
 % --- Executes on button press in btnSetSource.
@@ -1372,7 +1416,40 @@ function btnSetSource_Callback(hObject, eventdata, handles)
 % hObject    handle to btnSetSource (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+paramflag = get(handles.mnuSet,'Value');
+targetStr = get(handles.edtTargetSet,'String');
 
+options = get(handles.mnuSet,'UserData');
+ParameterStr = options{paramflag,1};
+unitStr = options{paramflag,2};
+funcName = options{paramflag,3};
+% objStr = options{paramflag,4};
+
+switch paramflag
+    case {1,2}
+        rate = get(handles.edtRateSet,'String');
+        switch paramflag
+            case 1  % temperature
+                functionStr = ['TEMP(PPMS_obj,',targetStr,',',rate,',10,1);'];
+            case 2  % field
+                functionStr = ['FIELD(PPMS_obj,',targetStr,',',rate,',1);'];
+        end
+        % update listbox
+        commandStr = ['Set ',ParameterStr,' to ', targetStr,'[',unitStr,']',...
+                        ' in rate ',rate,'[',unitStr,'/sec]'];
+        index = get(handles.CommandList,'Value');
+        add_item_to_list_box(handles.CommandList,commandStr,index);
+        % update commands in script
+        add_command_str([functionStr,'    % ',commandStr],index);
+    case {3,4}
+        % update listbox
+        commandStr = ['Set ',ParameterStr,' to ', targetStr,'[',unitStr,']'];
+        index = get(handles.CommandList,'Value');
+        add_item_to_list_box(handles.CommandList,commandStr,index);
+        % update commands in script
+        functionStr = [funcName,'(cs_obj,''on'',',targetStr,');'];
+        add_command_str([functionStr,'    % ',commandStr],index);
+end
 
 function edtTargetSet_Callback(hObject, eventdata, handles)
 % hObject    handle to edtTargetSet (see GCBO)
