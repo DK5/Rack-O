@@ -23,7 +23,7 @@ function varargout = MainFig2(varargin)
 % Edit the above text to modify the response to help MainFig
 
 
-% Last Modified by GUIDE v2.5 11-Jun-2016 16:41:46
+% Last Modified by GUIDE v2.5 11-Jun-2016 17:29:32
 
 
 % Begin initialization code - DO NOT EDIT
@@ -933,13 +933,21 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 data = cell(2,2);
 data{1,1} = 'Temprature';   % title
-data{1,2} = '°K';           % units
+data{1,2} = 'wait for temperature to be reached';           % hint
 
 data{2,1} = 'Field';
-data{2,2} = 'Oe';
+data{2,2} = 'wait for magnetic field to be reached';
 
 set(hObject,'UserData',data);
 
+% --- Executes on selection change in mnuParameter.
+function mnuParameter_Callback(hObject, eventdata, handles)
+% hObject    handle to mnuParameter (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+choice = get(hObject,'Value');
+options = get(hObject,'UserData');
+set(handles.txtHint,'string',options{choice,2});
 
 % --- Executes on button press in btnWait4.
 function btnWait4_Callback(hObject, eventdata, handles)
@@ -1045,13 +1053,13 @@ data{2,1} = 'Terminal'; % name
 data{2,2} = 'terminal';  % function callback
 data{2,3} = '';             % units
 
-data{3,1} = 'Integration Time'; % name
-data{3,2} = 'IntegrationTime';  % function callback
-data{3,3} = 'mS';             % units
+data{3,1} = 'Points'; % name
+data{3,2} = 'xPointM';  % function callback
+data{3,3} = '';             % units
 
-data{4,1} = 'Points'; % name
-data{4,2} = 'xPointM';  % function callback
-data{4,3} = '';             % units
+data{4,1} = 'Integration Time'; % name
+data{4,2} = 'IntegrationTime';	% function callback
+data{4,3} = 'mS';	% units
 
 set(hObject,'UserData',data);
 
@@ -1128,7 +1136,7 @@ function edtVoltSet_Callback(hObject, eventdata, handles)
 currChar = get(handles.figure1,'CurrentCharacter');
 if isequal(currChar,char(13)) %char(13) == enter key
    %call the pushbutton callback
-   btnVoltSet_Callback(hObject, eventdata, handles);
+   btnConfig_Callback(hObject, eventdata, handles);
 end
 
 
@@ -1365,6 +1373,8 @@ options = get(hObject,'UserData');
 paramflag = get(handles.mnuSet,'Value');
 unitStr = options{paramflag,2};
 set(handles.txtUnitTargetSet,'string',unitStr);
+hintStr = options{paramflag,5};
+set(handles.txtHint,'string',hintStr);
 if paramflag==1 || paramflag==2
     set(handles.edtRateSet,'Enable','on');
     set(handles.txtUnitRateSet,'Enable','on');
@@ -1372,6 +1382,7 @@ if paramflag==1 || paramflag==2
 else
 	set(handles.edtRateSet,'Enable','off');
     set(handles.txtUnitRateSet,'Enable','off');
+    set(handles.txtUnitRateSet,'string','');
 end
 
 
@@ -1392,21 +1403,25 @@ data{1,1} = 'Temperature'; % name
 data{1,2} = '°K';       % units
 data{1,3} = 'TEMP';     % function callback
 data{1,4} = 'PPMS_obj';	% object
+data{1,5} = 'Send PPMS to specified temperature (Kelvin) by specified rate';	% hint
 
 data{2,1} = 'Field'; % name
 data{2,2} = 'Oe';       % units
 data{2,3} = 'FIELD';     % function callback
 data{2,4} = 'PPMS_obj';	% object
+data{2,5} = 'Send PPMS to specified magnetic field (Oersted) by specified rate';	% hint
 
 data{3,1} = 'Current'; % name
 data{3,2} = 'uA';       % units
 data{3,3} = 'current';	% function callback
 data{3,4} = 'cs_obj';	% object
+data{3,5} = 'Apply current (micro-Ampere) from the Source-Meter';	% hint
 
 data{4,1} = 'Voltage'; % name
 data{4,2} = 'uV';       % units
 data{4,3} = 'voltage';     % function callback
 data{4,4} = 'cs_obj';	% object
+data{4,5} = 'Apply voltage (micro-Volt) from the Source-Meter';	% hint
 
 set(hObject,'UserData',data);
 
