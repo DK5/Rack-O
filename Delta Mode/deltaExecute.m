@@ -11,6 +11,7 @@ fprintf(volt_obj,':TRACe:CLEar');	% Clear readings from buffer
 
 %% current source
 % current(2) = -current(1);   % prepare to delta: +-
+current = current*1e-6;
 listStr = [num2str(current),',',num2str(-current)];
 % listStr = num2str(current);
 % listStr = strrep(listStr,repmat(' ',1,7),',');

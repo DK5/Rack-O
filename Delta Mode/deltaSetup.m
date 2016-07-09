@@ -1,8 +1,12 @@
 function deltaSetup( volt_obj , cs_obj , compliance, delay)
-%UNTITLED3 Summary of this function goes here
-%   Detailed explanation goes here
+%deltaSetup(volt_obj,cs_obj,compliance,delay) sets the nano-voltmeter and
+%the source-meter to delta mode measurement
+%   volt_obj - nano-voltmeter object
+%   cs_obj - source-meter object
+%   compliance - compliance level (Volts)
+%   delay - delay between triggers (blank - 0)
 if exist('delay','var') == 0
-    delay = 0;      % Slot No.
+    delay = 0;
 end
 %% set 2182 voltmeter for delta mode
 fprintf(volt_obj,':TRACe:CLEar');                % Clear readings from buffer
