@@ -1,4 +1,4 @@
-function [ ] = store( obj1 )
+function [ ] = store_nv( obj1 )
 %store simply commands the voltmeter to start storing measurements in the
 %buffer
 %   obj1 = voltmeter object

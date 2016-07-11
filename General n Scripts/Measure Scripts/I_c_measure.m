@@ -17,11 +17,29 @@ PPMS    =GPcon(15,0);   % Connects to the PPMS
 % wait4temp(PPMS_obj);
 % pause(300);
 
-fprintf(nV_obj,':*RST');     % Reset nanoVoltmeter
+
+%%%%%%%%%% INIT NANOVOLTMETER   %%%%%%%%%%%%%%%%%
+fprintf(nV_obj,':*RST');                    % Reset nanoVoltmeter
+fprintf(nV_obj,':SYST:PRES');               % Return to SYSTem:PRESet defaults
+fprintf(nV_obj,':SYST:FAZ OFF');            % disable Front Autozero.
+fprintf(nV_obj,':TRIG:DEL 0.5');            % Set trigger delay
+fprintf(nV_obj,':SAMP:COUN 10');            % Specify sample count
+fprintf(nV_obj,':TRAC:FEED SENS');          % Select source of readings for buffer 
+fprintf(nV_obj,':SENS:FUNC "VOLT:DC"');     % Select function: ‘VOLTage[:DC]’
+fprintf(nV_obj,':SENS:VOLT:APER 10E-03');   % Determine the measurement Integration Time
+fprintf(nV_obj,':INIT:CONT ON');            % Enable continuous initiation
+fprintf(nV_obj,':READ?');
+
+%%%%%%%% simple measurement %%%%%%%%%%%%
+fprintf(nV_obj,':conf:volt');   % Perform CONFigure operations.
+fprintf(nV_obj,':trig:del 0.5');   % Set delay for 0.5sec.
+fprintf(nV_obj,':samp:coun 10');   % Set sample count to 10.
+fprintf(nV_obj,':read?');   % Trigger and request readings.
+
 fprintf(src_obj,':*RST');     % Reset current src
 openAllCH (switch_obj);
 
-switchVoltage(switch_obj,'ON', 8, 9);   %set legs for nanoVoltmeter
+switchVoltage(switch_obj,'ON', 12, 13);   %set legs for nanoVoltmeter
 switchCurrent(switch_obj,'ON', 14, 3);  %set legs for current src
 
 terminal(src_obj, 'rear' ); % Use rear pannel of the Sourcemeter
@@ -47,24 +65,27 @@ V_bias=mean(Vmeasurement);
 Vi=4;
 Vf=8;
 V_src=Vi:0.25:Vf;      % set voltage
-R_msr=zeros(length(V_src),1);
-I_src=zeros(length(V_src),1);
-V_msr=zeros(length(V_src),1);
 
 
+Ii=0.1;
+If=10.1;
+I=Ii:0.1:If;
 k=1;
-IntegrationTime(nV_obj,100e-3)
+R_msr=zeros(length(I),1);
+I_src=zeros(length(I),1);
+V_msr=zeros(length(I),1);
+%current(src_obj,'ON', Ii);
 
-%current(src_obj,'ON', I);
-
-for v=V_src
-    voltage(src_obj, 'ON', v*(10^6));
-    read(nV_obj);
-    pause(10);
-    Vmeasurement=read(nV_obj);
-    V_msr(k)= abs(V_bias - mean(Vmeasurement));
-    I_src(k) = readSM(src_obj, 'c');
-    R_msr(k) = V_msr(k)/I_src(k);
+for i=I
+    current(src_obj,'ON', i);
+    fprintf(nV_obj,'read?');
+    pause(20);
+    data=fscanf(nV_obj);                         % Request all stored readings
+    vals = str2double(strsplit(data,'VDC,'));      % Export readings to array
+    vals(isnan(vals))=[];                       % Deletes all NaN
+    V_msr(k)=mean(vals);
+    I_src(k) = i;
+    R_msr(k) = V_msr(k)/(I_src(k)*(10^-6));
     plot(I_src(1:k),R_msr(1:k));
     k=k+1;
 end
