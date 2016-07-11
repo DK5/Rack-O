@@ -1257,18 +1257,19 @@ function btnScan_Callback(hObject, eventdata, handles)
 choice = get(handles.mnuScan,'Value');
 switch choice
     case {1,2}
-        ScanPPMS();
+        ScanPPMS(handles, choice);
     case {3,4}
-        ScanSM
+        ScanSM(handles, choice);
 end
 
-function ScanSM()
+function ScanSM(handles, choice)
 initValStr = get(handles.edtInitVal,'String');
 targetValStr = get(handles.edtTargetVal,'String');
 methodVal = get(handles.edtStep,'String');
 methodFlag = get(handles.rdoSteps,'Value');
+Options = get(handles.mnuScan,'UserData');
 ParameterStr = Options{choice,1};   % Parameter name
-objectStr = Options{choice,4};   % object name
+unitStr = ['[',Options{choice,2},']'];  % unit
 
 if methodFlag
     methodStr = 'steps';
@@ -1292,28 +1293,27 @@ isDelta = get(handles.chkDelta,'Value');
 if isDelta
     commandStr = ['Delta Measurement - Scan ',ParameterStr,' from ',initValStr,unitStr,' to ',...
         targetValStr,unitStr,' by ',methodStr,' of ', methodVal,unitStr];
-    functionStr = 'DeltaExecuteList';
+    functionStr = ['DeltaExecuteList(nv_obj , cs_obj ,',ParameterStr(1:4),')'];
 else
     commandStr = ['Scan ',ParameterStr,' from ',initValStr,unitStr,' to ',...
         targetValStr,unitStr,' by ',methodStr,' of ', methodVal,unitStr];
-    functionStr = 'TrigMeasList';
+    functionStr = ['TrigMeasList(nv_obj , cs_obj , ',ParameterStr(1:4),')'];
 end
 
 index = get(handles.CommandList,'Value');
 add_item_to_list_box(handles.CommandList,commandStr,index);
-add_item_to_list_box(handles.CommandList,'end',index+1);
+% add_item_to_list_box(handles.CommandList,'end',index+1);
 
 % update commands in script
 sendCommand = {defStr;functionStr};
 add_command_str(sendCommand,index);
-add_command_str('end',index+1);
+% add_command_str('end',index+1);
 
 
-function ScanPPMS()
+function ScanPPMS(handles, choice)
 initValStr = get(handles.edtInitVal,'String');
 targetValStr = get(handles.edtTargetVal,'String');
 methodVal = get(handles.edtStep,'String');
-choice = get(handles.mnuScan,'Value');
 Options = get(handles.mnuScan,'UserData');
 methodFlag = get(handles.rdoSteps,'Value');
 ParameterStr = Options{choice,1};   % Parameter name
@@ -1455,11 +1455,16 @@ set(handles.txtRateSet,'string','Rate:');
 set(handles.txtUnitTargetSet,'string',unitStr);
 hintStr = options{paramflag,5};
 set(handles.txtHint,'string',hintStr);
+defVals = options{paramflag,6};
+set(handles.edtTargetSet,'String',num2str(defVals(1)));
+set(handles.edtRateSet,'String',num2str(defVals(2)));
+
 if paramflag==1 || paramflag==2
     set(handles.edtRateSet,'Enable','on');
     set(handles.txtUnitRateSet,'Enable','on');
-    set(handles.txtRateSet,'Enable','on');
-    set(handles.txtUnitRateSet,'string',[unitStr,'/min']);
+    set(handles.txtRateSet,'Enable','on');    
+    rateUnit = {'/min:','/sec:'};
+    set(handles.txtUnitRateSet,'string',[unitStr,rateUnit{paramflag}]);
 else
 	set(handles.edtRateSet,'Enable','off');
     set(handles.txtUnitRateSet,'Enable','off');
@@ -1486,24 +1491,28 @@ data{1,2} = '°K';       % units
 data{1,3} = 'TEMP';     % function callback
 data{1,4} = 'PPMS_obj';	% object
 data{1,5} = 'Send PPMS to specified temperature (Kelvin) by specified rate';	% hint
+data{1,6} = [100, 4];    % default values
 
 data{2,1} = 'Field'; % name
 data{2,2} = 'Oe';       % units
 data{2,3} = 'FIELD';     % function callback
 data{2,4} = 'PPMS_obj';	% object
 data{2,5} = 'Send PPMS to specified magnetic field (Oersted) by specified rate';	% hint
+data{2,6} = [0, 10];    % default values
 
 data{3,1} = 'Current'; % name
 data{3,2} = 'uA';       % units
 data{3,3} = 'current';	% function callback
 data{3,4} = 'cs_obj';	% object
 data{3,5} = 'Apply current (micro-Ampere) from the Source-Meter';	% hint
+data{3,6} = [1, 0];    % default values
 
 data{4,1} = 'Voltage'; % name
-data{4,2} = 'uV';       % units
+data{4,2} = 'V';       % units
 data{4,3} = 'voltage';     % function callback
 data{4,4} = 'cs_obj';	% object
-data{4,5} = 'Apply voltage (micro-Volt) from the Source-Meter';	% hint
+data{4,5} = 'Apply voltage (Volt) from the Source-Meter';	% hint
+data{4,6} = [1, 0];    % default values
 
 set(hObject,'UserData',data);
 
@@ -1577,11 +1586,17 @@ unitStr = options{paramflag,2};
 set(handles.txt_initValUnit,'string',unitStr);
 set(handles.txt_finalValUnit,'string',unitStr);
 hintStr = options{paramflag,5};
+defVals = options{paramflag,6};
 set(handles.txtHint,'string',hintStr);
+set(handles.edtInitVal,'String',num2str(defVals(1)));
+set(handles.edtTargetVal,'String',num2str(defVals(2)));
+set(handles.edtRateScan,'String',num2str(defVals(3)));
+
 if paramflag==1 || paramflag==2
     set(handles.edtRateScan,'Enable','on');
     set(handles.txtRateScan,'Enable','on');
-    set(handles.txtRateScan,'string',['Rate(',unitStr,'/min):']);
+    rateUnit = {'/min):','/sec):'};
+    set(handles.txtRateScan,'string',['Rate(',unitStr,rateUnit{paramflag}]);
     set(handles.chkDelta,'Value',0);
     set(handles.chkDelta,'Enable','off');
 else
@@ -1614,6 +1629,8 @@ data{1,5} = {'Scan (loop) on temperature values (Kelvin) in PPMS.',...  % hint
              '    Spacing - diffrence of temperature in each iteration.',...
              '    Steps - number of temperatures to be scanned.',...
              '    <not implemented> Rate - approaching rate in each iteration.'};
+data{1,6} = [300, 10, 4];   % default values - initVal, target, rate
+
 data{2,1} = 'Field'; % name
 data{2,2} = 'Oe';       % units
 data{2,3} = 'FIELD';     % function callback
@@ -1622,6 +1639,8 @@ data{2,5} = {'Scan (loop) on field values (Oersted) in PPMS.',...  % hint
              '    Spacing - diffrence of field in each iteration.',...
              '    Steps - number of fields to be scanned.',...
              '    <not implemented> Rate - approaching rate in each iteration.'};
+data{2,6} = [0, 1000, 10];   % default values - initVal, target, rate
+
 data{3,1} = 'Current'; % name
 data{3,2} = 'uA';       % units
 data{3,3} = 'current';	% function callback
@@ -1629,13 +1648,17 @@ data{3,4} = 'cs_obj';	% object
 data{3,5} = {'Scan (loop) on current values (micro-Amps).',...  % hint
              '    Spacing - diffrence of current in each iteration.',...
              '    Steps - number of currents to be scanned.'};         
+data{3,6} = [-1, 1, 0];   % default values - initVal, target, rate
+
 data{4,1} = 'Voltage'; % name
-data{4,2} = 'uV';       % units
+data{4,2} = 'V';       % units
 data{4,3} = 'voltage';     % function callback
 data{4,4} = 'cs_obj';	% object
-data{4,5} = {'Scan (loop) on voltage values (micro-Amps).',...  % hint
+data{4,5} = {'Scan (loop) on voltage values (Volts).',...  % hint
              '    Spacing - diffrence of voltage in each iteration.',...
              '    Steps - number of voltages to be scanned.'}; 
+data{4,6} = [-1, 1, 0];   % default values - initVal, target, rate
+
 set(hObject,'UserData',data);
 
 
@@ -1644,8 +1667,6 @@ function edtRateScan_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edtRateScan as text
-%        str2double(get(hObject,'String')) returns contents of edtRateScan as a double
 
 
 % --- Executes on button press in btnOpenPlot.
