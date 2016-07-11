@@ -92,27 +92,18 @@ command(1)=[];
 command=command';
 
 execute(sm_obj,command);
-wait4OPC(sm_obj)  
-% execute(nv_obj,{'INIT'});
-% pause(5)
-% execute(sm_obj,{'INIT'});
-% pause(2)
-
-%     wait4OPC(sm_obj)                        % Wait for measurement to finish
-    execute(sm_obj,{':OUTP OFF'});          % Turn off source
-    execute(nv_obj,{':TRACe:FEED:CONTrol NEver'});
-    data = query(nv_obj, ':data:data?');
-%     length(data)
-    Vdata = str2double(strsplit(data,','));      % Export readings to array    
 
 
 %% End of measurement
-% wait4OPC(sm_obj)                        % Wait for measurement to finish
-% execute(sm_obj,{':OUTP OFF'});          % Turn off source
+wait4OPC(sm_obj);
+execute(sm_obj,{':OUTP OFF'});          % Turn off source
 
-%% Read data
+%% Read data NanoVoltMeter
+execute(nv_obj,{':TRACe:FEED:CONTrol NEver'});
+data = query(nv_obj, ':data:data?');
+Vdata = str2double(strsplit(data,','));      % Export readings to array    
+%% Read data SourceMeter
 data=query(sm_obj,':TRACe:DATA?');      % Read data from buffer
-length(data)
 data = str2double(strsplit(data,','));  % Export readings to vector
 length(data)
 data=reshape(data,5,[])';               % Make measured data a table/matrix

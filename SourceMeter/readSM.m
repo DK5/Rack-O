@@ -11,7 +11,7 @@ switch lower(func)
         str = 'VOLT';
 end
 
-fprintf(sm_obj,':TRIGger:SOURce imm');     % Specify control source as immediate
+% fprintf(sm_obj,':TRIGger:SOURce imm');     % Specify control source as immediate
 fprintf(sm_obj,':SENSe:FUNCtion:CONCurrent OFF');   % Disable ability to measure more than one function simultaneously
 fprintf(sm_obj,[':SENSe:FUNCtion ','"',str,'"']);   % Specify functions to enable (VOLTage[:DC], CURRent[:DC], or RESistance);
 fprintf(sm_obj,[':FORM:ELEM ',str]);    % func readings only.
