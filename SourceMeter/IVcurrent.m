@@ -10,9 +10,9 @@ function [I,V] = IVcurrent( volt_obj , cs_obj , CurrentList, samples)
 fprintf(volt_obj,':TRACe:CLEar');	% Clear readings from buffer
 
 %% current source
-listStr=num2str(CurrentList,'%g, ');
-listStr=listStr(listStr~=' ');
-listStr=listStr(1:end-1);
+listStr = num2str(CurrentList,'%g, ');
+listStr = listStr(listStr~=' ');
+listStr = listStr(1:end-1);
 
 fprintf(cs_obj,[':TRIGger:COUNt ',num2str(samples*length(CurrentList))]);	% Specify trigger count (1 to 2500);
 fprintf(cs_obj,[':SOURce:LIST:CURRent ',listStr]);	% Create list of I-Source values
@@ -24,6 +24,6 @@ opc = 0; % operation completed
 while opc~=1
     opc = str2double(query(volt_obj,'*OPC?'));
 end
-I = 0%readSM(cs_obj);
+I = 0;	%readSM(cs_obj);
 V = read(volt_obj);
 end

@@ -1,9 +1,10 @@
-function [CommandsTab] = cellTab( CommandsCell)
+function [CommandsTab] = cellTab(CommandsCell)
 %Tab identation
 
 CommandsTab = strtrim(CommandsCell); % remove all tabs
 TABS = zeros(length(CommandsTab),1);
 counter = 0;
+errorind = 0;
 
 % counts TAB
 for i = 1:length(CommandsTab)
@@ -42,7 +43,8 @@ for i = 1:length(CommandsTab)
             case 'end'
                 counter = counter - 1;
                 if counter == -1
-                    error('End statement cannot be above loop');
+                    errorind = i;
+%                     error('End statement cannot be above loop');
                 end
                 TABS(i)=counter;
             otherwise
@@ -52,7 +54,14 @@ for i = 1:length(CommandsTab)
         tab = repmat('    ',1,TABS(i));
         CommandsTab{i,1} = [tab, CommandsTab{i,1}];
     end
-    
+end
+
+if errorind     % there is error
+    if ~counter  % not-equal number of scan & end
+        error('End statement cannot be above loop');
+    else
+        CommandsTab(errorind) = [];
+    end
 end
 
 end

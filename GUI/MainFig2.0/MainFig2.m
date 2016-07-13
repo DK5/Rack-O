@@ -23,7 +23,7 @@ function varargout = MainFig2(varargin)
 % Edit the above text to modify the response to help MainFig
 
 
-% Last Modified by GUIDE v2.5 19-Jun-2016 14:33:13
+% Last Modified by GUIDE v2.5 13-Jul-2016 17:03:48
 
 
 % Begin initialization code - DO NOT EDIT
@@ -157,7 +157,7 @@ function add_command_str(str,index)
 % index - index of command line
 % activity - 'p'/'k'
 cellCommands = getappdata(0,'cellCommands');
-if isempty(cellCommands{1})
+if isempty(cellCommands)
     % no commands yet
     cellCommands = {str};
 elseif size(cellCommands,1) < index
@@ -187,6 +187,7 @@ if size(cellCommands,1) == 1
 else
     cellCommands(index) = [];
 end
+cellCommands = cellTab(cellCommands);	% add TABs
 setappdata(0,'cellCommands',cellCommands);
 % % if activity == 'p'
 % %     % write to pCommands
@@ -302,28 +303,8 @@ function h = add_item_to_list_box(h, newitem, index)
 % H = ADDITEMTOLISTBOX(H, STRING)
 % H listbox handle
 % STRING a new item to display
-
     oldstring = get(h, 'string'); % Get the cell array from the listbox. 
-    
-%     space = 0;
-%     for i=1:(index-1) %% Move right the text according to the loops
-%         item_selected = oldstring{i};
-%         L = length(item_selected);
-%         if L>(4+space)
-%            if strcmp(item_selected((1+space):(4+space)), 'Scan')
-%              space = space +3;
-%            end
-%         elseif L==(3+space)
-%            if strcmp(item_selected((1+space):(3+space)), 'End')
-%              space = space -3;
-%            end
-%         end
-%    end
-%     
-%     for j=1:space
-%         newitem = [' ', newitem];
-%     end
-     
+
     if isempty(oldstring)
         newstring = {newitem};
 %     elseif ~iscell(oldstring)
@@ -357,15 +338,18 @@ end
 
 for ind = 1:length(index)
     lineStr = strings{index(ind)};
-    if strcmp(lineStr,'End')
+    if strcmpi(lineStr,'end')
         errordlg('Cannot delete End statement!','Error 0x004');
         return
     elseif strcmp(lineStr,'End Sequence')
         errordlg('Cannot delete End Sequence statement!','Error 0x005');
         return
+    elseif strcmpi(lineStr(1:4),'scan')
+        
     end
 end
 strings(index) = [];
+strings = cellTab(strings);	% add TABs
 set(h,'value',min(min(ind)+1,length(strings))); 
 set(h,'string',strings); 
 % L = length(strings);
@@ -439,6 +423,7 @@ try
     del_item_from_list_box(handles.CommandList,index_selected);
     delete_command_str(index_selected);
 catch
+    errordlg('Error while deleting line');
 end
 
 
@@ -532,11 +517,10 @@ function btnSaveFile_Callback(hObject, eventdata, handles)
 
 FileName = get(handles.file_name_edit,'String');  % get the desired filename
 close_ind = getappdata(0,'cell_ind');
-ListCommands = get(handles.CommandList,'string');
-contents = getappdata(0,'cellCommands');
+ListCommands = get(handles.CommandList,'string');   % get commands list window
+contents = getappdata(0,'cellCommands');        % get code
+contents = [{['load ',FileName,'.mat']};contents];   % load data in script
 save(FileName,'close_ind','ListCommands','contents');
-
-add_command_str(['load ',FileName,'.mat'],1);
 
 if strcmp(FileName,'Enter File name')    % make sure the user has entered a filename
      errordlg('Please Enter a File Name!','Error 0x003');  % user didnt
@@ -826,7 +810,7 @@ configs(:,:,~sums) = [];                % delete empty configs
 % setappdata(0,'configs',configs);        % set app data
 k = find(configs);                      % find non-zero elements -> linear index
 [row,col,~] = ind2sub(size(configs),k);	% sub-index
-close_ind = [row,col];                  % generate array
+close_ind = [row+2,col+2];                  % generate array
 sizes = squeeze(sums)';                 % size of each config
 cell_ind = mat2cell(close_ind,sizes);   % rows & cols ordered in cell array
 setappdata(0,'cell_ind',cell_ind);      % set app data
@@ -863,7 +847,7 @@ else
         set(handles.CommandList,'String',allstring);   % set new order
         set(handles.CommandList,'Value',(min(index-2)+(1:length(index))));   % set selection to the moved line
     catch
-        errordlg('End statement can''t be above its loop');
+%         errordlg('End statement can''t be above its loop');
     end
     
     commands = cellCommands(index);  % get selcted commannd index
@@ -873,7 +857,7 @@ else
         cellCommands = cellTab(cellCommands);
         setappdata(0,'cellCommands',cellCommands);
     catch
-        errordlg('End statement can''t be above its loop');
+%         errordlg('End statement can''t be above its loop');
     end
 end
 
@@ -1348,8 +1332,8 @@ else
     initVal = str2double(initValStr);
     targetVal = str2double(targetValStr);
     space = str2double(methodVal);
-    interval = abs(initVal-targetVal);
-    space = interval/floor(interval/space); % there must be natural number of steps
+    interval = targetVal-initVal;
+    space = interval/floor(abs(interval/space)); % there must be natural number of steps
     methodVal = num2str(space);
     set(handles.edtStep,'String',methodVal);
     defStr = [ParameterStr(1:4),' = ',initValStr,':',methodVal,':',targetValStr,';'];
@@ -1433,7 +1417,8 @@ add_item_to_list_box(handles.CommandList,'end',index+1);
 
 % update commands in script
 sendCommand = { ['% ',commandStr];...
-                'for s = 1:length(close_ind)';...
+                'for s = 1:length(close_ind)';...              
+                'openAllCH(switcher_obj);';...
                 'rows = close_ind{s}(:,1);';...
                 'cols = close_ind{s}(:,2);';...
                 'for ch = 1:size(rows,1)';...
@@ -1465,11 +1450,15 @@ if paramflag==1 || paramflag==2
     set(handles.txtRateSet,'Enable','on');    
     rateUnit = {'/min:','/sec:'};
     set(handles.txtUnitRateSet,'string',[unitStr,rateUnit{paramflag}]);
+    set(handles.tglSM,'Visible','off');
+    set(handles.tglSM,'Enable','off');
 else
 	set(handles.edtRateSet,'Enable','off');
     set(handles.txtUnitRateSet,'Enable','off');
     set(handles.txtUnitRateSet,'string','');
     set(handles.txtRateSet,'Enable','off');
+    set(handles.tglSM,'Visible','on');
+    set(handles.tglSM,'Enable','on');
 end
 
 
@@ -1542,18 +1531,20 @@ switch paramflag
         end
         % update listbox
         commandStr = ['Set ',ParameterStr,' to ', targetStr,'[',unitStr,']',...
-                        ' in rate ',rate,'[',unitStr,'/min]'];
+                        ' in rate ',rate,'[',unitStr,'/min]',];
         index = get(handles.CommandList,'Value');
         add_item_to_list_box(handles.CommandList,commandStr,index);
         % update commands in script
         add_command_str([functionStr,'    % ',commandStr],index);
     case {3,4}
         % update listbox
-        commandStr = ['Set ',ParameterStr,' to ', targetStr,'[',unitStr,']'];
+        state = get(handles.tglSM,'string');
+        commandStr = ['Set ',ParameterStr,' to ', targetStr,'[',unitStr,'] - ',state];
         index = get(handles.CommandList,'Value');
         add_item_to_list_box(handles.CommandList,commandStr,index);
         % update commands in script
-        functionStr = [funcName,'(cs_obj,''on'',',targetStr,');'];
+        state = get(handles.tglSM,'string');
+        functionStr = [funcName,'(cs_obj,','',state,'',',',targetStr,');'];
         add_command_str([functionStr,'    % ',commandStr],index);
 end
 
@@ -1574,7 +1565,7 @@ function edtRateSet_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edtRateSet as text
 %        str2double(get(hObject,'String')) returns contents of edtRateSet as a double
 
-
+ 
 % --- Executes on selection change in mnuScan.
 function mnuScan_Callback(hObject, eventdata, handles)
 % hObject    handle to mnuScan (see GCBO)
@@ -1599,11 +1590,22 @@ if paramflag==1 || paramflag==2
     set(handles.txtRateScan,'string',['Rate(',unitStr,rateUnit{paramflag}]);
     set(handles.chkDelta,'Value',0);
     set(handles.chkDelta,'Enable','off');
+    set(handles.btnScan,'string','Scan');
 else
 	set(handles.edtRateScan,'Enable','off');
-    set(handles.txtRateScan,'string','Rate:');
-    set(handles.txtRateScan,'Enable','off');
+    set(handles.txtRateScan,'string','Samples:');
     set(handles.chkDelta,'Enable','on');
+    delta = get(handles.chkDelta,'Value');
+    if delta
+        set(handles.btnScan,'string','Delta');
+        set(handles.txtRateScan,'string','Samples:');
+        set(handles.txtRateScan,'Enable','on');
+        set(handles.edtRateScan,'Enable','on');
+    else
+        set(handles.btnScan,'string','I-V');
+        set(handles.txtRateScan,'Enable','off');
+        set(handles.edtRateScan,'Enable','off');
+    end
 end
 
 
@@ -1681,5 +1683,29 @@ function chkDelta_Callback(hObject, eventdata, handles)
 % hObject    handle to chkDelta (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+delta = get(hObject,'value');
+if delta
+    set(handles.btnScan,'string','Delta');
+    set(handles.txtRateScan,'string','Samples:');
+    set(handles.txtRateScan,'Enable','on');
+    set(handles.edtRateScan,'Enable','on');
+else
+    set(handles.btnScan,'string','I-V');
+    set(handles.txtRateScan,'Enable','off');
+    set(handles.edtRateScan,'Enable','off');
+end
 % Hint: get(hObject,'Value') returns toggle state of chkDelta
+
+
+% --- Executes on button press in tglSM.
+function tglSM_Callback(hObject, eventdata, handles)
+% hObject    handle to tglSM (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+state = get(hObject,'Value');
+if state
+    set(hObject,'string','ON');
+else
+    set(hObject,'string','OFF');
+end
+% Hint: get(hObject,'Value') returns toggle state of tglSM

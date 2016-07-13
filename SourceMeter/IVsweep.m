@@ -1,19 +1,19 @@
 % function [I,V,TimeSig] = IVsweep( nv_obj , sm_obj , mode ,minP,maxP,stepP)
 %% Set 2401 SourceMeter object configuration
-fclose( sm_obj )
+fclose( sm_obj );
 BufferSize=20000;
 set(sm_obj, 'InputBufferSize', BufferSize);
 set(sm_obj, 'OutputBufferSize', BufferSize);
 set(sm_obj, 'Timeout', 20);
-fopen (sm_obj)
+fopen (sm_obj);
 
 %% Set 2182 NanoVoltmeter object configuration
-fclose( nv_obj )
+fclose( nv_obj );
 BufferSize=1024;
 set(nv_obj, 'InputBufferSize', BufferSize);
 set(nv_obj, 'OutputBufferSize', BufferSize);
 set(nv_obj, 'Timeout', 20);
-fopen ( nv_obj )
+fopen ( nv_obj );
 
 %% Current vs Voltage mode
 MODE=cell(1);
@@ -78,7 +78,7 @@ command{end+1}=[':SOURce:',MODE{1},':STEP ', num2str(stepP)];
 command{end+1}=[':SOUR:',MODE{1},':MODE SWE'];
 command{end+1}=[':SOUR:SWE:RANG AUTO'];
 command{end+1}=[':SOUR:SWE:SPAC LIN'];
-command{end+1}=[':TRIG:COUN ',num2str(length([minP:stepP:maxP]))];
+command{end+1}=[':TRIG:COUN ',num2str(length(minP:stepP:maxP))];
 command{end+1}=[':SOUR:DEL 0.01'];
 command{end+1}=[':route:terminals rear'];
 command{end+1}=[':TRACe:CLEar'];
@@ -101,32 +101,23 @@ pause(10)
 %     pause(0.5)
 % end
 
-
-
-
 %% End of measurement
 wait4OPC(sm_obj)                        % Wait for measurement to finish
 execute(sm_obj,{':OUTP OFF'});          % Turn off source
 
 %% Read data
-data=query(sm_obj,':TRACe:DATA?');      % Read data from buffer
+data = query(sm_obj,':TRACe:DATA?');	% Read data from buffer
 vals = str2double(strsplit(data,','));  % Export readings to vector
-data=reshape(vals,5,[])';               % Make measured data a table/matrix
-I=data(:,2);                            % Measured current
-TimeSig=data(:,4);                      % Time signiture from the begening of the measurement
-V=read2(nv_obj);
- 
+data = reshape(vals,5,[])';	% Make measured data a table/matrix
+I = data(:,2);              % Measured current
+TimeSig = data(:,4);        % Time signiture from the begening of the measurement
+V = read2(nv_obj);
 
-
-
-
-data=query(nv_obj,':TRACe:DATA?')
+data = query(nv_obj,':TRACe:DATA?');
 
 reads = read1(nv_obj);
 
-
-
-II=minP:stepP:maxP;
-command={[':OUTP OFF']};
+II = minP:stepP:maxP;
+command = {[':OUTP OFF']};
 execute(sm_obj,command);
 
