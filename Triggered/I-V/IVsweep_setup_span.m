@@ -76,7 +76,6 @@ command{end+1}=[':SOURce:',MODE{1},':MODE SWEep'];
 % command{end+1}=[':SOURce:',MODE{1},':STARt ', num2str(minP)];
 % command{end+1}=[':SOURce:',MODE{1},':STOP ', num2str(maxP)];
 % command{end+1}=[':SOURce:',MODE{1},':STEP ', num2str(stepP)];
-% command{end+1}=[':SOURce:',MODE{1},':STEP ', num2str(stepP)];
 
 command{end+1}=[':SOURce:',MODE{1},':CENTer ', num2str(centerP)];
 command{end+1}=[':SOURce:',MODE{1},':SPAN ', num2str(centerP)];
