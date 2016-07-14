@@ -1,5 +1,5 @@
 % function [Idata,Vdata,TimeSig] = IVsweep( nv_obj , sm_obj , mode ,minP,maxP,stepP)
-function [Idata,Vdata] = IVsweep_setup( nv_obj , sm_obj , mode ,minP,maxP,stepP)
+function [Idata,Vdata] = IVsweep_setup_span( nv_obj , sm_obj , mode ,centerP,spanP,pointsP)
 %% Set 2401 SourceMeter object configuration
 fclose( sm_obj )
 BufferSize=2^20;
@@ -72,13 +72,20 @@ command{end+1}=[':SOUR:FUNC ',MODE{1}];
 command{end+1}=[':SENS:FUNC ''','CURRent',':DC'''];
 command{end+1}=[':SENS:VOLT:PROT 21'];
 command{end+1}=[':SOURce:',MODE{1},':MODE SWEep'];
-command{end+1}=[':SOURce:',MODE{1},':STARt ', num2str(minP)];
-command{end+1}=[':SOURce:',MODE{1},':STOP ', num2str(maxP)];
-command{end+1}=[':SOURce:',MODE{1},':STEP ', num2str(stepP)];
-command{end+1}=[':SOUR:',MODE{1},':MODE SWE'];
+
+% command{end+1}=[':SOURce:',MODE{1},':STARt ', num2str(minP)];
+% command{end+1}=[':SOURce:',MODE{1},':STOP ', num2str(maxP)];
+% command{end+1}=[':SOURce:',MODE{1},':STEP ', num2str(stepP)];
+% command{end+1}=[':SOURce:',MODE{1},':STEP ', num2str(stepP)];
+
+command{end+1}=[':SOURce:',MODE{1},':CENTer ', num2str(centerP)];
+command{end+1}=[':SOURce:',MODE{1},':SPAN ', num2str(centerP)];
+command{end+1}=[':SOURce:',MODE{1},':POINts ', num2str(centerP)];
+
 command{end+1}=[':SOUR:SWE:RANG AUTO'];
 command{end+1}=[':SOUR:SWE:SPAC LIN'];
-command{end+1}=[':TRIG:COUN ',num2str(length([minP:stepP:maxP]))];
+% command{end+1}=[':SOUR:SWE:DIREction UP/DOWn'];
+command{end+1}=[':TRIG:COUN ',num2str(pointsP)];
 command{end+1}=[':SOUR:DEL 0.01'];
 command{end+1}=[':route:terminals rear'];
 command{end+1}=[':TRACe:CLEar'];
