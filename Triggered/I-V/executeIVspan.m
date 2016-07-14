@@ -15,13 +15,28 @@ switch lower(mode)
         MODE = 'VOLTage';
 end
 
+%% NanoVoltMeter current & mode configuration
+command = cell(1);
+command{end+1}=':TRACe:CLEar';
+command{end+1}=':TRACe:FEED:CONTrol NEver';
+% command{end+1}=':TRAC:FEED SENS';
+command{end+1}=':TRACe:FEED:CONTrol NEXT';
+command(1)=[];
+command=command';
+execute(nv_obj,command);
+
 %% SM current & mode configuration
 command = cell(1);
+command{end+1}=':TRACe:FEED:CONTrol NEver';
+% command{end+1}=':TRAC:FEED SENS';
+command{end+1}=':TRACe:CLEar';
+command{end+1}=':TRACe:FEED:CONTrol NEXT';
 command{end+1}=[':SOUR:FUNC ',MODE];
 command{end+1}=[':SOURce:',MODE,':MODE SWEep'];
 command{end+1}=[':SOURce:',MODE,':CENTer ',num2str(center)];
 command{end+1}=[':SOURce:',MODE,':SPAN ',num2str(span)];
-command{end+1}=[':SOURce:',MODE,':POINts ',num2str(points)];
+% command{end+1}=[':SOURce:',MODE,':POINts ',num2str(points)];
+command{end+1}=[':SOURce:sweep:POINts ',num2str(points)];
 command{end+1}=[':TRIG:COUN ',num2str(points)];
 command{end+1}=':OUTP ON';
 command{end+1}=':INIT';
