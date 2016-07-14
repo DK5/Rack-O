@@ -1277,7 +1277,7 @@ isDelta = get(handles.chkDelta,'Value');
 if isDelta
     commandStr = ['Delta Measurement - Scan ',ParameterStr,' from ',initValStr,unitStr,' to ',...
         targetValStr,unitStr,' by ',methodStr,' of ', methodVal,unitStr];
-    functionStr = ['DeltaExecuteList(nv_obj , cs_obj ,',ParameterStr(1:4),')'];
+    functionStr = ['deltaExecute(nv_obj , cs_obj ,',ParameterStr(1:4),')'];
 else
     commandStr = ['Scan ',ParameterStr,' from ',initValStr,unitStr,' to ',...
         targetValStr,unitStr,' by ',methodStr,' of ', methodVal,unitStr];
@@ -1708,14 +1708,17 @@ if delta	% delta is on
     set(handles.rdoSpace,'enable','off');
     set(handles.edtStep,'enable','off');
 else        % delta is off - I-V
-    set(handles.btnScan,'string','I-V');
-    set(handles.txtRateScan,'Enable','off');
-    set(handles.edtRateScan,'Enable','off');
-    set(handles.txtInitVal,'string','Initial Value:');
-    set(handles.txtTarVal,'string','Taget Value:');
     set(handles.rdoSteps,'enable','on');
     set(handles.rdoSpace,'enable','on');
     set(handles.edtStep,'enable','on');
+    space = get(handles.rdoSpace,'value');
+    if space
+        set(handles.btnScan,'string','I-V');
+        set(handles.txtRateScan,'Enable','off');
+        set(handles.edtRateScan,'Enable','off');
+        set(handles.txtInitVal,'string','Initial Value:');
+        set(handles.txtTarVal,'string','Taget Value:'); 
+    end
 end
 % Hint: get(hObject,'Value') returns toggle state of chkDelta
 
