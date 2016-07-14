@@ -1,4 +1,4 @@
-function [Idata,Vdata] = executeIVspan(nv_obj,sm_obj,mode,centerP,spanP,pointsP)
+function [Idata,Vdata] = executeIVspan(nv_obj,sm_obj,mode,center,span,points)
 % executeIV(nv_obj,sm_obj,mode,minP,maxP,stepP) executes IV measuring
 % routine, by specified values
 %   nv_obj - nano-Voltmeter object
@@ -19,10 +19,10 @@ end
 command = cell(1);
 command{end+1}=[':SOUR:FUNC ',MODE];
 command{end+1}=[':SOURce:',MODE,':MODE SWEep'];
-command{end+1}=[':SOURce:',MODE,':CENTer ', num2str(centerP)];
-command{end+1}=[':SOURce:',MODE,':SPAN ', num2str(centerP)];
-command{end+1}=[':SOURce:',MODE,':POINts ', num2str(centerP)];
-command{end+1}=[':TRIG:COUN ',num2str(pointsP)];
+command{end+1}=[':SOURce:',MODE,':CENTer ',num2str(center)];
+command{end+1}=[':SOURce:',MODE,':SPAN ',num2str(span)];
+command{end+1}=[':SOURce:',MODE,':POINts ',num2str(points)];
+command{end+1}=[':TRIG:COUN ',num2str(points)];
 command{end+1}=':OUTP ON';
 command{end+1}=':INIT';
 command{end+1}='*OPC';  % Listen to OPC later on
