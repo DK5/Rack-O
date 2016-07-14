@@ -23,7 +23,7 @@ function varargout = MainFig2(varargin)
 % Edit the above text to modify the response to help MainFig
 
 
-% Last Modified by GUIDE v2.5 13-Jul-2016 17:03:48
+% Last Modified by GUIDE v2.5 14-Jul-2016 14:18:46
 
 
 % Begin initialization code - DO NOT EDIT
@@ -1389,8 +1389,14 @@ function rdoSteps_Callback(hObject, eventdata, handles)
 % hObject    handle to rdoSpace (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-set(handles.txt_MethodUnit,'String','');
-% Hint: get(hObject,'Value') returns toggle state of rdoSpace
+choice = get(hObject,'value');
+if choice
+    set(handles.txt_MethodUnit,'String','');
+    mnuScan_Callback(handles.mnuScan, eventdata, handles);
+else
+    set(handles.rdoSteps,'value',1);
+    mnuScan_Callback(handles.mnuScan, eventdata, handles);
+end% Hint: get(hObject,'Value') returns toggle state of rdoSpace
 
 
 % --- Executes on button press in rdoSpace.
@@ -1398,8 +1404,14 @@ function rdoSpace_Callback(hObject, eventdata, handles)
 % hObject    handle to rdoSpace (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-unit = get(handles.txt_initValUnit,'String');
-set(handles.txt_MethodUnit,'String',unit);
+choice = get(hObject,'value');
+if choice
+    unit = get(handles.txt_initValUnit,'String');
+    set(handles.txt_MethodUnit,'String',unit);
+    chkDelta_Callback(handles.chkDelta,eventdata,handles);
+else
+    set(handles.rdoSpace,'value',1);
+end
 % Hint: get(hObject,'Value') returns toggle state of rdoSpace
 
 
@@ -1584,6 +1596,8 @@ set(handles.edtTargetVal,'String',num2str(defVals(2)));
 set(handles.edtRateScan,'String',num2str(defVals(3)));
 
 if paramflag==1 || paramflag==2
+    set(handles.txtInitVal,'string','Initial Value:');
+    set(handles.txtTarVal,'string','Taget Value:');
     set(handles.edtRateScan,'Enable','on');
     set(handles.txtRateScan,'Enable','on');
     rateUnit = {'/min):','/sec):'};
@@ -1591,20 +1605,20 @@ if paramflag==1 || paramflag==2
     set(handles.chkDelta,'Value',0);
     set(handles.chkDelta,'Enable','off');
     set(handles.btnScan,'string','Scan');
+    set(handles.rdoSteps,'enable','on');
+    set(handles.rdoSpace,'enable','on');
+    set(handles.edtStep,'enable','on');
 else
-	set(handles.edtRateScan,'Enable','off');
     set(handles.txtRateScan,'string','Samples:');
     set(handles.chkDelta,'Enable','on');
-    delta = get(handles.chkDelta,'Value');
-    if delta
-        set(handles.btnScan,'string','Delta');
-        set(handles.txtRateScan,'string','Samples:');
-        set(handles.txtRateScan,'Enable','on');
-        set(handles.edtRateScan,'Enable','on');
+    chkDelta_Callback(handles.chkDelta,eventdata,handles);
+    steps = get(handles.rdoSteps,'value');
+    if steps
+        set(handles.txtInitVal,'string','Center:');
+        set(handles.txtTarVal,'string','Span:');
     else
-        set(handles.btnScan,'string','I-V');
-        set(handles.txtRateScan,'Enable','off');
-        set(handles.edtRateScan,'Enable','off');
+        set(handles.txtInitVal,'string','Initial Value:');
+        set(handles.txtTarVal,'string','Taget Value:');
     end
 end
 
@@ -1670,7 +1684,6 @@ function edtRateScan_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-
 % --- Executes on button press in btnOpenPlot.
 function btnOpenPlot_Callback(hObject, eventdata, handles)
 % hObject    handle to btnOpenPlot (see GCBO)
@@ -1684,15 +1697,25 @@ function chkDelta_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 delta = get(hObject,'value');
-if delta
+if delta	% delta is on
     set(handles.btnScan,'string','Delta');
     set(handles.txtRateScan,'string','Samples:');
     set(handles.txtRateScan,'Enable','on');
     set(handles.edtRateScan,'Enable','on');
-else
+    set(handles.txtInitVal,'string','Center:');
+    set(handles.txtTarVal,'string','Span:');
+    set(handles.rdoSteps,'enable','off');
+    set(handles.rdoSpace,'enable','off');
+    set(handles.edtStep,'enable','off');
+else        % delta is off - I-V
     set(handles.btnScan,'string','I-V');
     set(handles.txtRateScan,'Enable','off');
     set(handles.edtRateScan,'Enable','off');
+    set(handles.txtInitVal,'string','Initial Value:');
+    set(handles.txtTarVal,'string','Taget Value:');
+    set(handles.rdoSteps,'enable','on');
+    set(handles.rdoSpace,'enable','on');
+    set(handles.edtStep,'enable','on');
 end
 % Hint: get(hObject,'Value') returns toggle state of chkDelta
 
