@@ -10,7 +10,7 @@ for k=1:length(Im)
     wait4OPC(sm_obj)
 %     [Idata,Vdata] = executeIV( nv_obj , sm_obj , 'v' ,-10,10,0.1);
 %     [Idata,Vdata] = executeIVspan( nv_obj , sm_obj , 'v' ,-5,2,101);
-    [Idata,Vdata] = deltaExecuteSpan(nv_obj,sm_obj,'c',-5,2,2)
+    [Idata,Vdata] = deltaExecuteSpan(nv_obj,sm_obj,'c',0,2,2)
 %         data.T{Tindx,k-1}=T;
 %         data.I{Tindx,k-1}=Idata;
 %         data.V{Tindx,k-1}=Vdata;
