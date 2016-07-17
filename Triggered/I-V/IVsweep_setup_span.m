@@ -87,6 +87,7 @@ command{end+1}=[':SOUR:SWE:SPAC LIN'];
 command{end+1}=[':TRIG:COUN ',num2str(pointsP)];
 command{end+1}=[':SOUR:DEL 0.01'];
 command{end+1}=[':route:terminals rear'];
+command{end+1}=[':TRAC:FEED:CONT NEVER'];
 command{end+1}=[':TRACe:CLEar'];
 command{end+1}=[':TRACe:POINts 2500'];
 command{end+1}=[':TRAC:FEED SENS'];

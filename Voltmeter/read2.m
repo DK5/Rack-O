@@ -10,6 +10,6 @@ data = query(obj1, ':data:data?');          % Request all stored readings
 % length(data)
 store_nv(obj1);                                % Clear and continue
 vals = str2double(strsplit(data,','));      % Export readings to array
-vals(isnan(vals))=[];                       % Deletes all NaN
+% vals(isnan(vals))=[];                       % Deletes all NaN
 
 end

@@ -3,7 +3,7 @@ function [Idata,Vdata] = executeIV(nv_obj,sm_obj,mode,minP,maxP,stepP)
 % routine, by specified values
 %   nv_obj - nano-Voltmeter object
 %   sm_obj - SourceMeter object
-%   mode   - 'C' for current scanning, 'V' for voltage
+%   mode   - 'C' for current scanning in uA, 'V' for voltage
 %   minP,maxP,stepP - minimum point ,maximum point, step (spacing) 
 
 %% Current vs Voltage mode
@@ -11,6 +11,9 @@ MODE = cell(1,2);
 switch lower(mode)
     case 'c'
         MODE = 'CURRent';
+            minP=minP*1e-6;
+            maxP=maxP*1e-6;
+            stepP=stepP*1e-6;
     case 'v'
         MODE = 'VOLTage';
 end
