@@ -1,6 +1,6 @@
 close all
 
-GPdis
+% GPdis
 switch_obj=GPcon(5,0);
 nv_obj=GPcon(6,0);
 sm_obj=GPcon(23,0);
@@ -26,7 +26,7 @@ T=0;
 t=1;
 TEMP(PPMS,7.3,1,1)
 wait4temp(PPMS)
-TEMP(PPMS,7.6,0.02,0)
+TEMP(PPMS,10,5,0)
 while T(end)<7.58
     T(t)=ReadPPMSdata(PPMS,1); % Meausres temperature
     for CH=2:2%1:length(Ip)
