@@ -4,10 +4,10 @@ opc = 0; % operation completed
 fprintf(obj,'*OPC?')
 while opc~=1
     try
-        tic
+%         tic
 %         opc = str2double(query(obj,'*OPC?'))
         opc = str2double(fscanf(obj));
-        toc
+%         toc
 %         fprintf(obj,'*OPC')
 %         pause(9)
     end

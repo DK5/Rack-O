@@ -24,6 +24,6 @@ switch upper(str)
         closeCH(obj, posV, C1, S);
         closeCH(obj, negV, C2, S);
     case 'OFF'
-        openCH(obj, posv, C1, S);
+        openCH(obj, posV, C1, S);
         openCH(obj, negV, C2, S);
 end

@@ -6,7 +6,7 @@ function execute(obj,commands)
 % fprintf(obj,OneLineCMD);
 
 for k=1:length(commands)
-%     a=commands{k};
+    a=commands{k};
     fprintf(obj,commands{k});
 end
 

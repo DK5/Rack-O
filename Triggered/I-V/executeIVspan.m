@@ -1,16 +1,31 @@
-function [Idata,Vdata] = executeIVspan(nv_obj,sm_obj,mode,center,span,points)
+function [Idata,Vdata] = executeIVspan(nv_obj,sm_obj,mode,center,span,points,DIRE)
 % executeIV(nv_obj,sm_obj,mode,minP,maxP,stepP) executes IV measuring
 % routine, by specified values
 %   nv_obj - nano-Voltmeter object
 %   sm_obj - SourceMeter object
 %   mode   - 'C' for current scanning, 'V' for voltage
 %   minP,maxP,stepP - minimum point ,maximum point, step (spacing) 
+%   DIRE - UP/DOWN - direction of measurement
+
+%% DIREction
+if exist('DIRE','var') == 0
+    DIRE = 'up';
+end
+
+switch lower(DIRE)
+    case {'down','d'}
+        DIRE='DOWN';
+    otherwise
+        DIRE='UP' ;
+end
 
 %% Current vs Voltage mode
 MODE = cell(1,2);
 switch lower(mode)
     case 'c'
         MODE = 'CURRent';
+        center=center*1e-6;
+        span=span*1e-6;
     case 'v'
         MODE = 'VOLTage';
 end
@@ -35,6 +50,7 @@ command{end+1}=[':SOUR:FUNC ',MODE];
 command{end+1}=[':SOURce:',MODE,':MODE SWEep'];
 command{end+1}=[':SOURce:',MODE,':CENTer ',num2str(center)];
 command{end+1}=[':SOURce:',MODE,':SPAN ',num2str(2*span)];
+command{end+1}=[':SOUR:SWE:DIREction ',DIRE];       
 % command{end+1}=[':SOURce:',MODE,':POINts ',num2str(points)];
 command{end+1}=[':SOURce:sweep:POINts ',num2str(points)];
 command{end+1}=[':TRIG:COUN ',num2str(points)];
