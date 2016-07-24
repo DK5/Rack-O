@@ -7,7 +7,7 @@ function relative(nv_obj,mode)
 switch lower(mode)
     case 'on'
         command = cell(1);
-        command{end+1}=':sens:volt:ref:ACQuire';
+%         command{end+1}=':sens:volt:ref:ACQuire';
         command{end+1}=':sens:volt:ref:stat on';
         command(1)=[];
         execute(nv_obj,command);

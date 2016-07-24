@@ -1,4 +1,4 @@
-function deltaSetup( nv_obj , sm_obj , compliance, delay)
+function deltaSetup( nv_obj , sm_obj , Vcompliance,Icompliance, delay)
 %deltaSetup(volt_obj,cs_obj,compliance,delay) sets the nano-voltmeter and
 %the source-meter to delta mode measurement
 %   volt_obj - nano-voltmeter object
@@ -9,8 +9,12 @@ if exist('delay','var') == 0
     delay = 0;
 end
 
-if exist('compliance','var') == 0
-    compliance = 12;
+if exist('Vcompliance','var') == 0
+    Vcompliance = 21;
+end
+
+if exist('Icompliance','var') == 0
+    Icompliance = 1.05;
 end
 
 %% Set 2401 SourceMeter object configuration
@@ -34,7 +38,8 @@ fopen ( nv_obj )
 command=cell(1);
 command{end+1}=['*RST'];
 command{end+1}=[':SYSTem:PRESet'];
-command{end+1}=[':SENSe:VOLTage:DELTa ON']; % Enable or disable Delta
+command{end+1}=[':SENSe:VOLTage:DELTa OFF']; % Enable or disable Delta
+% command{end+1}=[':calc:stat off'];
 % command{end+1}=[':SENSe:VOLTage:NPLCycles 1']; % Set integration rate in line cycles to minimun (0.01 to 50);
                                                 % integration rate = nplc/frequency
 command{end+1}=[':TRIGger:DELay 0'];             % Set trigger delay
@@ -65,16 +70,18 @@ command{end+1}='ARM:SOUR IMM';
 command{end+1}='arm:outp none';
 command{end+1}='TRIG:DIR ACC';
 command{end+1}=':TRIGger:SOURce TLINk';         % Specify control source as T-Link trigger
+% command{end+1}=':TRIGger:SOURce IMMediate';
 command{end+1}=':TRIGger:OUTPut SOURce';      % Output trigger after SOURce
 command{end+1}='TRIG:INP SENS';
 
 command{end+1}=[':TRIGger:DELay ',num2str(delay)];	% Specify Trigger Delay
 command{end+1}=[':SENSe:FUNCtion:CONCurrent OFF'];% Disable ability to measure more than one function simultaneously
 command{end+1}=[':SENSe:FUNCtion ''current'''];   % Specify functions to enable (VOLTage[:DC], CURRent[:DC], or RESistance);
-command{end+1}=[':SENSe:VOLTage:PROTection:LEVel ',num2str(compliance)];     % Specify voltage limit for I-Source 
+command{end+1}=[':SENSe:CURRent:PROTection:LEVel ',num2str(Icompliance)];     % Specify current limit for I-Source 
+command{end+1}=[':SENSe:VOLTage:PROTection:LEVel ',num2str(Vcompliance)];     % Specify voltage limit for I-Source 
 % command{end+1}=[':SENSe:VOLTage:RANGe ',num2str(compliance)];    % Configure measurement range  
 command{end+1}=[':SENSe:VOLTage:RANGe:AUTO ON '];
-command{end+1}=':route:terminals rear';
+command{end+1}=[':route:terminals rear'];
 command{end+1}=[':TRAC:FEED:CONT NEVER'];
 command{end+1}=[':TRACe:CLEar'];
 command{end+1}=[':TRACe:POINts 2500'];

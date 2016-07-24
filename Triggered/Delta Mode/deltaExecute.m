@@ -1,4 +1,4 @@
-function [Idata,Vdata] = deltaExecute( volt_obj , cs_obj , current, repeats)
+function [Idata,Vdata] = deltaExecute( nv_obj , sm_obj , current, repeats)
 %deltaExecute( cs_obj , volt_obj , samples , current, compliance) 
 % executes delta mode measuring routine
 %   cs_obj = current source object
@@ -7,17 +7,17 @@ function [Idata,Vdata] = deltaExecute( volt_obj , cs_obj , current, repeats)
 %   current = current supply (in uA)
 %   compliance = voltage protection level (max voltage)
 %% voltmeter
-fprintf(volt_obj,':TRACe:CLEar');	% Clear readings from buffer
+fprintf(nv_obj,':TRACe:CLEar');	% Clear readings from buffer
 
 %% current source
 current = current*1e-6;
 listStr = [num2str(current),',',num2str(-current)];
 
-fprintf(cs_obj,[':TRIGger:COUNt ',num2str(repeats)]);	% Specify trigger count (1 to 2500);
-fprintf(cs_obj,[':SOURce:LIST:CURRent ',listStr]);	% Create list of I-Source values
-fprintf(cs_obj,':OUTPut ON');	% Turn source on
-fprintf(cs_obj,':INITiate');	% Initiate source-measure cycle(s);.
-fprintf(cs_obj,'*OPC');	% prepare to OPC
+fprintf(sm_obj,[':TRIGger:COUNt ',num2str(repeats)]);	% Specify trigger count (1 to 2500);
+fprintf(sm_obj,[':SOURce:LIST:CURRent ',listStr]);	% Create list of I-Source values
+fprintf(sm_obj,':OUTPut ON');	% Turn source on
+fprintf(sm_obj,':INITiate');	% Initiate source-measure cycle(s);.
+fprintf(sm_obj,'*OPC');	% prepare to OPC
 
 %% End of measurement
 wait4OPC(sm_obj);

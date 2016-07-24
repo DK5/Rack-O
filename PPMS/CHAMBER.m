@@ -17,7 +17,7 @@ try
                 Cmd=['CHAMBER 4'];
                 fprintf(PPMSobj, Cmd);
             else
-                disp('DUMB PROOF ALERT!!! Cannot vent below 210 K')
+                disp('DUMB PROOF ALERT!!! Cannot vent below 290 K')
             end
     end
 catch

@@ -1,4 +1,8 @@
 function setupIV(nv_obj,sm_obj)
+
+Icompliance = 1.05;
+Vcompliance = 21;
+
 % setupIV(nv_obj,sm_obj) setting-up the IV triggered measurment
 
 %% Set 2401 SourceMeter object configuration
@@ -21,6 +25,7 @@ fopen(nv_obj);
 command = cell(1);
 command{end+1}='*RST';
 command{end+1}=':SYSTem:PRESet';
+command{end+1}=[':SENSe:VOLTage:DELTa OFF'];
 command{end+1}=':TRIGger:DELay 0';
 command{end+1}=':TRIGger:SOURce EXTernal';
 command{end+1}=':TRACe:CLEar';
@@ -47,10 +52,11 @@ command{end+1}=':TRIGger:SOURce TLINk';         % Specify control source as T-Li
 command{end+1}=':TRIGger:OUTPut SOURce';      % Output trigger after SOURce
 command{end+1}='TRIG:INP SENS';
 command{end+1}=':SENS:FUNC ''CURRent:DC''';
-command{end+1}=':SENS:VOLT:PROT 21';
+command{end+1}=[':SENSe:CURRent:PROTection:LEVel ',num2str(Icompliance)];     % Specify current limit for I-Source 
+command{end+1}=[':SENSe:VOLTage:PROTection:LEVel ',num2str(Vcompliance)];     % Specify voltage limit for I-Source 
 command{end+1}=':SOUR:SWE:RANG AUTO';
 command{end+1}=':SOUR:SWE:SPAC LIN';
-command{end+1}=':SOUR:DEL 0.01';
+command{end+1}=':SOUR:DEL 0';
 command{end+1}=':route:terminals rear';
 command{end+1}=':TRACe:CLEar';
 command{end+1}=':TRACe:POINts 2500';
