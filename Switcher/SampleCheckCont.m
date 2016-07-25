@@ -22,7 +22,7 @@ limits = 3:15;
 % axis([min(limits) max(limits) min(limits) max(limits)] + 0.5);
 % axis square;
 
-currentValue=100;
+currentValue=1e3;
 % Channel Checking
 p=0;
 t=0;

@@ -12,7 +12,7 @@ while opc~=1
 %         pause(9)
     end
     error=error+1;
-    if error>25
+    if error>32
         disp('Error!!!')
         break
     end
