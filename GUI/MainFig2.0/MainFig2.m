@@ -1717,7 +1717,7 @@ else        % delta is off - I-V
         set(handles.txtRateScan,'Enable','off');
         set(handles.edtRateScan,'Enable','off');
         set(handles.txtInitVal,'string','Initial Value:');
-        set(handles.txtTarVal,'string','Taget Value:'); 
+        set(handles.txtTarVal,'string','Target Value:'); 
     end
 end
 % Hint: get(hObject,'Value') returns toggle state of chkDelta

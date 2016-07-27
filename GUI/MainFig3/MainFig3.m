@@ -1262,17 +1262,18 @@ if methodFlag
     correct = floor(abs(str2double(methodVal)));	% steps must be natural number
     methodVal = num2str(correct);
     set(handles.edtStep,'String',methodVal);    % rewrite value
-    defStr = [ParameterStr(1:4),' = ','linspace(',initValStr,',',targetValStr,',',methodVal,');'];
+    defStr = [ParameterStr(1:4),' = ','linspace(0,',targetValStr,',',methodVal,');'];
+    targetVal = str2double(targetValStr);
+    pause = num2str(targetVal/(correct-1));
 else
     methodStr = 'spacing';
-    initVal = str2double(initValStr);
     targetVal = str2double(targetValStr);
     space = str2double(methodVal);
-    interval = abs(initVal-targetVal);
-    space = interval/floor(interval/space); % there must be natural number of steps
+    space = targetVal/floor(targetVal/space); % there must be natural number of steps
     methodVal = num2str(space);
     set(handles.edtStep,'String',methodVal);
-    defStr = [ParameterStr(1:4),' = ',initValStr,':',methodVal,':',targetValStr,';'];
+    defStr = [ParameterStr(1:4),' = 0:',methodVal,':',targetValStr,';'];
+    pause = methodVal;
 end
 commandStr = ['Scan ',ParameterStr,' from ',initValStr,unitStr,' to ',...
         targetValStr,unitStr,' by ',methodStr,' of ', methodVal,unitStr];
@@ -1281,9 +1282,9 @@ add_item_to_list_box(handles.CommandList,commandStr,index);
 add_item_to_list_box(handles.CommandList,'end',index+1);
 
 % update commands in script
-sendCommand = {defStr;['for ',indStr,'=1:length(',ParameterStr(1:4),')'];functionStr};
-add_command_str(sendCommand,index);
-add_command_str('end',index+1);
+add_command_str(['for ',defStr],index);
+pauseStr = ['pause(',pause,');'];
+add_command_str({pauseStr;'end'},index+1);
 
 
 function ScanSM(handles, choice)
@@ -1341,20 +1342,21 @@ methodVal = get(handles.edtStep,'String');
 Options = get(handles.mnuScan,'UserData');
 methodFlag = get(handles.rdoSteps,'Value');
 ParameterStr = Options{choice,1};   % Parameter name
-objectStr = Options{choice,4};   % object name
 unitStr = ['[',Options{choice,2},']'];  % unit
 indArr = 'kh'; % array of loop indices
 indStr = indArr(choice);
+appStr = num2str(get(handles.mnuApproach,'value') - 1);
 
 switch choice
     case 1
-        functionStr = 'TEMP(PPMS_obj,Temp(k),10,1);';
+        functionStr = ['TEMP(PPMS_obj,Temp(k),10,',appStr,');'];
         if str2double(initValStr)<1.7 || str2double(targetValStr)<1.7
             errordlg('Temperature can''t go below 1.7K');
             return;
         end
     case 2
-        functionStr = 'FIELD(PPMS_obj,H(j),10,1,1);';
+        
+        functionStr = ['FIELD(PPMS_obj,H(j),10,',appStr,',',,');'];
         if str2double(initValStr) > 9e4 || str2double(targetValStr) > 9e4
             errordlg('Magnetic field can''t go above 90,000 Oe (= 9T)');
             return;
