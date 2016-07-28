@@ -1,5 +1,11 @@
 load time_test.mat
-for Time = linspace(0,10,5);
-    pause(2.5);
+
+Time = linspace(0,10,5);
+tic
+for t = 1:length(Time)
+    
+    %
+    timesig (k)= toc
+    pause(2.5-timesig(k));
 end
 
