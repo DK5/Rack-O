@@ -22,10 +22,11 @@ for k=1:length(Temp)
             I{end+1,s}=dI(2);
             V{end+1,s}=dV(2);
             R(end+1,s)=dV(2)/dI(2);
+            [data] = ReadPPMSdata(PPMSobj,[1,2]);  %PPMS data
+            T(end+1,s)=data(1);
+            H(end+1,s)=data(2);
         end
-        [data] = ReadPPMSdata(PPMSobj,[1,2]);  %PPMS data
-        T(end+1)=data(1);
-        H(end+1)=data(2);
+
     end
     filename=['Nb_R_vs_H_@T=',num2str(Temp(k)),'K.mat'];
     save([Location,filename],'T','H','I','V','R');  % Save file

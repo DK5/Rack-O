@@ -23,7 +23,7 @@ function varargout = MainFig3(varargin)
 % Edit the above text to modify the response to help MainFig
 
 
-% Last Modified by GUIDE v2.5 27-Jul-2016 16:20:33
+% Last Modified by GUIDE v2.5 28-Jul-2016 18:10:16
 
 
 % Begin initialization code - DO NOT EDIT
@@ -523,7 +523,7 @@ end
 close_ind = getappdata(0,'cell_ind');
 ListCommands = get(handles.CommandList,'string');   % get commands list window
 contents = getappdata(0,'cellCommands');        % get code
-contents = [{['load ',FileName(1:end-2),'.mat;'];'s = 1;'};contents];   % load data in script
+contents = [['load ',FileName(1:end-2),'.mat;'];contents];   % load data in script
 
 % if strcmp(FileName,'Enter File name')    % make sure the user has entered a filename
 %      errordlg('Please Enter a File Name!','Error 0x003');  % user didnt
@@ -817,7 +817,7 @@ configs(:,:,~sums) = [];                % delete empty configs
 % setappdata(0,'configs',configs);        % set app data
 k = find(configs);                      % find non-zero elements -> linear index
 [row,col,~] = ind2sub(size(configs),k);	% sub-index
-close_ind = [row+2,col+2];                  % generate array
+close_ind = [col,row+2];                  % generate array
 sizes = squeeze(sums)';                 % size of each config
 cell_ind = mat2cell(close_ind,sizes);   % rows & cols ordered in cell array
 setappdata(0,'cell_ind',cell_ind);      % set app data
@@ -1980,3 +1980,14 @@ else    % IV
     add_item_to_list_box(handles.CommandList,'IV setup',index);
     add_command_str('setupIV(nv_obj,sm_obj);',index);
 end
+
+
+% --- Executes on button press in btnPPMSdata.
+function btnPPMSdata_Callback(hObject, eventdata, handles)
+% hObject    handle to btnPPMSdata (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+index = get(handles.CommandList,'value');
+add_item_to_list_box(handles.CommandList,'Read PPMS data',index);
+add_command_str({'[data] = ReadPPMSdata(PPMSobj,[1,2]);  %PPMS data';...
+            'T(end+1)=data(1);';'H(end+1)=data(2);'},index);
