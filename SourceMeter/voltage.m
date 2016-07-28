@@ -1,4 +1,4 @@
-function voltage( vs_obj , state , Volts)
+function voltage( vs_obj , state , volts)
 %voltage( vs_obj , uamps ) supplies voltage from source meter
 %   vs_obj = voltage source object
 %   uVolts = voltage level in uVolts
