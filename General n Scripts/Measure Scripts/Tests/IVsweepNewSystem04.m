@@ -70,6 +70,6 @@ end
 toc
 datestr(now)
 end
-%     save('D:\Dropbox\Yeshurun\Lior Shani\Test_new_system\IVsweepMeasurement_test','data')
+    save('D:\Dropbox\Yeshurun\Lior Shani\Test_new_system\IVsweepMeasurement_test','data')
 
 execute(PPMS,{'SHUTDOWN'})

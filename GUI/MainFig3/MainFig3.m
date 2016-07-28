@@ -1356,7 +1356,7 @@ switch choice
         end
     case 2
         
-        functionStr = ['FIELD(PPMS_obj,H(j),10,',appStr,',',,');'];
+        functionStr = ['FIELD(PPMS_obj,H(j),10,',appStr,',',');'];
         if str2double(initValStr) > 9e4 || str2double(targetValStr) > 9e4
             errordlg('Magnetic field can''t go above 90,000 Oe (= 9T)');
             return;
