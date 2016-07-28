@@ -23,7 +23,7 @@ function varargout = MainFig3(varargin)
 % Edit the above text to modify the response to help MainFig
 
 
-% Last Modified by GUIDE v2.5 24-Jul-2016 13:49:26
+% Last Modified by GUIDE v2.5 27-Jul-2016 16:20:33
 
 
 % Begin initialization code - DO NOT EDIT
@@ -1079,7 +1079,7 @@ if paramflag == 3 % delta mode
     set(handles.mnuSet,'Value',3);
     set(handles.edtRateSet,'Enable','on');
     set(handles.txtUnitRateSet,'Enable','on');
-    set(handles.txtRateSet,'String','Samples:');
+    set(handles.txtRateSet,'String','Repeat:');
     set(handles.txtUnitRateSet,'string','');
 end
 
@@ -1124,8 +1124,8 @@ funcStr = Options{funcFlag,2};
 
 if funcFlag == 3 % delta mode
     current = get(handles.edtTargetSet,'string');
-    samples = get(handles.edtRateSet,'string');
-    funcStr = {'deltaSetup(nv_obj,cs_obj,compliance);';[funcStr,current,',',samples,');']};
+    repeats = get(handles.edtRateSet,'string');
+    funcStr = {'deltaSetup(nv_obj,cs_obj,compliance);';[funcStr,current,',',repeats,');']};
 end
 
 % add item to sequence
@@ -1194,7 +1194,7 @@ switch paramflag
     case 1
         ParameterStr = 'Temprature';
         functionStr = ['TEMP(PPMS_obj,',targetStr,',',rate,',10,1);'];
-        unitStr = '[°K';
+        unitStr = '[?K';
     case 2
         ParameterStr = 'Field';
         functionStr = ['FIELD(PPMS_obj,',targetStr,',',rate,',1,1);'];
@@ -1288,51 +1288,88 @@ add_command_str({pauseStr;'end'},index+1);
 
 
 function ScanSM(handles, choice)
-initValStr = get(handles.edtInitVal,'String');
-targetValStr = get(handles.edtTargetVal,'String');
-methodVal = get(handles.edtStep,'String');
-methodFlag = get(handles.rdoSteps,'Value');
+index = get(handles.CommandList,'Value');
 Options = get(handles.mnuScan,'UserData');
 ParameterStr = Options{choice,1};   % Parameter name
 unitStr = ['[',Options{choice,2},']'];  % unit
+initValStr = get(handles.edtInitVal,'String');
+targetValStr = get(handles.edtTargetVal,'String');
+routine = get(handles.mnuApproach,'value');
+switch routine
+    case {1,2}  % Normal scan or IV
+        methodVal = get(handles.edtStep,'String');
+        methodFlag = get(handles.rdoSteps,'Value');
+        indArr = 'jv'; % array of loop indices
+        indStr = indArr(choice - 2);
+        if methodFlag
+            methodStr = 'steps';
+            correct = floor(abs(str2double(methodVal)));	% steps must be natural number
+            methodVal = num2str(correct);
+            set(handles.edtStep,'String',methodVal);    % rewrite value
+            if routine == 1 % Normal scan
+                defStr = [ParameterStr(1:4),' = ','linspace(',initValStr,',',targetValStr,',',methodVal,');'];
+                commandStr = ['Scan ',ParameterStr,' from ',initValStr,unitStr,' to ',...
+                                targetValStr,unitStr,' by ',methodStr,' of ', methodVal];
+                add_item_to_list_box(handles.CommandList,commandStr,index);
+                add_item_to_list_box(handles.CommandList,'end',index+1);
+                % update commands in script
+                functionStr = [lower(ParameterStr),...
+                    '(sm_obj,''on'',',ParameterStr(1:4),'(',indStr,'))'];
+                sendCommand = {defStr;['for ',indStr,'=1:length(',ParameterStr(1:4),')'];functionStr};
+                add_command_str(sendCommand,index);
+                add_command_str('end',index+1);
+            else    % IV
+                commandStr = ['IV measurement (',ParameterStr,'): center ',initValStr,unitStr,...
+                    ' , span  ',targetValStr,unitStr,' , ',methodVal,' steps'];
+                add_item_to_list_box(handles.CommandList,commandStr,index);
+                functionStr = ['executeIVspan(nv_obj, sm_obj,','''',ParameterStr(1),'''',...
+                    ',',initValStr,',',targetValStr,',',methodVal,');'];
+                add_command_str(functionStr,index);
+            end
+        else
+            methodStr = 'spacing';
+            initVal = str2double(initValStr);
+            targetVal = str2double(targetValStr);
+            space = str2double(methodVal);
+            interval = abs(initVal-targetVal);
+            space = interval/floor(interval/space); % there must be natural number of steps
+            methodVal = num2str(space);
+            set(handles.edtStep,'String',methodVal);
+            if routine == 1 % Normal scan
+                defStr = [ParameterStr(1:4),' = ','linspace(',initValStr,',',targetValStr,',',methodVal,');'];
+                commandStr = ['Scan ',ParameterStr,' from ',initValStr,unitStr,' to ',...
+                                targetValStr,unitStr,' by ',methodStr,' of ', methodVal];
+                add_item_to_list_box(handles.CommandList,commandStr,index);
+                add_item_to_list_box(handles.CommandList,'end',index+1);
+                % update commands in script
+                functionStr = [lower(ParameterStr),...
+                    '(sm_obj,''on'',',ParameterStr(1:4),'(',indStr,'));'];
+                sendCommand = {defStr;['for ',indStr,'=1:length(',ParameterStr(1:4),')'];['% ',commandStr];functionStr};
+                add_command_str(sendCommand,index);
+                add_command_str('end',index+1);
+            else    % IV
+                commandStr = ['IV measurement (',ParameterStr,'): start ',initValStr,unitStr,...
+                    ' , stop  ',targetValStr,unitStr,' , spacing ',methodVal,unitStr];
+                add_item_to_list_box(handles.CommandList,commandStr,index);
+                functionStr = ['executeIV(nv_obj, sm_obj,','''',ParameterStr(1),'''',...
+                    ',',initValStr,',',targetValStr,',',methodVal,');    % ',commandStr];
+                add_command_str(functionStr,index);
+            end
+        end
 
-if methodFlag
-    methodStr = 'steps';
-    correct = floor(abs(str2double(methodVal)));	% steps must be natural number
-    methodVal = num2str(correct);
-    set(handles.edtStep,'String',methodVal);    % rewrite value
-    defStr = [ParameterStr(1:4),' = ','linspace(',initValStr,',',targetValStr,',',methodVal,');'];
-else
-    methodStr = 'spacing';
-    initVal = str2double(initValStr);
-    targetVal = str2double(targetValStr);
-    space = str2double(methodVal);
-    interval = abs(initVal-targetVal);
-    space = interval/floor(interval/space); % there must be natural number of steps
-    methodVal = num2str(space);
-    set(handles.edtStep,'String',methodVal);
-    defStr = [ParameterStr(1:4),' = ',initValStr,':',methodVal,':',targetValStr,';'];
+    case 3  % delta is on
+        repeatStr = get(handles.edtRateScan,'string');
+        if str2double(repeatStr) < 1
+           repeatStr = '1';
+           set(handles.edtRateScan,'string','1');
+        end
+        commandStr = ['Delta measurement (',ParameterStr,'): center ',initValStr,unitStr,...
+            ' , span  ',targetValStr,unitStr,' , ',repeatStr,' repeats'];
+        add_item_to_list_box(handles.CommandList,commandStr,index);
+        functionStr = ['deltaExecuteSpan(nv_obj, sm_obj,','''',ParameterStr(1),'''',...
+                    ',',initValStr,',',targetValStr,',',repeatStr,');    % ',commandStr];
+        add_command_str(functionStr,index);
 end
-
-isDelta = get(handles.chkDelta,'Value');
-if isDelta
-    commandStr = ['Delta Measurement - Scan ',ParameterStr,' from ',initValStr,unitStr,' to ',...
-        targetValStr,unitStr,' by ',methodStr,' of ', methodVal,unitStr];
-    functionStr = ['deltaExecute(nv_obj , cs_obj ,',ParameterStr(1:4),')'];
-else
-    commandStr = ['Scan ',ParameterStr,' from ',initValStr,unitStr,' to ',...
-        targetValStr,unitStr,' by ',methodStr,' of ', methodVal,unitStr];
-    functionStr = ['TrigMeasList(nv_obj , cs_obj , ',ParameterStr(1:4),')'];
-end
-
-index = get(handles.CommandList,'Value');
-add_item_to_list_box(handles.CommandList,commandStr,index);
-% add_item_to_list_box(handles.CommandList,'end',index+1);
-
-% update commands in script
-sendCommand = {defStr;functionStr};
-add_command_str(sendCommand,index);
-% add_command_str('end',index+1);
 
 
 function ScanPPMS(handles, choice)
@@ -1345,18 +1382,25 @@ ParameterStr = Options{choice,1};   % Parameter name
 unitStr = ['[',Options{choice,2},']'];  % unit
 indArr = 'kh'; % array of loop indices
 indStr = indArr(choice);
-appStr = num2str(get(handles.mnuApproach,'value') - 1);
+appInd = get(handles.mnuApproach,'value');
+appStr = num2str(appInd - 1);
+rateStr = get(handles.edtRateScan,'string');
+allStr = get(handles.mnuApproach,'string');
+apmStr = allStr{appInd};
 
 switch choice
     case 1
-        functionStr = ['TEMP(PPMS_obj,Temp(k),10,',appStr,');'];
+        functionStr = ['TEMP(PPMS_obj,Temp(k),',rateStr,',',appStr,');'];
         if str2double(initValStr)<1.7 || str2double(targetValStr)<1.7
             errordlg('Temperature can''t go below 1.7K');
             return;
         end
     case 2
-        
-        functionStr = ['FIELD(PPMS_obj,H(j),10,',appStr,',',');'];
+        modeStr = num2str(get(handles.mnuEndMode,'value')-1);
+        functionStr = ['FIELD(PPMS_obj,Fiel(h),',rateStr,',',appStr,',',modeStr,');'];
+        AllMode = get(handles.mnuEndMode,'string');
+        modeStr = AllMode{str2double(modeStr)+1};
+        apmStr = [apmStr,', ',modeStr];
         if str2double(initValStr) > 9e4 || str2double(targetValStr) > 9e4
             errordlg('Magnetic field can''t go above 90,000 Oe (= 9T)');
             return;
@@ -1369,6 +1413,7 @@ if methodFlag
     methodVal = num2str(correct);
     set(handles.edtStep,'String',methodVal);    % rewrite value
     defStr = [ParameterStr(1:4),' = ','linspace(',initValStr,',',targetValStr,',',methodVal,');'];
+    methodValunit = methodVal;
 else
     methodStr = 'spacing';
     initVal = str2double(initValStr);
@@ -1376,14 +1421,17 @@ else
     space = str2double(methodVal);
     interval = targetVal-initVal;
     space = interval/floor(abs(interval/space)); % there must be natural number of steps
-    methodVal = num2str(space);
-    set(handles.edtStep,'String',methodVal);
+    set(handles.edtStep,'String',num2str(space));
+    methodValunit = [num2str(space),unitStr];
     defStr = [ParameterStr(1:4),' = ',initValStr,':',methodVal,':',targetValStr,';'];
 end
 
 % update listbox
+rateUnit = get(handles.txtRateScan,'string');
+rateUnit = ['[',rateUnit(6:end-2),']',];
 commandStr = ['Scan ',ParameterStr,' from ',initValStr,unitStr,' to ',...
-        targetValStr,unitStr,' by ',methodStr,' of ', methodVal,unitStr];
+        targetValStr,unitStr,' by ',methodStr,' of ', methodValunit,...
+        '. Rate ',rateStr,rateUnit,', ',apmStr];
 index = get(handles.CommandList,'Value');
 add_item_to_list_box(handles.CommandList,commandStr,index);
 add_item_to_list_box(handles.CommandList,'end',index+1);
@@ -1435,8 +1483,9 @@ if choice
     set(handles.txt_MethodUnit,'String','');
 else
     set(handles.rdoSteps,'value',1);
-end% Hint: get(hObject,'Value') returns toggle state of rdoSpace
-
+end
+mnuApproach_Callback(handles.mnuApproach, eventdata, handles);
+% Hint: get(hObject,'Value') returns toggle state of rdoSpace
 
 % --- Executes on button press in rdoSpace.
 function rdoSpace_Callback(hObject, eventdata, handles)
@@ -1452,6 +1501,7 @@ else
     set(handles.rdoSpace,'value',1);
 end
 % Hint: get(hObject,'Value') returns toggle state of rdoSpace
+mnuApproach_Callback(handles.mnuApproach, eventdata, handles);
 
 
 % --- Executes on button press in btnScanSwitch.
@@ -1527,7 +1577,7 @@ end
 data = cell(4,5);
 
 data{1,1} = 'Temperature'; % name
-data{1,2} = '°K';       % units
+data{1,2} = '?K';       % units
 data{1,3} = 'TEMP';     % function callback
 data{1,4} = 'PPMS_obj';	% object
 data{1,5} = 'Send PPMS to specified temperature (Kelvin) by specified rate';	% hint
@@ -1639,6 +1689,7 @@ set(handles.edtTargetVal,'String',num2str(defVals(2)));
 set(handles.edtRateScan,'String',num2str(defVals(3)));
 adata = get(handles.mnuApproach,'UserData');
 set(handles.mnuApproach,'Value',1);
+set(handles.btnSetup,'visible','off');
 
 switch paramflag
     case 5  % Time
@@ -1685,7 +1736,7 @@ switch paramflag
         set(handles.txtInitVal,'Enable','on');
         set(handles.txtApproach,'Enable','on');
         set(handles.mnuApproach,'Enable','on');
-        set(handles.txtRateScan,'string','Samples:');
+        set(handles.txtRateScan,'string','Repeats:');
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -1712,7 +1763,7 @@ data{5,5} = {'Scan (loop) on time values (seconds).',...  % hint
 data{5,6} = [0, 10, 0];   % default values - initVal, target, rate
 
 data{1,1} = 'Temperature'; % name
-data{1,2} = '°K';       % units
+data{1,2} = '?K';       % units
 data{1,3} = 'TEMP';     % function callback
 data{1,4} = 'PPMS_obj';	% object
 data{1,5} = {'Scan (loop) on temperature values (Kelvin) in PPMS.',...  % hint
@@ -1738,7 +1789,7 @@ data{3,4} = 'cs_obj';	% object
 data{3,5} = {'Scan (loop) on current values (micro-Amps).',...  % hint
              '    Spacing - diffrence of current in each iteration.',...
              '    Steps - number of currents to be scanned.'};         
-data{3,6} = [-1, 1, 0];   % default values - initVal, target, rate
+data{3,6} = [-1, 1, 1];   % default values - initVal, target, rate
 
 data{4,1} = 'Voltage'; % name
 data{4,2} = 'V';       % units
@@ -1747,7 +1798,7 @@ data{4,4} = 'cs_obj';	% object
 data{4,5} = {'Scan (loop) on voltage values (Volts).',...  % hint
              '    Spacing - diffrence of voltage in each iteration.',...
              '    Steps - number of voltages to be scanned.'}; 
-data{4,6} = [-1, 1, 0];   % default values - initVal, target, rate
+data{4,6} = [-1, 1, 1];   % default values - initVal, target, rate
 
 set(hObject,'UserData',data);
 
@@ -1812,6 +1863,7 @@ if paramflag==3 || paramflag==4
             set(handles.edtStep,'enable','on');
             set(handles.txtInitVal,'string','Initial Value:');
             set(handles.txtTarVal,'string','Target Value:');
+            set(handles.btnSetup,'visible','off');
         case 2  % IV is on
             set(handles.btnScan,'string','I-V');
             set(handles.txtRateScan,'Enable','off');
@@ -1819,11 +1871,18 @@ if paramflag==3 || paramflag==4
             set(handles.rdoSteps,'enable','on');
             set(handles.rdoSpace,'enable','on');
             set(handles.edtStep,'enable','on');
-            set(handles.txtInitVal,'string','Center:');
-            set(handles.txtTarVal,'string','Span:');
+            set(handles.btnSetup,'visible','on');
+            space = get(handles.rdoSpace,'value');
+            if space
+                set(handles.txtInitVal,'string','Initial Value:');
+                set(handles.txtTarVal,'string','Target Value:');
+            else
+                set(handles.txtInitVal,'string','Center:');
+                set(handles.txtTarVal,'string','Span:');
+            end
         case 3  % delta is on
             set(handles.btnScan,'string','Delta');
-            set(handles.txtRateScan,'string','Samples:');
+            set(handles.txtRateScan,'string','Repeat:');
             set(handles.txtRateScan,'Enable','on');
             set(handles.edtRateScan,'Enable','on');
             set(handles.txtInitVal,'string','Center:');
@@ -1831,6 +1890,7 @@ if paramflag==3 || paramflag==4
             set(handles.rdoSteps,'enable','off');
             set(handles.rdoSpace,'enable','off');
             set(handles.edtStep,'enable','off');
+            set(handles.btnSetup,'visible','on');
     end
 end
 % Hints: contents = cellstr(get(hObject,'String')) returns mnuApproach contents as cell array
@@ -1878,4 +1938,21 @@ function mnuEndMode_CreateFcn(hObject, eventdata, handles)
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in btnSetup.
+function btnSetup_Callback(hObject, eventdata, handles)
+% hObject    handle to btnSetup (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+routine = get(handles.mnuApproach,'value') - 2;
+index = get(handles.CommandList,'value');
+if routine % Delta
+    add_item_to_list_box(handles.CommandList,'Delta setup',index);
+    add_command_str('deltaSetup(nv_obj,sm_obj);',index);
+    
+else    % IV
+    add_item_to_list_box(handles.CommandList,'IV setup',index);
+    add_command_str('setupIV(nv_obj,sm_obj);',index);
 end
