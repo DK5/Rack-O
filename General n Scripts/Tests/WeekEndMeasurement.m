@@ -18,12 +18,12 @@ for k=1:length(Temp)
             for ch = 1:size(rows,1)
                 closeCH(switcher_obj,rows(ch),cols(ch),1);
             end
-            [dV,dI]=deltaExecuteSpan(nv_obj,sm_obj,'c',0,1,1);% Delta Measurement
+            [dV,dI]=ExecuteIVspan(nv_obj,sm_obj,'c',0,1,1);% Delta Measurement
+            I{end+1,s}=dI(2);
+            V{end+1,s}=dV(2);
+            R(end+1,s)=dV(2)/dI(2);
         end
-        [data]=ReadPPMSdata(PPMSobj,[1,2]);  %PPMS data
-        I(end+1)=dI(2);
-        V(end+1)=dV(2);
-        R(end+1)=dV(2)/dI(2);
+        [data] = ReadPPMSdata(PPMSobj,[1,2]);  %PPMS data
         T(end+1)=data(1);
         H(end+1)=data(2);
     end

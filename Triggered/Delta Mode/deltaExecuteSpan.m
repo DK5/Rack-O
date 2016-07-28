@@ -64,18 +64,18 @@ execute(sm_obj,{':OUTP OFF'});          % Turn off source
 data=read2(nv_obj)';
 
 data=reshape(data,2,[])';
-Vdata(:,1)=(data(:,2)+data(:,1))/2;             % center voltage (average)
-Vdata(:,2)=-(data(:,2)-data(:,1))/2;             % span/2 current, differential voltage  (dV/2)
+Vdata(:,1)=(data(:,2)+data(:,1))/2;     % center voltage (average)
+Vdata(:,2)=-(data(:,2)-data(:,1))/2;    % span/2 current, differential voltage  (dV/2)
 
 % Vdata=data;
 
 %% Read data SourceMeter
-data = query(sm_obj,':TRACe:DATA?');      % Read data from buffer
+data = query(sm_obj,':TRACe:DATA?');    % Read data from buffer
 data = str2double(strsplit(data,','));  % Export readings to vector
-data = reshape(data,5,[])';               % Make measured data a table/matrix
-IIdata=reshape(data(:,2),2,[]);            % Measured currents (center+-span/2)
-Idata(:,1)=sum(IIdata)'/2;                  % center current (average)
-Idata(:,2)=diff(IIdata)'/2;                % span/2 current, differential current  (dI/2)
+data = reshape(data,5,[])';             % Make measured data a table/matrix
+IIdata=reshape(data(:,2),2,[]);         % Measured currents (center+-span/2)
+Idata(:,1)=sum(IIdata)'/2;              % center current (average)
+Idata(:,2)=diff(IIdata)'/2;             % span/2 current, differential current  (dI/2)
 % TimeSig=data(:,4)                    % Time signiture from the begening of the measurement
 
 end

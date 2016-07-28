@@ -514,20 +514,27 @@ function btnSaveFile_Callback(hObject, eventdata, handles)
 % hObject    handle to btnSaveFile (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 FileName = get(handles.file_name_edit,'String');  % get the desired filename
+[FileName,dir] = uiputfile('*.m','Save Script',FileName);
+if ~dir
+%     errordlg('No directory was chosen');
+    return;
+end
 close_ind = getappdata(0,'cell_ind');
 ListCommands = get(handles.CommandList,'string');   % get commands list window
 contents = getappdata(0,'cellCommands');        % get code
-contents = [{['load ',FileName,'.mat']};contents];   % load data in script
-save(FileName,'close_ind','ListCommands','contents');
+contents = [{['load ',FileName(1:end-2),'.mat;'];'s = 1;'};contents];   % load data in script
 
-if strcmp(FileName,'Enter File name')    % make sure the user has entered a filename
-     errordlg('Please Enter a File Name!','Error 0x003');  % user didnt
-    return
-end
+% if strcmp(FileName,'Enter File name')    % make sure the user has entered a filename
+%      errordlg('Please Enter a File Name!','Error 0x003');  % user didnt
+%     return
+% end
 
-FID = fopen([FileName,'.m'],'w');   
+FileName = [dir,FileName(1:end-2)];
+eval(['save(','''',FileName,'.mat','''',',''close_ind'',''ListCommands'',''contents'');']);
+
+eval(['FID = fopen(',['''',FileName,'.m'''],',''w'');']);
+% FID = fopen(['''',FileName,'.m'''],'w');   
 formatSpec = '%s\r\n';
 [nrows,~] = size(contents); % number of commands 
 for row = 1:nrows
@@ -544,7 +551,7 @@ end
 
 fclose(FID);
 
-eval(['edit ',FileName,'.m']);   %show the file
+eval(['edit ','''',FileName,'''','.m']);   %show the file
 msgbox('File Saved.','Attention','Help');
 
 
@@ -1031,7 +1038,7 @@ data = cell(4,3);
 
 data{1,1} = 'Compliance'; % name
 data{1,2} = 'compliance';  % function callback
-data{1,3} = 'uV';             % units
+data{1,3} = 'V';             % units
 
 data{2,1} = 'Terminal'; % name
 data{2,2} = 'terminal';  % function callback
@@ -1322,9 +1329,10 @@ switch routine
                 commandStr = ['IV measurement (',ParameterStr,'): center ',initValStr,unitStr,...
                     ' , span  ',targetValStr,unitStr,' , ',methodVal,' steps'];
                 add_item_to_list_box(handles.CommandList,commandStr,index);
-                functionStr = ['executeIVspan(nv_obj, sm_obj,','''',ParameterStr(1),'''',...
-                    ',',initValStr,',',targetValStr,',',methodVal,');'];
-                add_command_str(functionStr,index);
+                functionStr = ['[Idata,Vdata] = executeIVspan(nv_obj, sm_obj,','''',ParameterStr(1),'''',...
+                    ',',initValStr,',',targetValStr,',',methodVal,');   % ', commandStr];
+                add_command_str({functionStr;'I{end,s} = Idata;     % IV current';...
+                                    'V{end,s} = Vdata;     % IV voltage'},index);
             end
         else
             methodStr = 'spacing';
@@ -1366,9 +1374,12 @@ switch routine
         commandStr = ['Delta measurement (',ParameterStr,'): center ',initValStr,unitStr,...
             ' , span  ',targetValStr,unitStr,' , ',repeatStr,' repeats'];
         add_item_to_list_box(handles.CommandList,commandStr,index);
-        functionStr = ['deltaExecuteSpan(nv_obj, sm_obj,','''',ParameterStr(1),'''',...
+        functionStr = ['[Id,Vd] = deltaExecuteSpan(nv_obj, sm_obj,','''',ParameterStr(1),'''',...
                     ',',initValStr,',',targetValStr,',',repeatStr,');    % ',commandStr];
-        add_command_str(functionStr,index);
+        add_command_str({functionStr;...
+            'dI(end+1,s) = Id(2);    % span/2 current, differential current  (dI/2)';...
+            'dV(end+1,s) = Vd(2);    % span/2 current, differential voltage  (dV/2)';...
+            'dR(end+1,s) = Vd(2)/Id(2);  % differential resistance'},index);
 end
 
 
@@ -1391,8 +1402,12 @@ apmStr = allStr{appInd};
 switch choice
     case 1
         functionStr = ['TEMP(PPMS_obj,Temp(k),',rateStr,',',appStr,');'];
-        if str2double(initValStr)<1.7 || str2double(targetValStr)<1.7
-            errordlg('Temperature can''t go below 1.7K');
+        if str2double(initValStr)<1.8 ||  str2double(initValStr)>370
+            errordlg('Temperature can''t go below 1.8K or above 370K');
+            return;
+        end
+        if str2double(rateStr)<=0 || str2double(rateStr)>12
+            errordlg('Temperature rate can''t go below 0[K/min] or above 12[K/min]');
             return;
         end
     case 2
@@ -1401,8 +1416,12 @@ switch choice
         AllMode = get(handles.mnuEndMode,'string');
         modeStr = AllMode{str2double(modeStr)+1};
         apmStr = [apmStr,', ',modeStr];
-        if str2double(initValStr) > 9e4 || str2double(targetValStr) > 9e4
-            errordlg('Magnetic field can''t go above 90,000 Oe (= 9T)');
+        if abs(str2double(initValStr)) > 9e4
+            errordlg('Magnetic field (absolute value) can''t go above 90,000 Oe (= 9T)');
+            return;
+        end
+        if str2double(rateStr)<=0 || str2double(rateStr)>187
+            errordlg('Temperature rate can''t go below 0[Oe/sec] or above 187[Oe/sec]');
             return;
         end
 end
@@ -1437,7 +1456,7 @@ add_item_to_list_box(handles.CommandList,commandStr,index);
 add_item_to_list_box(handles.CommandList,'end',index+1);
 
 % update commands in script
-sendCommand = {defStr;['for ',indStr,'=1:length(',ParameterStr(1:4),')'];functionStr};
+sendCommand = {defStr;['for ',indStr,'=1:length(',ParameterStr(1:4),')'];['% ',commandStr];functionStr};
 add_command_str(sendCommand,index);
 add_command_str('end',index+1);
 
@@ -1763,7 +1782,7 @@ data{5,5} = {'Scan (loop) on time values (seconds).',...  % hint
 data{5,6} = [0, 10, 0];   % default values - initVal, target, rate
 
 data{1,1} = 'Temperature'; % name
-data{1,2} = '?K';       % units
+data{1,2} = '°K';       % units
 data{1,3} = 'TEMP';     % function callback
 data{1,4} = 'PPMS_obj';	% object
 data{1,5} = {'Scan (loop) on temperature values (Kelvin) in PPMS.',...  % hint
@@ -1788,7 +1807,9 @@ data{3,3} = 'current';	% function callback
 data{3,4} = 'cs_obj';	% object
 data{3,5} = {'Scan (loop) on current values (micro-Amps).',...  % hint
              '    Spacing - diffrence of current in each iteration.',...
-             '    Steps - number of currents to be scanned.'};         
+             '    Steps - number of currents to be scanned.';...
+             % IV hint
+             };         
 data{3,6} = [-1, 1, 1];   % default values - initVal, target, rate
 
 data{4,1} = 'Voltage'; % name
@@ -1853,44 +1874,47 @@ function mnuApproach_Callback(hObject, eventdata, handles)
 paramflag = get(handles.mnuScan,'value');
 if paramflag==3 || paramflag==4
     routine = get(hObject,'value');
-    switch routine
-        case 1  % Normal scan
-            set(handles.btnScan,'string','scan');
-            set(handles.txtRateScan,'Enable','off');
-            set(handles.edtRateScan,'Enable','off');
-            set(handles.rdoSteps,'enable','on');
-            set(handles.rdoSpace,'enable','on');
-            set(handles.edtStep,'enable','on');
-            set(handles.txtInitVal,'string','Initial Value:');
-            set(handles.txtTarVal,'string','Target Value:');
-            set(handles.btnSetup,'visible','off');
-        case 2  % IV is on
-            set(handles.btnScan,'string','I-V');
-            set(handles.txtRateScan,'Enable','off');
-            set(handles.edtRateScan,'Enable','off');
-            set(handles.rdoSteps,'enable','on');
-            set(handles.rdoSpace,'enable','on');
-            set(handles.edtStep,'enable','on');
-            set(handles.btnSetup,'visible','on');
-            space = get(handles.rdoSpace,'value');
-            if space
+    if routine == 3        % delta is on
+        set(handles.btnScan,'string','Delta');
+        set(handles.txtRateScan,'string','Repeats:');
+        set(handles.txtRateScan,'Enable','on');
+        set(handles.edtRateScan,'Enable','on');
+        set(handles.txtInitVal,'string','Center:');
+        set(handles.txtTarVal,'string','Span:');
+        set(handles.rdoSteps,'enable','off');
+        set(handles.rdoSpace,'enable','off');
+        set(handles.edtStep,'enable','off');
+        set(handles.btnSetup,'visible','on');
+        set(handles.edtInitVal,'string','0');
+    elseif routine == 3        % continuos
+        set(handles.txtRateScan,'string','Time interval:');
+    else
+        set(handles.txtRateScan,'Enable','off');
+        set(handles.edtRateScan,'Enable','off');
+        set(handles.rdoSteps,'enable','on');
+        set(handles.rdoSpace,'enable','on');
+        set(handles.edtStep,'enable','on');
+        switch routine
+            case 1  % Normal scan
+                set(handles.btnScan,'string','scan');
                 set(handles.txtInitVal,'string','Initial Value:');
                 set(handles.txtTarVal,'string','Target Value:');
-            else
-                set(handles.txtInitVal,'string','Center:');
-                set(handles.txtTarVal,'string','Span:');
-            end
-        case 3  % delta is on
-            set(handles.btnScan,'string','Delta');
-            set(handles.txtRateScan,'string','Repeat:');
-            set(handles.txtRateScan,'Enable','on');
-            set(handles.edtRateScan,'Enable','on');
-            set(handles.txtInitVal,'string','Center:');
-            set(handles.txtTarVal,'string','Span:');
-            set(handles.rdoSteps,'enable','off');
-            set(handles.rdoSpace,'enable','off');
-            set(handles.edtStep,'enable','off');
-            set(handles.btnSetup,'visible','on');
+                set(handles.btnSetup,'visible','off');
+                set(handles.edtInitVal,'string','-1');
+            case 2  % IV is on
+                set(handles.btnScan,'string','I-V');
+                set(handles.btnSetup,'visible','on');
+                space = get(handles.rdoSpace,'value');
+                if space
+                    set(handles.txtInitVal,'string','Initial Value:');
+                    set(handles.txtTarVal,'string','Target Value:');
+                    set(handles.edtInitVal,'string','-1');
+                else
+                    set(handles.txtInitVal,'string','Center:');
+                    set(handles.txtTarVal,'string','Span:');
+                    set(handles.edtInitVal,'string','0');
+                end  
+        end  
     end
 end
 % Hints: contents = cellstr(get(hObject,'String')) returns mnuApproach contents as cell array

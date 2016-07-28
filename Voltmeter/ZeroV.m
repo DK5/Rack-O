@@ -11,7 +11,7 @@ pause(delay)
 % diff_counter=0;
 % while diff_counter<=5;
 %     [ vals ] = read2( nv_obj )
-%     V=[V vals];
+%     V = [V vals];
 %     diff_counter=sum(abs(diff(V))*1e9<5)
 %     subplot(2,1,1)
 %         plot(V*1e9)
