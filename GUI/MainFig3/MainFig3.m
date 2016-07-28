@@ -1079,7 +1079,7 @@ if paramflag == 3 % delta mode
     set(handles.mnuSet,'Value',3);
     set(handles.edtRateSet,'Enable','on');
     set(handles.txtUnitRateSet,'Enable','on');
-    set(handles.txtRateSet,'String','Samples:');
+    set(handles.txtRateSet,'String','Repeat:');
     set(handles.txtUnitRateSet,'string','');
 end
 
@@ -1124,8 +1124,8 @@ funcStr = Options{funcFlag,2};
 
 if funcFlag == 3 % delta mode
     current = get(handles.edtTargetSet,'string');
-    samples = get(handles.edtRateSet,'string');
-    funcStr = {'deltaSetup(nv_obj,cs_obj,compliance);';[funcStr,current,',',samples,');']};
+    repeats = get(handles.edtRateSet,'string');
+    funcStr = {'deltaSetup(nv_obj,cs_obj,compliance);';[funcStr,current,',',repeats,');']};
 end
 
 % add item to sequence
@@ -1358,16 +1358,16 @@ switch routine
         end
 
     case 3  % delta is on
-        sampleStr = get(handles.edtRateScan,'string');
-        if str2double(sampleStr) < 1
-           sampleStr = '1';
+        repeatStr = get(handles.edtRateScan,'string');
+        if str2double(repeatStr) < 1
+           repeatStr = '1';
            set(handles.edtRateScan,'string','1');
         end
         commandStr = ['Delta measurement (',ParameterStr,'): center ',initValStr,unitStr,...
-            ' , span  ',targetValStr,unitStr,' , ',sampleStr,' samples'];
+            ' , span  ',targetValStr,unitStr,' , ',repeatStr,' repeats'];
         add_item_to_list_box(handles.CommandList,commandStr,index);
         functionStr = ['deltaExecuteSpan(nv_obj, sm_obj,','''',ParameterStr(1),'''',...
-                    ',',initValStr,',',targetValStr,');    % ',commandStr];
+                    ',',initValStr,',',targetValStr,',',repeatStr,');    % ',commandStr];
         add_command_str(functionStr,index);
 end
 
@@ -1413,6 +1413,7 @@ if methodFlag
     methodVal = num2str(correct);
     set(handles.edtStep,'String',methodVal);    % rewrite value
     defStr = [ParameterStr(1:4),' = ','linspace(',initValStr,',',targetValStr,',',methodVal,');'];
+    methodValunit = methodVal;
 else
     methodStr = 'spacing';
     initVal = str2double(initValStr);
@@ -1421,7 +1422,7 @@ else
     interval = targetVal-initVal;
     space = interval/floor(abs(interval/space)); % there must be natural number of steps
     set(handles.edtStep,'String',num2str(space));
-    methodVal = [num2str(space),unitStr];
+    methodValunit = [num2str(space),unitStr];
     defStr = [ParameterStr(1:4),' = ',initValStr,':',methodVal,':',targetValStr,';'];
 end
 
@@ -1429,7 +1430,7 @@ end
 rateUnit = get(handles.txtRateScan,'string');
 rateUnit = ['[',rateUnit(6:end-2),']',];
 commandStr = ['Scan ',ParameterStr,' from ',initValStr,unitStr,' to ',...
-        targetValStr,unitStr,' by ',methodStr,' of ', methodVal,...
+        targetValStr,unitStr,' by ',methodStr,' of ', methodValunit,...
         '. Rate ',rateStr,rateUnit,', ',apmStr];
 index = get(handles.CommandList,'Value');
 add_item_to_list_box(handles.CommandList,commandStr,index);
@@ -1735,7 +1736,7 @@ switch paramflag
         set(handles.txtInitVal,'Enable','on');
         set(handles.txtApproach,'Enable','on');
         set(handles.mnuApproach,'Enable','on');
-        set(handles.txtRateScan,'string','Samples:');
+        set(handles.txtRateScan,'string','Repeats:');
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -1788,7 +1789,7 @@ data{3,4} = 'cs_obj';	% object
 data{3,5} = {'Scan (loop) on current values (micro-Amps).',...  % hint
              '    Spacing - diffrence of current in each iteration.',...
              '    Steps - number of currents to be scanned.'};         
-data{3,6} = [-1, 1, 0];   % default values - initVal, target, rate
+data{3,6} = [-1, 1, 1];   % default values - initVal, target, rate
 
 data{4,1} = 'Voltage'; % name
 data{4,2} = 'V';       % units
@@ -1797,7 +1798,7 @@ data{4,4} = 'cs_obj';	% object
 data{4,5} = {'Scan (loop) on voltage values (Volts).',...  % hint
              '    Spacing - diffrence of voltage in each iteration.',...
              '    Steps - number of voltages to be scanned.'}; 
-data{4,6} = [-1, 1, 0];   % default values - initVal, target, rate
+data{4,6} = [-1, 1, 1];   % default values - initVal, target, rate
 
 set(hObject,'UserData',data);
 
@@ -1881,7 +1882,7 @@ if paramflag==3 || paramflag==4
             end
         case 3  % delta is on
             set(handles.btnScan,'string','Delta');
-            set(handles.txtRateScan,'string','Samples:');
+            set(handles.txtRateScan,'string','Repeat:');
             set(handles.txtRateScan,'Enable','on');
             set(handles.edtRateScan,'Enable','on');
             set(handles.txtInitVal,'string','Center:');
