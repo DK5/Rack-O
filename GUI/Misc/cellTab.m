@@ -5,6 +5,7 @@ CommandsTab = strtrim(CommandsCell); % remove all tabs
 TABS = zeros(length(CommandsTab),1);
 counter = 0;
 errorind = 0;
+eeind = 1;
 
 % counts TAB
 for i = 1:length(CommandsTab)
@@ -42,8 +43,9 @@ for i = 1:length(CommandsTab)
                 counter = counter + 1;
             case 'end'
                 counter = counter - 1;
-                if counter == -1
-                    errorind = i;
+                if counter < 0
+                    errorind(eeind) = i;
+                    eeind = eeind + 1;
 %                     error('End statement cannot be above loop');
                 end
                 TABS(i)=counter;

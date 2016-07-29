@@ -23,7 +23,7 @@ function varargout = MainFig3(varargin)
 % Edit the above text to modify the response to help MainFig
 
 
-% Last Modified by GUIDE v2.5 28-Jul-2016 18:10:16
+% Last Modified by GUIDE v2.5 29-Jul-2016 18:20:11
 
 
 % Begin initialization code - DO NOT EDIT
@@ -325,40 +325,40 @@ function h = add_item_to_list_box(h, newitem, index)
     % Set the new cell array to the list box
     set(h, 'string', newstring);
 
-function h = del_item_from_list_box(h, index)
+function endseq = del_item_from_list_box(h, index)
 % del_item_from_list_box - removes items to the listbox
 % H = del_item_from_list_box(H, index)
 % H listbox handle
 % index - index to remove 
 % STRING a new item to display
 strings = get(h,'string');   % listbox string cell array
+endseq = 0;
 if isempty(strings)
     return;
 end
 
+count = 0;
 for ind = 1:length(index)
-    lineStr = strings{index(ind)};
-    if strcmpi(lineStr,'end')
-        errordlg('Cannot delete End statement!','Error 0x004');
-        return
-    elseif strcmp(lineStr,'End Sequence')
-        errordlg('Cannot delete End Sequence statement!','Error 0x005');
-        return
-    elseif strcmpi(lineStr(1:4),'scan')
-        
+    lineStr = strtrim(strings{index(ind)});
+    switch lineStr(1:3)
+        case 'Sca'
+            count = count + 1;
+        case 'end'
+            count = count - 1;
+            if count < 0
+                errordlg('Cannot delete End statement without its scan!','Error 0x004');
+                return;
+            end
+        case 'End'
+            errordlg('Cannot delete End Sequence statement!','Error 0x005');
+            endseq = 1;
+            return;
     end
 end
 strings(index) = [];
 strings = cellTab(strings);	% add TABs
 set(h,'value',min(min(ind)+1,length(strings))); 
 set(h,'string',strings); 
-% L = length(strings);
-% if isempty(strings)
-% elseif index==L 
-% else
-%     newstring = {strings{1:(index-1)} strings{index+1:end}};
-%     set(h,'string',newstring);
-% end
 
 
 % --- Executes during object creation, after setting all properties.
@@ -376,6 +376,19 @@ end
 set(hObject, 'String', {'End sequence'});
 set(hObject, 'UserData',cell(1));
 
+% --- Executes on key press with focus on CommandList and none of its controls.
+function CommandList_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to CommandList (see GCBO)
+% eventdata  structure with the following fields (see UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
+key = eventdata.Key;
+if strcmp(key,'delete') % delete key
+    % call the pushbutton callback
+    btnDeleteLine_Callback(hObject, eventdata, handles)
+end
 
 % --- Executes on button press in btnPause.
 function btnPause_Callback(hObject, eventdata, handles)
@@ -420,8 +433,10 @@ function btnDeleteLine_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 index_selected = get(handles.CommandList, 'Value');
 try
-    del_item_from_list_box(handles.CommandList,index_selected);
-    delete_command_str(index_selected);
+    endseq = del_item_from_list_box(handles.CommandList,index_selected);
+    if ~endseq
+        delete_command_str(index_selected);
+    end
 catch
     errordlg('Error while deleting line');
 end
@@ -1957,3 +1972,4 @@ index = get(handles.CommandList,'value');
 add_item_to_list_box(handles.CommandList,'Read PPMS data',index);
 add_command_str({'[data] = ReadPPMSdata(PPMSobj,[1,2]);    % PPMS data';...
             'T(end+1)=data(1);';'H(end+1)=data(2);'},index);
+
