@@ -923,7 +923,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 data = cell(2,2);
-data{1,1} = 'Temprature';   % title
+data{1,1} = 'Temperature';   % title
 data{1,2} = 'wait for temperature to be reached';           % hint
 
 data{2,1} = 'Field';
@@ -958,7 +958,7 @@ commandStr = ['Wait for ',Options{paramflag}];
 index = get(handles.CommandList,'Value');
 add_item_to_list_box(handles.CommandList,commandStr,index);
 % update commands in script
-add_command_str(functionStr,index);
+add_command_str([functionStr,'  % ',commandStr],index);
 
 
 % --- Executes on button press in btnSMadd.
@@ -1070,77 +1070,6 @@ add_item_to_list_box(handles.CommandList,commandLine,index);
 functionStr = [Options{funcFlag,2},'(nv_obj, ',setValue,');'];
 add_command_str(functionStr,index);
 
-
-% % --- Executes on selection change in mnuMeas.
-% function mnuMeas_Callback(hObject, eventdata, handles)
-% % hObject    handle to mnuMeas (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% options = get(hObject,'UserData');
-% paramflag = get(hObject,'Value');
-% 
-% hintStr = options{paramflag,3};
-% set(handles.txtHint,'string',hintStr);
-% if paramflag == 3 % delta mode
-%     set(handles.txtUnitTargetSet,'string','uA');
-%     set(handles.mnuSet,'Value',3);
-%     set(handles.edtRateSet,'Enable','on');
-%     set(handles.txtUnitRateSet,'Enable','on');
-%     set(handles.txtRateSet,'String','Repeat:');
-%     set(handles.txtUnitRateSet,'string','');
-% end
-
-% % --- Executes during object creation, after setting all properties.
-% function mnuMeas_CreateFcn(hObject, eventdata, handles)
-% % hObject    handle to mnuMeas (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    empty - handles not created until after all CreateFcns called
-% 
-% % Hint: popupmenu controls usually have a white background on Windows.
-% %       See ISPC and COMPUTER.
-% if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-%     set(hObject,'BackgroundColor','white');
-% end
-% data = cell(3,2);
-% 
-% data{1,1} = '1 Shot Voltage'; % name
-% % data{1,2} = 'V';       % units
-% data{1,2} = 'OneShotTriggerV(nv_obj)';     % function callback
-% % data{1,4} = 'nv_obj';	% object
-% data{1,3} = '1 shot Measure of voltage (nano Voltmeter)';	% hint
-% 
-% data{2,1} = 'Continously';
-% data{2,2} = 'read(nv_obj);';
-% data{2,3} = 'Continuosly Measure voltage (nano Voltmeter)';	% hint
-% 
-% data{3,1} = 'Delta Mode';
-% data{3,2} = 'DeltaMode(volt_obj , cs_obj ,';
-% data{3,3} = 'Delta Measurement of voltage (nano Voltmeter). Set current value in the Set/Source panel';	% hint
-% 
-% set(hObject,'UserData',data);
-
-
-% % --- Executes on button press in btnMeas.
-% function btnMeas_Callback(hObject, eventdata, handles)
-% % hObject    handle to btnMeas (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% funcFlag = get(handles.mnuMeas,'Value');  % Choice
-% Options = get(handles.mnuMeas,'UserData');% get data from menu
-% funcStr = Options{funcFlag,2};
-% 
-% if funcFlag == 3 % delta mode
-%     current = get(handles.edtTargetSet,'string');
-%     repeats = get(handles.edtRateSet,'string');
-%     funcStr = {'deltaSetup(nv_obj,cs_obj,compliance);';[funcStr,current,',',repeats,');']};
-% end
-% 
-% % add item to sequence
-% commandLine = ['Measure Voltage ',Options{funcFlag,1}];
-% index = get(handles.CommandList,'Value');
-% add_item_to_list_box(handles.CommandList,commandLine,index);
-% add_command_str(funcStr,index);
-% 
 
 function edtVoltSet_Callback(hObject, eventdata, handles)
 % hObject    handle to edtVoltSet (see GCBO)
@@ -1402,7 +1331,7 @@ apmStr = allStr{appInd};
 switch choice
     case 1
         functionStr = ['TEMP(PPMS_obj,Temp(k),',rateStr,',',appStr,');'];
-        if str2double(initValStr)<1.8 ||  str2double(initValStr)>370
+        if str2double(initValStr)<1.8 ||  str2double(initValStr)>370 || str2double(targetValStr)<1.8 ||  str2double(targetValStr)>370
             errordlg('Temperature can''t go below 1.8K or above 370K');
             return;
         end
@@ -1416,7 +1345,7 @@ switch choice
         AllMode = get(handles.mnuEndMode,'string');
         modeStr = AllMode{str2double(modeStr)+1};
         apmStr = [apmStr,', ',modeStr];
-        if abs(str2double(initValStr)) > 9e4
+        if abs(str2double(initValStr)) > 9e4 || abs(str2double(targetValStr)) > 9e4
             errordlg('Magnetic field (absolute value) can''t go above 90,000 Oe (= 9T)');
             return;
         end
@@ -1542,6 +1471,7 @@ sendCommand = { ['% ',commandStr];...
                 'rows = close_ind{s}(:,1);';...
                 'cols = close_ind{s}(:,2);';...
                 'for ch = 1:size(rows,1)';...
+                '% close all channels on this configuration';...
                 'closeCH(switcher_obj,rows(ch),cols(ch),1);';...
                 'end'};
 add_command_str(sendCommand,index);
@@ -1646,8 +1576,24 @@ switch paramflag
         switch paramflag
             case 1  % temperature
                 functionStr = ['TEMP(PPMS_obj,',targetStr,',',rate,',10,1);'];
+                if str2double(targetStr)<1.8 ||  str2double(targetStr)>370
+                    errordlg('Temperature can''t go below 1.8K or above 370K');
+                    return;
+                end
+                if str2double(rate)<=0 || str2double(rate)>12
+                    errordlg('Temperature rate can''t go below 0[K/min] or above 12[K/min]');
+                    return;
+                end
             case 2  % field
                 functionStr = ['FIELD(PPMS_obj,',targetStr,',',rate,',1);'];
+                if abs(str2double(targetStr)) > 9e4
+                    errordlg('Magnetic field (absolute value) can''t go above 90,000 Oe (= 9T)');
+                    return;
+                end
+                if str2double(rate)<=0 || str2double(rate)>187
+                    errordlg('Temperature rate can''t go below 0[Oe/sec] or above 187[Oe/sec]');
+                    return;
+                end
         end
         % update listbox
         commandStr = ['Set ',ParameterStr,' to ', targetStr,'[',unitStr,']',...
@@ -1994,11 +1940,11 @@ routine = get(handles.mnuApproach,'value') - 2;
 index = get(handles.CommandList,'value');
 if routine % Delta
     add_item_to_list_box(handles.CommandList,'Delta setup',index);
-    add_command_str('deltaSetup(nv_obj,sm_obj);',index);
+    add_command_str('deltaSetup(nv_obj,sm_obj);    % Delta setup',index);
     
 else    % IV
     add_item_to_list_box(handles.CommandList,'IV setup',index);
-    add_command_str('setupIV(nv_obj,sm_obj);',index);
+    add_command_str('setupIV(nv_obj,sm_obj);    % IV setup',index);
 end
 
 
@@ -2009,5 +1955,5 @@ function btnPPMSdata_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 index = get(handles.CommandList,'value');
 add_item_to_list_box(handles.CommandList,'Read PPMS data',index);
-add_command_str({'[data] = ReadPPMSdata(PPMSobj,[1,2]);  %PPMS data';...
+add_command_str({'[data] = ReadPPMSdata(PPMSobj,[1,2]);    % PPMS data';...
             'T(end+1)=data(1);';'H(end+1)=data(2);'},index);
