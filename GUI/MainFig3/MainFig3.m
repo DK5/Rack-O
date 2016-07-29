@@ -1071,76 +1071,76 @@ functionStr = [Options{funcFlag,2},'(nv_obj, ',setValue,');'];
 add_command_str(functionStr,index);
 
 
-% --- Executes on selection change in mnuMeas.
-function mnuMeas_Callback(hObject, eventdata, handles)
-% hObject    handle to mnuMeas (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-options = get(hObject,'UserData');
-paramflag = get(hObject,'Value');
+% % --- Executes on selection change in mnuMeas.
+% function mnuMeas_Callback(hObject, eventdata, handles)
+% % hObject    handle to mnuMeas (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% options = get(hObject,'UserData');
+% paramflag = get(hObject,'Value');
+% 
+% hintStr = options{paramflag,3};
+% set(handles.txtHint,'string',hintStr);
+% if paramflag == 3 % delta mode
+%     set(handles.txtUnitTargetSet,'string','uA');
+%     set(handles.mnuSet,'Value',3);
+%     set(handles.edtRateSet,'Enable','on');
+%     set(handles.txtUnitRateSet,'Enable','on');
+%     set(handles.txtRateSet,'String','Repeat:');
+%     set(handles.txtUnitRateSet,'string','');
+% end
 
-hintStr = options{paramflag,3};
-set(handles.txtHint,'string',hintStr);
-if paramflag == 3 % delta mode
-    set(handles.txtUnitTargetSet,'string','uA');
-    set(handles.mnuSet,'Value',3);
-    set(handles.edtRateSet,'Enable','on');
-    set(handles.txtUnitRateSet,'Enable','on');
-    set(handles.txtRateSet,'String','Repeat:');
-    set(handles.txtUnitRateSet,'string','');
-end
-
-% --- Executes during object creation, after setting all properties.
-function mnuMeas_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to mnuMeas (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-data = cell(3,2);
-
-data{1,1} = '1 Shot Voltage'; % name
-% data{1,2} = 'V';       % units
-data{1,2} = 'OneShotTriggerV(nv_obj)';     % function callback
-% data{1,4} = 'nv_obj';	% object
-data{1,3} = '1 shot Measure of voltage (nano Voltmeter)';	% hint
-
-data{2,1} = 'Continously';
-data{2,2} = 'read(nv_obj);';
-data{2,3} = 'Continuosly Measure voltage (nano Voltmeter)';	% hint
-
-data{3,1} = 'Delta Mode';
-data{3,2} = 'DeltaMode(volt_obj , cs_obj ,';
-data{3,3} = 'Delta Measurement of voltage (nano Voltmeter). Set current value in the Set/Source panel';	% hint
-
-set(hObject,'UserData',data);
+% % --- Executes during object creation, after setting all properties.
+% function mnuMeas_CreateFcn(hObject, eventdata, handles)
+% % hObject    handle to mnuMeas (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    empty - handles not created until after all CreateFcns called
+% 
+% % Hint: popupmenu controls usually have a white background on Windows.
+% %       See ISPC and COMPUTER.
+% if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+%     set(hObject,'BackgroundColor','white');
+% end
+% data = cell(3,2);
+% 
+% data{1,1} = '1 Shot Voltage'; % name
+% % data{1,2} = 'V';       % units
+% data{1,2} = 'OneShotTriggerV(nv_obj)';     % function callback
+% % data{1,4} = 'nv_obj';	% object
+% data{1,3} = '1 shot Measure of voltage (nano Voltmeter)';	% hint
+% 
+% data{2,1} = 'Continously';
+% data{2,2} = 'read(nv_obj);';
+% data{2,3} = 'Continuosly Measure voltage (nano Voltmeter)';	% hint
+% 
+% data{3,1} = 'Delta Mode';
+% data{3,2} = 'DeltaMode(volt_obj , cs_obj ,';
+% data{3,3} = 'Delta Measurement of voltage (nano Voltmeter). Set current value in the Set/Source panel';	% hint
+% 
+% set(hObject,'UserData',data);
 
 
-% --- Executes on button press in btnMeas.
-function btnMeas_Callback(hObject, eventdata, handles)
-% hObject    handle to btnMeas (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-funcFlag = get(handles.mnuMeas,'Value');  % Choice
-Options = get(handles.mnuMeas,'UserData');% get data from menu
-funcStr = Options{funcFlag,2};
-
-if funcFlag == 3 % delta mode
-    current = get(handles.edtTargetSet,'string');
-    repeats = get(handles.edtRateSet,'string');
-    funcStr = {'deltaSetup(nv_obj,cs_obj,compliance);';[funcStr,current,',',repeats,');']};
-end
-
-% add item to sequence
-commandLine = ['Measure Voltage ',Options{funcFlag,1}];
-index = get(handles.CommandList,'Value');
-add_item_to_list_box(handles.CommandList,commandLine,index);
-add_command_str(funcStr,index);
-
+% % --- Executes on button press in btnMeas.
+% function btnMeas_Callback(hObject, eventdata, handles)
+% % hObject    handle to btnMeas (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% funcFlag = get(handles.mnuMeas,'Value');  % Choice
+% Options = get(handles.mnuMeas,'UserData');% get data from menu
+% funcStr = Options{funcFlag,2};
+% 
+% if funcFlag == 3 % delta mode
+%     current = get(handles.edtTargetSet,'string');
+%     repeats = get(handles.edtRateSet,'string');
+%     funcStr = {'deltaSetup(nv_obj,cs_obj,compliance);';[funcStr,current,',',repeats,');']};
+% end
+% 
+% % add item to sequence
+% commandLine = ['Measure Voltage ',Options{funcFlag,1}];
+% index = get(handles.CommandList,'Value');
+% add_item_to_list_box(handles.CommandList,commandLine,index);
+% add_command_str(funcStr,index);
+% 
 
 function edtVoltSet_Callback(hObject, eventdata, handles)
 % hObject    handle to edtVoltSet (see GCBO)
@@ -1201,7 +1201,7 @@ switch paramflag
     case 1
         ParameterStr = 'Temprature';
         functionStr = ['TEMP(PPMS_obj,',targetStr,',',rate,',10,1);'];
-        unitStr = '[?K';
+        unitStr = '[°K';
     case 2
         ParameterStr = 'Field';
         functionStr = ['FIELD(PPMS_obj,',targetStr,',',rate,',1,1);'];
@@ -1596,7 +1596,7 @@ end
 data = cell(4,5);
 
 data{1,1} = 'Temperature'; % name
-data{1,2} = '?K';       % units
+data{1,2} = '°K';       % units
 data{1,3} = 'TEMP';     % function callback
 data{1,4} = 'PPMS_obj';	% object
 data{1,5} = 'Send PPMS to specified temperature (Kelvin) by specified rate';	% hint
@@ -1702,7 +1702,7 @@ if uflag
 end
 hintStr = options{paramflag,5};
 defVals = options{paramflag,6};
-set(handles.txtHint,'string',hintStr);
+set(handles.txtHint,'string',hintStr(1,:));
 set(handles.edtInitVal,'String',num2str(defVals(1)));
 set(handles.edtTargetVal,'String',num2str(defVals(2)));
 set(handles.edtRateScan,'String',num2str(defVals(3)));
@@ -1788,7 +1788,7 @@ data{1,4} = 'PPMS_obj';	% object
 data{1,5} = {'Scan (loop) on temperature values (Kelvin) in PPMS.',...  % hint
              '    Spacing - diffrence of temperature in each iteration.',...
              '    Steps - number of temperatures to be scanned.',...
-             '    <not implemented> Rate - approaching rate in each iteration.'};
+             '    Rate - approaching rate in each iteration.'};
 data{1,6} = [300, 10, 4];   % default values - initVal, target, rate
 
 data{2,1} = 'Field'; % name
@@ -1798,7 +1798,7 @@ data{2,4} = 'PPMS_obj';	% object
 data{2,5} = {'Scan (loop) on field values (Oersted) in PPMS.',...  % hint
              '    Spacing - diffrence of field in each iteration.',...
              '    Steps - number of fields to be scanned.',...
-             '    <not implemented> Rate - approaching rate in each iteration.'};
+             '    Rate - approaching rate in each iteration.'};
 data{2,6} = [0, 1000, 10];   % default values - initVal, target, rate
 
 data{3,1} = 'Current'; % name
@@ -1807,8 +1807,16 @@ data{3,3} = 'current';	% function callback
 data{3,4} = 'cs_obj';	% object
 data{3,5} = {'Scan (loop) on current values (micro-Amps).',...  % hint
              '    Spacing - diffrence of current in each iteration.',...
-             '    Steps - number of currents to be scanned.';...
+             '    Steps   - number of currents to be scanned.','';...
              % IV hint
+             'IV triggered measuremsnt, ruled by CURRENT (I, micro-Amps)',...
+             '    Spacing - diffrence of current in each shot (initial & target values).',...
+             '    Steps   - number of currents to be scanned (center & span).','';...
+             % Delta hint
+             'Delta mode triggered measurement, ruled by CURRENT (I, micro-Amps)',...
+             '    Center  - center current.',...
+             '    Span    - current span.',...
+             '    Repeats - repeats on the measurement.'
              };         
 data{3,6} = [-1, 1, 1];   % default values - initVal, target, rate
 
@@ -1818,7 +1826,17 @@ data{4,3} = 'voltage';     % function callback
 data{4,4} = 'cs_obj';	% object
 data{4,5} = {'Scan (loop) on voltage values (Volts).',...  % hint
              '    Spacing - diffrence of voltage in each iteration.',...
-             '    Steps - number of voltages to be scanned.'}; 
+             '    Steps - number of voltages to be scanned.','';... 
+             % IV hint
+             'IV triggered measuremsnt, ruled by VOLTAGE (V, volts)',...
+             '    Spacing - diffrence of voltage in each shot (initial & target values).',...
+             '    Steps   - number of voltages to be scanned (center & span).','';...
+             % Delta hint
+             'Delta mode triggered measurement, ruled by VOLTAGE (V, volts)',...
+             '    Center  - center voltage.',...
+             '    Span    - voltage span.',...
+             '    Repeats - repeats on the measurement.'
+             }; 
 data{4,6} = [-1, 1, 1];   % default values - initVal, target, rate
 
 set(hObject,'UserData',data);
@@ -1871,12 +1889,14 @@ function mnuApproach_Callback(hObject, eventdata, handles)
 % hObject    handle to mnuApproach (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+options = get(handles.mnuScan,'userData');
 paramflag = get(handles.mnuScan,'value');
+hints = options{paramflag,5};
 if paramflag==3 || paramflag==4
     routine = get(hObject,'value');
+    set(handles.txtHint,'string',hints(routine,:));
     if routine == 3        % delta is on
         set(handles.btnScan,'string','Delta');
-        set(handles.txtRateScan,'string','Repeats:');
         set(handles.txtRateScan,'Enable','on');
         set(handles.edtRateScan,'Enable','on');
         set(handles.txtInitVal,'string','Center:');
@@ -1886,7 +1906,7 @@ if paramflag==3 || paramflag==4
         set(handles.edtStep,'enable','off');
         set(handles.btnSetup,'visible','on');
         set(handles.edtInitVal,'string','0');
-    elseif routine == 3        % continuos
+    elseif routine == 4        % continuos
         set(handles.txtRateScan,'string','Time interval:');
     else
         set(handles.txtRateScan,'Enable','off');
