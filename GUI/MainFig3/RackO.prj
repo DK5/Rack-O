@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
+  <configuration target="target.ezdeploy.standalone" target-name="MATLAB Compiler for Standalone Applications" name="RackO" location="C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\MainFig3" file="C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\MainFig3\RackO.prj" preferred-package-type="package.type.exe" build-checksum="2952548678" preferred-package-location="C:\Users\B\Documents\MATLAB\Devices\Rack-O\App\MainFig3\RackO\for_redistribution">
+    <param.appname>RackO</param.appname>
+    <param.authnamewatermark>Daniel Karasikov</param.authnamewatermark>
+    <param.email>d.karasikov@gmail.com</param.email>
+    <param.company>Insititute of Superconductivity BIU</param.company>
+    <param.icon />
+    <param.icons />
+    <param.summary>GPIB devices</param.summary>
+    <param.description />
+    <param.screenshot />
+    <param.version>0.3</param.version>
+    <param.namespace>RackO</param.namespace>
+    <param.guid />
+    <param.installpath.string>\Insititute of Superconductivity BIU\RackO\</param.installpath.string>
+    <param.installpath.combo>option.installpath.programfiles</param.installpath.combo>
+    <param.logo />
+    <param.install.notes />
+    <param.intermediate>C:\Users\B\Documents\MATLAB\Devices\Rack-O\App\MainFig3\RackO\for_testing</param.intermediate>
+    <param.output>C:\Users\B\Documents\MATLAB\Devices\Rack-O\App\MainFig3\RackO\for_redistribution</param.output>
+    <param.embed.ctf>true</param.embed.ctf>
+    <param.target.type>subtarget.standalone</param.target.type>
+    <param.classorg />
+    <param.web.mcr>true</param.web.mcr>
+    <param.package.mcr>true</param.package.mcr>
+    <param.no.mcr>false</param.no.mcr>
+    <param.web.mcr.name>MyAppInstaller_web</param.web.mcr.name>
+    <param.package.mcr.name>MyAppInstaller_mcr</param.package.mcr.name>
+    <param.no.mcr.name>MyAppInstaller_app</param.no.mcr.name>
+    <param.user.defined.mcr.options />
+    <param.windows.command.prompt>true</param.windows.command.prompt>
+    <param.user.only.registration>false</param.user.only.registration>
+    <param.mads.no.java>false</param.mads.no.java>
+    <param.mads.exclusive.mcr>false</param.mads.exclusive.mcr>
+    <param.net.framework>option.net.framework.default</param.net.framework>
+    <param.assembly.type>false</param.assembly.type>
+    <param.encryption.key.file />
+    <param.net.enable.remoting>false</param.net.enable.remoting>
+    <param.net.tsa.enable>false</param.net.tsa.enable>
+    <param.net.tsa.assembly />
+    <param.net.tsa.interface />
+    <param.net.tsa.namespace>RackO</param.net.tsa.namespace>
+    <param.net.tsa.superclass />
+    <param.net.tsa.metadata />
+    <param.net.tsa.metadata.assembly>C:\Users\B\Documents\MATLAB</param.net.tsa.metadata.assembly>
+    <param.create.log>false</param.create.log>
+    <param.log.file />
+    <unset>
+      <param.icon />
+      <param.icons />
+      <param.description />
+      <param.screenshot />
+      <param.namespace />
+      <param.guid />
+      <param.installpath.string />
+      <param.logo />
+      <param.install.notes />
+      <param.embed.ctf />
+      <param.target.type />
+      <param.classorg />
+      <param.web.mcr />
+      <param.no.mcr />
+      <param.web.mcr.name />
+      <param.package.mcr.name />
+      <param.no.mcr.name />
+      <param.windows.command.prompt />
+      <param.user.only.registration />
+      <param.mads.no.java />
+      <param.mads.exclusive.mcr />
+      <param.net.framework />
+      <param.assembly.type />
+      <param.encryption.key.file />
+      <param.net.enable.remoting />
+      <param.net.tsa.enable />
+      <param.net.tsa.assembly />
+      <param.net.tsa.interface />
+      <param.net.tsa.namespace />
+      <param.net.tsa.superclass />
+      <param.net.tsa.metadata />
+      <param.net.tsa.metadata.assembly />
+      <param.create.log />
+      <param.log.file />
+    </unset>
+    <fileset.main>
+      <file>${PROJECT_ROOT}\MainFig3.m</file>
+    </fileset.main>
+    <fileset.resources>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Functions\execute.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Functions\GPcon.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Functions\GPdis.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Functions\isfigureopen.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Functions\kActivity.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Functions\qdiff.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Functions\SendGmail.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Functions\SendGmailPPMS.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Functions\setBuffer.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Functions\wait4OPC.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Measure Scripts\dR_vs_T_with_Lock_In_01.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Measure Scripts\I_c_measure.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Measure Scripts\Measure_with_PPMS_Hsweep_vs_I_02.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Measure Scripts\Measure_with_PPMS_Hsweep_vs_T_01.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Measure Scripts\Measure_with_PPMS_R_vs_I_diff_T_01.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Measure Scripts\Measure_with_PPMS_R_vs_T_diff_I_01.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Measure Scripts\quietFREQ.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Measure Scripts\R_vs_T.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Measure Scripts\saveTest4.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Measure Scripts\Tests\conf.csv</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Measure Scripts\Tests\ContiniousMeasurement01.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Measure Scripts\Tests\DeltaModeNewSystem01.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Measure Scripts\Tests\IVsweepNewSystem02.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Measure Scripts\Tests\IVsweepNewSystem03.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Measure Scripts\Tests\IVsweepNewSystem04.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Measure Scripts\Tests\R_vs_T_Keithley_Test01.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Measure Scripts\VcontMeasScript.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Tests\amir&amp;oz.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Tests\commands.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Tests\lastTest.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Tests\presentation01.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Tests\scan_trig.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Tests\scan_trig_com.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Tests\scanPPMS_test.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Tests\stest.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Tests\switchTest.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Tests\time_test.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Timer experiments\kActivity.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Timer experiments\main_timer.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Timer experiments\parallel try1.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Timer experiments\parallel try2.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Timer experiments\parVar.mat</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Timer experiments\randtm.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Timer experiments\try1_ general.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Timer experiments\try2_general.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\General n Scripts\Timer Scripts\main_timer.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\ChannelMatrix\ChannelMatrix.fig</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\ChannelMatrix\ChannelMatrix.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\ChannelMatrix\CheckMatrix.fig</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\ChannelMatrix\CheckMatrix.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\ChannelMatrix\commands.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\ChannelMatrix\matrixCheck.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\commands.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\MainFig2.0\MainFig2.fig</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\MainFig2.0\MainFig2.m</file>
+      <file>${PROJECT_ROOT}\cdataShut.mat</file>
+      <file>${PROJECT_ROOT}\cdataShut2.mat</file>
+      <file>${PROJECT_ROOT}\MainFig3.asv</file>
+      <file>${PROJECT_ROOT}\MainFig3.fig</file>
+      <file>${PROJECT_ROOT}\MainFig3.m</file>
+      <file>${PROJECT_ROOT}\pwr.jpg</file>
+      <file>${PROJECT_ROOT}\pwrinvert.png</file>
+      <file>${PROJECT_ROOT}\Thumbs.db</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\MainFig\load_file_dialog.fig</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\MainFig\load_file_dialog.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\MainFig\MainFig.fig</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\MainFig\MainFig.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\Misc\cellTab.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\Misc\ChannelMatrixV2\ChannelMatrixV2.fig</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\Misc\ChannelMatrixV2\ChannelMatrixV2.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\Misc\MainFig1.fig</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\Misc\MainFig1.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\Misc\MainFigClean.fig</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\Misc\MainFigClean.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\Misc\sample_gui.fig</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\Misc\sample_gui.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\Misc\TAB_creator.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\Misc\untitled2.fig</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\Misc\untitled2.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\Test\Test01.fig</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\Test\Test01.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\Test\timerfunction01.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\Updated Version\untitled2.fig</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\GUI\Updated Version\untitled2.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Lock-in\aGain.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Lock-in\askTrace.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Lock-in\autoGain.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Lock-in\coupling.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Lock-in\harm.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Lock-in\inSRC.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Lock-in\refSLP.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Lock-in\refSRC.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Lock-in\sampleRate.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Lock-in\setTrace.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Manuals\Keithley 2401 SourceMeter Manual.pdf</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Manuals\Keithley 3700A-Series.pdf</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Manuals\Keithley 3706A-S Switch Script Application.pdf</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Manuals\Keithley-182_Voltmeter.pdf</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Manuals\Keithley-2182A-900-01A.pdf</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Manuals\Keithley-224-Current_Source.pdf</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Manuals\LakeShore-330_autotuning_temp_controller.pdf</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Manuals\PPMS GPIB commands manual A0_OCR.pdf</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Manuals\Standord_Lock_in_SR850m.pdf</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Manuals\Wavetek_650_Synth_func_gen.pdf</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Manuals\YOKOGAWA_7651.pdf</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\CHAMBER.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\ChamberQ.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\Connect2PPMS.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\CURRENT.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\FIELD.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\FieldQ.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\GetValue.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\HeliumLevel.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\Measure_with_PPMS_Hsweep_vs_I_02.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\Measure_with_PPMS_Hsweep_vs_T_01.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\Measure_with_PPMS_R_vs_I_diff_T_01.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\Measure_with_PPMS_R_vs_T_diff_I_01.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\ReadPPMSdata.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\ReadPPMSstatus.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\ScanField.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\ShowTempWhileWait.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\Shutdown.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\TEMP.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\TempQ.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\wait4field.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\PPMS\wait4temp.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\beeper.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\compliance.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\complianceQ.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\current.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\cutShort.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\getError.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\manualCompQ.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\measureFunc.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\myCompQ.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\oneShot.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\readSM.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\ReadSMbuffer.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\remote trigger model.PNG</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\sourceFunc.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\storeSM.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\sweepI.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\target.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\terminal.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\voltage.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\SourceMeter\xPointM.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Switcher\closeCH.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Switcher\ExtraInstrument.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Switcher\getState.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Switcher\openAllCH.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Switcher\openCH.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Switcher\patchMatrix.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Switcher\RandCheck.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Switcher\SampleCheck.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Switcher\SampleCheckCont.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Switcher\switchCurrent.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Switcher\switchCurrent2.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Switcher\switchVoltage.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Switcher\switchVoltage2.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\Delta Mode\Delta process.PNG</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\Delta Mode\deltaExecute.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\Delta Mode\deltaExecute02.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\Delta Mode\deltaExecuteList.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\Delta Mode\deltaExecuteSpan.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\Delta Mode\deltaSetup.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\Delta Mode\deltaSetup02.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\Delta Mode\old\Delta_02.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\Delta Mode\old\Delta_03.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\Delta Mode\old\Delta_Matlab_2182.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\Delta Mode\old\deltaMode.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\Delta Mode\old\deltaSample.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\Delta Mode\old\execute_deltaMode.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\Delta Mode\old\setup_deltaMode.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\I-V\executeIV.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\I-V\executeIVspan.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\I-V\IVcurrent.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\I-V\IVsweep.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\I-V\IVsweep_setup.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\I-V\IVsweep_setup_span.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\I-V\IVvoltage.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Triggered\I-V\setupIV.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Voltmeter\IntegrationTime.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Voltmeter\OneShotTriggerV.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Voltmeter\read1.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Voltmeter\read2.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Voltmeter\read_nv.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Voltmeter\relative.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Voltmeter\store_nv.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Voltmeter\temp.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Voltmeter\VcontMeas.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Voltmeter\voltread.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Voltmeter\voltReset.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Voltmeter\wait4read.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\Voltmeter\ZeroV.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\WaveTek\ampl.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\WaveTek\askampl.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\WaveTek\askfreq.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\WaveTek\channel.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\WaveTek\execute.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\WaveTek\freq.m</file>
+      <file>C:\Users\B\Documents\MATLAB\Devices\Rack-O\WaveTek\output.m</file>
+    </fileset.resources>
+    <fileset.package />
+    <build-deliverables>
+      <file name="RackO.exe" location="C:\Users\B\Documents\MATLAB\Devices\Rack-O\App\MainFig3\RackO\for_testing" optional="false">C:\Users\B\Documents\MATLAB\Devices\Rack-O\App\MainFig3\RackO\for_testing\RackO.exe</file>
+      <file name="readme.txt" location="C:\Users\B\Documents\MATLAB\Devices\Rack-O\App\MainFig3\RackO\for_testing" optional="true">C:\Users\B\Documents\MATLAB\Devices\Rack-O\App\MainFig3\RackO\for_testing\readme.txt</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>C:\Program Files\MATLAB\R2013b</root>
+      <toolboxes>
+        <toolbox name="fixedpoint" />
+      </toolboxes>
+    </matlab>
+    <platform>
+      <unix>false</unix>
+      <mac>false</mac>
+      <windows>true</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>6.2</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>win64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>
+

@@ -23,7 +23,7 @@ function varargout = MainFig3(varargin)
 % Edit the above text to modify the response to help MainFig
 
 
-% Last Modified by GUIDE v2.5 29-Jul-2016 18:20:11
+% Last Modified by GUIDE v2.5 07-Aug-2016 15:33:10
 
 
 % Begin initialization code - DO NOT EDIT
@@ -658,7 +658,7 @@ function chamber_mode_popup_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from chamber_mode_popup
 
 %WHEN TIME'S COME: ADD THESE LINES:
-
+contents = get(hObject,'string');
 action = contents{get(hObject,'Value')}; %id of selceted action
 CHAMBER(PPMS_obj,action-1);
 
@@ -1031,9 +1031,16 @@ function mnuConfig_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 choice = get(hObject,'Value');
-units = get(hObject,'UserData');
-unit = units{choice,3};
-set(handles.txtVoltSetUnit,'String',unit);
+data = get(hObject,'UserData');
+unit = data{choice,3};
+if iscell(unit)
+    set(handles.mnuConfigParam,'visible','on');
+    set(handles.mnuConfigParam,'string',unit);
+    set(handles.txtVoltSetUnit,'String','');
+else
+    set(handles.mnuConfigParam,'visible','off');
+    set(handles.txtVoltSetUnit,'String',unit);
+end
 % Hints: contents = cellstr(get(hObject,'String')) returns mnuConfig contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from mnuConfig
 
@@ -1057,11 +1064,11 @@ data{1,3} = 'V';             % units
 
 data{2,1} = 'Terminal'; % name
 data{2,2} = 'terminal';  % function callback
-data{2,3} = '';             % units
+data{2,3} = {'Rear';'Front'};             % units
 
 data{3,1} = 'Points'; % name
 data{3,2} = 'xPointM';  % function callback
-data{3,3} = '';             % units
+data{3,3} = {'2';'4'};             % units
 
 data{4,1} = 'Integration Time'; % name
 data{4,2} = 'IntegrationTime';	% function callback
@@ -1076,13 +1083,22 @@ function btnConfig_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 funcFlag = get(handles.mnuConfig,'Value');  % Choice
 Options = get(handles.mnuConfig,'UserData');% get data from menu
-setValue = get(handles.edtVoltSet,'String');
+
+unit = Options{funcFlag,3};
+if iscell(unit)
+    setValue = get(handles.mnuConfigParam,'String');
+    choice = get(handles.mnuConfigParam,'value');
+    setValue = setValue{choice};
+    unit = '';
+else
+    setValue = get(handles.edtVoltSet,'String');
+end
 
 % add item to sequence
-commandLine = ['Set ',Options{funcFlag,1},' to ',setValue,Options{funcFlag,3}];
+commandLine = ['Set ',Options{funcFlag,1},' to ',setValue,unit];
 index = get(handles.CommandList,'Value');
 add_item_to_list_box(handles.CommandList,commandLine,index);
-functionStr = [Options{funcFlag,2},'(nv_obj, ',setValue,');'];
+functionStr = [Options{funcFlag,2},'(nv_obj,',setValue,');    % ',commandLine];
 add_command_str(functionStr,index);
 
 
@@ -1275,8 +1291,8 @@ switch routine
                 add_item_to_list_box(handles.CommandList,commandStr,index);
                 functionStr = ['[Idata,Vdata] = executeIVspan(nv_obj, sm_obj,','''',ParameterStr(1),'''',...
                     ',',initValStr,',',targetValStr,',',methodVal,');   % ', commandStr];
-                add_command_str({functionStr;'I{end,s} = Idata;     % IV current';...
-                                    'V{end,s} = Vdata;     % IV voltage'},index);
+                add_command_str({functionStr;'I{end+1*(s==1),s} = Idata;     % IV current';...
+                                    'V{end+1*(s==1),s} = Vdata;     % IV voltage'},index);
             end
         else
             methodStr = 'spacing';
@@ -1321,9 +1337,9 @@ switch routine
         functionStr = ['[Id,Vd] = deltaExecuteSpan(nv_obj, sm_obj,','''',ParameterStr(1),'''',...
                     ',',initValStr,',',targetValStr,',',repeatStr,');    % ',commandStr];
         add_command_str({functionStr;...
-            'dI(end+1,s) = Id(2);    % span/2 current, differential current  (dI/2)';...
-            'dV(end+1,s) = Vd(2);    % span/2 current, differential voltage  (dV/2)';...
-            'dR(end+1,s) = Vd(2)/Id(2);  % differential resistance'},index);
+            'dI(end+1*(s==1),s) = Id(2);    % span/2 current, differential current  (dI/2)';...
+            'dV(end+1*(s==1),s) = Vd(2);    % span/2 current, differential voltage  (dV/2)';...
+            'dR(end+1*(s==1),s) = Vd(2)/Id(2);  % differential resistance'},index);
 end
 
 
@@ -1346,6 +1362,7 @@ apmStr = allStr{appInd};
 switch choice
     case 1
         functionStr = ['TEMP(PPMS_obj,Temp(k),',rateStr,',',appStr,');'];
+        setCom = ['TEMP(PPMS_obj,',initValStr,',',rateStr,',',appStr,');'];
         if str2double(initValStr)<1.8 ||  str2double(initValStr)>370 || str2double(targetValStr)<1.8 ||  str2double(targetValStr)>370
             errordlg('Temperature can''t go below 1.8K or above 370K');
             return;
@@ -1357,6 +1374,7 @@ switch choice
     case 2
         modeStr = num2str(get(handles.mnuEndMode,'value')-1);
         functionStr = ['FIELD(PPMS_obj,Fiel(h),',rateStr,',',appStr,',',modeStr,');'];
+        setCom = ['FIELD(PPMS_obj,',initValStr,',',rateStr,',',appStr,',',modeStr,');'];
         AllMode = get(handles.mnuEndMode,'string');
         modeStr = AllMode{str2double(modeStr)+1};
         apmStr = [apmStr,', ',modeStr];
@@ -1396,13 +1414,19 @@ commandStr = ['Scan ',ParameterStr,' from ',initValStr,unitStr,' to ',...
         targetValStr,unitStr,' by ',methodStr,' of ', methodValunit,...
         '. Rate ',rateStr,rateUnit,', ',apmStr];
 index = get(handles.CommandList,'Value');
-add_item_to_list_box(handles.CommandList,commandStr,index);
-add_item_to_list_box(handles.CommandList,'end',index+1);
+
+setStr = ['Set ',ParameterStr,' to ', initValStr,unitStr,...
+            ' in rate ',rateStr,rateUnit,', ',apmStr];
+            
+add_item_to_list_box(handles.CommandList,setStr,index);
+add_item_to_list_box(handles.CommandList,commandStr,index+1);
+add_item_to_list_box(handles.CommandList,'end',index+2);
 
 % update commands in script
+add_command_str(setCom,index);
 sendCommand = {defStr;['for ',indStr,'=1:length(',ParameterStr(1:4),')'];['% ',commandStr];functionStr};
-add_command_str(sendCommand,index);
-add_command_str('end',index+1);
+add_command_str(sendCommand,index+1);
+add_command_str('end',index+2);
 
 
 function edtStep_Callback(hObject, eventdata, handles)
@@ -1510,13 +1534,13 @@ set(handles.edtTargetSet,'String',num2str(defVals(1)));
 set(handles.edtRateSet,'String',num2str(defVals(2)));
 
 if paramflag==1 || paramflag==2
+    set(handles.tglSM,'Enable','off');
+    set(handles.tglSM,'Visible','off');
     set(handles.edtRateSet,'Enable','on');
     set(handles.txtUnitRateSet,'Enable','on');
     set(handles.txtRateSet,'Enable','on');    
     rateUnit = {'/min:','/sec:'};
     set(handles.txtUnitRateSet,'string',[unitStr,rateUnit{paramflag}]);
-    set(handles.tglSM,'Visible','off');
-    set(handles.tglSM,'Enable','off');
 else
 	set(handles.edtRateSet,'Enable','off');
     set(handles.txtUnitRateSet,'Enable','off');
@@ -1973,3 +1997,26 @@ add_item_to_list_box(handles.CommandList,'Read PPMS data',index);
 add_command_str({'[data] = ReadPPMSdata(PPMSobj,[1,2]);    % PPMS data';...
             'T(end+1)=data(1);';'H(end+1)=data(2);'},index);
 
+
+
+% --- Executes on selection change in mnuConfigParam.
+function mnuConfigParam_Callback(hObject, eventdata, handles)
+% hObject    handle to mnuConfigParam (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns mnuConfigParam contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from mnuConfigParam
+
+
+% --- Executes during object creation, after setting all properties.
+function mnuConfigParam_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to mnuConfigParam (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
