@@ -313,7 +313,7 @@ function h = add_item_to_list_box(h, newitem, index)
         if ~iscell(oldstring)
         	newstring = {newitem oldstring};
         else
-            newstring = [newitem oldstring{:}];
+            newstring = {newitem ,oldstring{:}};
         end
     else
         % Create the new cell array for the list box
@@ -1329,7 +1329,7 @@ apmStr = allStr{appInd};
 
 switch choice
     case 1
-        functionStr = ['TEMP(PPMS_obj,Temp(k),',rateStr,',',appStr,');'];
+        functionStr = ['TEMP(PPMS_obj,Temp(Tind),',rateStr,',',appStr,');'];
         setCom = ['TEMP(PPMS_obj,',initValStr,',',rateStr,',',appStr,');'];
         if str2double(initValStr)<1.8 ||  str2double(initValStr)>370 || str2double(targetValStr)<1.8 ||  str2double(targetValStr)>370
             errordlg('Temperature can''t go below 1.8K or above 370K');
@@ -1341,7 +1341,7 @@ switch choice
         end
     case 2
         modeStr = num2str(get(handles.mnuEndMode,'value')-1);
-        functionStr = ['FIELD(PPMS_obj,Fiel(h),',rateStr,',',appStr,',',modeStr,');'];
+        functionStr = ['FIELD(PPMS_obj,Fiel(Find),',rateStr,',',appStr,',',modeStr,');'];
         setCom = ['FIELD(PPMS_obj,',initValStr,',',rateStr,',',appStr,',',modeStr,');'];
         AllMode = get(handles.mnuEndMode,'string');
         modeStr = AllMode{str2double(modeStr)+1};
