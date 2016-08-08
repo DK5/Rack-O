@@ -15,10 +15,12 @@ for i = 1:length(CommandsTab)
         for j = 1:length(CommandsTabCell)
             if length(CommandsTabCell{j,1}) < 3
                 continue;
+            elseif strcmp(CommandsTab{i,1},'End sequence')
+                continue;
             end
             str = CommandsTabCell{j,1}(1:3);
-            switch str
-                case {'for','Sca'}
+            switch lower(str)
+                case {'for','sca','whi'}
                     TABS(i) = counter;
                     counter = counter + 1;
                 case 'end'
@@ -35,10 +37,12 @@ for i = 1:length(CommandsTab)
         % write TAB
         if length(CommandsTab{i,1}) < 3
             continue;
+        elseif strcmp(CommandsTab{i,1},'End sequence')
+            continue;
         end
         str = CommandsTab{i,1}(1:3);
-        switch str
-            case {'for','Sca'}
+        switch lower(str)
+            case {'for','sca','whi'}
                 TABS(i) = counter;
                 counter = counter + 1;
             case 'end'
@@ -59,7 +63,7 @@ for i = 1:length(CommandsTab)
 end
 
 if errorind     % there is error
-    if ~counter  % not-equal number of scan & end
+    if ~counter  % equal number of scan & end
         error('End statement cannot be above loop');
     else
         CommandsTab(errorind) = [];

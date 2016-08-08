@@ -23,7 +23,7 @@ function varargout = MainFig3(varargin)
 % Edit the above text to modify the response to help MainFig
 
 
-% Last Modified by GUIDE v2.5 07-Aug-2016 15:33:10
+% Last Modified by GUIDE v2.5 08-Aug-2016 12:47:42
 
 
 % Begin initialization code - DO NOT EDIT
@@ -310,8 +310,11 @@ function h = add_item_to_list_box(h, newitem, index)
 %     elseif ~iscell(oldstring)
 %          newstring = {oldstring newitem};
     elseif size(oldstring,1) == 1
-        add_item_to_list_box_end(h,newitem);
-        return;
+        if ~iscell(oldstring)
+        	newstring = {newitem oldstring};
+        else
+            newstring = [newitem oldstring{:}];
+        end
     else
         % Create the new cell array for the list box
         newstring = {oldstring{1:(index-1)},newitem,oldstring{index:end}};
@@ -341,7 +344,7 @@ count = 0;
 for ind = 1:length(index)
     lineStr = strtrim(strings{index(ind)});
     switch lineStr(1:3)
-        case 'Sca'
+        case {'Sca','Whi'}
             count = count + 1;
         case 'end'
             count = count - 1;
@@ -385,31 +388,13 @@ function CommandList_KeyPressFcn(hObject, eventdata, handles)
 %	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
 % handles    structure with handles and user data (see GUIDATA)
 key = eventdata.Key;
-if strcmp(key,'delete') % delete key
-    % call the pushbutton callback
-    btnDeleteLine_Callback(hObject, eventdata, handles)
-end
-
-% --- Executes on button press in btnPause.
-function btnPause_Callback(hObject, eventdata, handles)
-% hObject    handle to btnPause (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-Waiting_time = get(handles.txt_waiting_time, 'String');
-index_selected = get(handles.CommandList, 'Value');
-add_item_to_list_box(handles.CommandList, ['Pause ',Waiting_time, ' [sec]' ], index_selected);
-add_command_str(['pause(',Waiting_time,');'],index_selected);
-
-
-function txt_waiting_time_Callback(hObject, eventdata, handles)
-% hObject    handle to txt_waiting_time (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-currChar = get(handles.figure1,'CurrentCharacter');
-if isequal(currChar,char(13)) % char(13) = enter key
-   %call the pushbutton callback
-   btnPause_Callback(hObject, eventdata, handles);
+switch lower(key)
+    case 'delete'
+        btnDeleteLine_Callback(btnDeleteLine, eventdata, handles);    % call the pushbutton callback
+    case 'w'
+        btnUp_Callback(handles.btnUp,eventdata,handles);
+    case 's'
+        btnDown_Callback(handles.btnDown,eventdata,handles);
 end
 
 
@@ -955,26 +940,6 @@ choice = get(hObject,'Value');
 options = get(hObject,'UserData');
 set(handles.txtHint,'string',options{choice,2});
 
-% --- Executes on button press in btnWait4.
-function btnWait4_Callback(hObject, eventdata, handles)
-% hObject    handle to btnWait4 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-paramflag = get(handles.mnuParameter,'Value');
-Options = get(handles.mnuParameter,'UserData');
-switch paramflag
-    case 1
-        functionStr = 'wait4temp(PPMS_obj);';
-    case 2
-        functionStr = 'wait4field(PPMS_obj);';
-end
-
-commandStr = ['Wait for ',Options{paramflag}];
-index = get(handles.CommandList,'Value');
-add_item_to_list_box(handles.CommandList,commandStr,index);
-% update commands in script
-add_command_str([functionStr,'  % ',commandStr],index);
-
 
 % --- Executes on button press in btnSMadd.
 function btnSMadd_Callback(hObject, eventdata, handles)
@@ -1340,6 +1305,9 @@ switch routine
             'dI(end+1*(s==1),s) = Id(2);    % span/2 current, differential current  (dI/2)';...
             'dV(end+1*(s==1),s) = Vd(2);    % span/2 current, differential voltage  (dV/2)';...
             'dR(end+1*(s==1),s) = Vd(2)/Id(2);  % differential resistance'},index);
+    case 4  % continous measurement
+        add_item_to_list_box(handles.CommandList,'Measure Voltage continously',index);
+        add_command_str('Vread = VcontMeas(nv_obj, Tread, Tintegration);    % Measure Voltage continously',index);
 end
 
 
@@ -1770,20 +1738,24 @@ data{1,1} = 'Temperature'; % name
 data{1,2} = '°K';       % units
 data{1,3} = 'TEMP';     % function callback
 data{1,4} = 'PPMS_obj';	% object
-data{1,5} = {'Scan (loop) on temperature values (Kelvin) in PPMS.',...  % hint
+data{1,5} = {'Scan (loop) on Temperature values (Kelvin) in PPMS.',...  % hint
              '    Spacing - diffrence of temperature in each iteration.',...
              '    Steps - number of temperatures to be scanned.',...
-             '    Rate - approaching rate in each iteration.'};
+             '    Rate - approaching rate in each iteration.',...
+             'Approaching options:',...
+             '    Fast Settle - .','    No Overshoot - .'};
 data{1,6} = [300, 10, 4];   % default values - initVal, target, rate
 
 data{2,1} = 'Field'; % name
 data{2,2} = 'Oe';       % units
 data{2,3} = 'FIELD';     % function callback
 data{2,4} = 'PPMS_obj';	% object
-data{2,5} = {'Scan (loop) on field values (Oersted) in PPMS.',...  % hint
+data{2,5} = {'Scan (loop) on Field values (Oersted) in PPMS.',...  % hint
              '    Spacing - diffrence of field in each iteration.',...
              '    Steps - number of fields to be scanned.',...
-             '    Rate - approaching rate in each iteration.'};
+             '    Rate - approaching rate in each iteration.',...
+             'Approaching options:',...
+             '    Linear - .','   No Overshoot - .','    Oscillate - .'};
 data{2,6} = [0, 1000, 10];   % default values - initVal, target, rate
 
 data{3,1} = 'Current'; % name
@@ -1820,8 +1792,9 @@ data{4,5} = {'Scan (loop) on voltage values (Volts).',...  % hint
              'Delta mode triggered measurement, ruled by VOLTAGE (V, volts)',...
              '    Center  - center voltage.',...
              '    Span    - voltage span.',...
-             '    Repeats - repeats on the measurement.'
-             }; 
+             '    Repeats - repeats on the measurement.';...
+             % continous measurement
+             'Continous measurement of Voltage.','','',''}; 
 data{4,6} = [-1, 1, 1];   % default values - initVal, target, rate
 
 set(hObject,'UserData',data);
@@ -1979,11 +1952,15 @@ routine = get(handles.mnuApproach,'value') - 2;
 index = get(handles.CommandList,'value');
 if routine % Delta
     add_item_to_list_box(handles.CommandList,'Delta setup',index);
-    add_command_str('deltaSetup(nv_obj,sm_obj);    % Delta setup',index);
+    add_command_str({'deltaSetup(nv_obj,sm_obj);    % Delta setup';...
+                     'dI = []; dV = []; dR = [];    % preallocation - Keithley';...
+                     'T = []; H = [];    % preallocation - PPMS'},index);
     
 else    % IV
     add_item_to_list_box(handles.CommandList,'IV setup',index);
-    add_command_str('setupIV(nv_obj,sm_obj);    % IV setup',index);
+    add_command_str({'setupIV(nv_obj,sm_obj);    % IV setup';...
+                     'I = []; V = [];    % preallocation - Keithley';...
+                     'T = []; H = [];    % preallocation - PPMS'},index);
 end
 
 
@@ -2012,6 +1989,225 @@ function mnuConfigParam_Callback(hObject, eventdata, handles)
 % --- Executes during object creation, after setting all properties.
 function mnuConfigParam_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to mnuConfigParam (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushbutton47.
+function pushbutton47_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton47 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushbutton49.
+function pushbutton49_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton49 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+function edit33_Callback(hObject, eventdata, handles)
+% hObject    handle to edit33 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit33 as text
+%        str2double(get(hObject,'String')) returns contents of edit33 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit33_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit33 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+function edtPause_Callback(hObject, eventdata, handles)
+% hObject    handle to edtPause (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+currChar = get(handles.figure1,'CurrentCharacter');
+if isequal(currChar,char(13)) %char(13) == enter key
+   %call the pushbutton callback
+   btnWait_Callback(hObject, eventdata, handles);
+end
+% Hints: get(hObject,'String') returns contents of edtPause as text
+%        str2double(get(hObject,'String')) returns contents of edtPause as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edtPause_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edtPause (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in mnuWait4param.
+function mnuWait4param_Callback(hObject, eventdata, handles)
+% hObject    handle to mnuWait4param (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns mnuWait4param contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from mnuWait4param
+
+
+% --- Executes during object creation, after setting all properties.
+function mnuWait4param_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to mnuWait4param (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in btnWait.
+function btnWait_Callback(hObject, eventdata, handles)
+% hObject    handle to btnWait (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+choice = get(handles.mnuWait,'value');
+switch choice
+    case 1
+        Waiting_time = get(handles.edtPause, 'String');
+        index_selected = get(handles.CommandList, 'Value');
+        add_item_to_list_box(handles.CommandList, ['Pause ',Waiting_time, ' [sec]' ], index_selected);
+        add_command_str(['pause(',Waiting_time,');'],index_selected);
+    case 2
+        paramflag = get(handles.mnuWait4param,'Value');
+        Options = get(handles.mnuWait4param,'String');
+        switch paramflag
+            case 1
+                functionStr = 'wait4temp(PPMS_obj);';
+            case 2
+                functionStr = 'wait4field(PPMS_obj);';
+        end
+        commandStr = ['Wait for ',Options{paramflag}];
+        index = get(handles.CommandList,'Value');
+        add_item_to_list_box(handles.CommandList,commandStr,index);
+        % update commands in script
+        add_command_str([functionStr,'  % ',commandStr],index);
+    case 3
+        paramflag = get(handles.mnuWait4param,'Value');
+        Options = get(handles.mnuWait4param,'String');
+
+        commandStr = ['While ',Options{paramflag},' is reaching to its stable value, do:'];
+        index = get(handles.CommandList,'Value');
+        add_item_to_list_box(handles.CommandList,commandStr,index);
+        add_item_to_list_box(handles.CommandList,'end',index+1);
+        % update commands in script
+        ind = num2str(get(handles.mnuWait4param,'value'));
+        whileStr = {'[Status, StatusTXT] = ReadPPMSstatus(PPMSobj);    % Read status';...
+                    ['while Status(',ind,')~=1 && Status(',ind,')~=4    % while ',Options{paramflag},' not stable']};
+        add_command_str(whileStr,index);
+        endStr = {'[Status, StatusTXT] = ReadPPMSstatus(PPMSobj);    % Read status';'end'};
+        add_command_str(endStr,index+1);
+end
+
+
+% --- Executes on selection change in mnuWait.
+function mnuWait_Callback(hObject, eventdata, handles)
+% hObject    handle to mnuWait (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+choice = get(handles.mnuWait,'value');
+data = get(handles.mnuWait,'userData');
+set(handles.txtHint,'string',data{choice,2});    % set hint
+switch choice
+    case 1
+        set(handles.mnuWait4param,'visible','off');
+    case {2,3}
+        set(handles.mnuWait4param,'visible','on');
+end
+
+% --- Executes during object creation, after setting all properties.
+function mnuWait_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to mnuWait (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+data = cell(3,2);
+
+data{1,1} = 'Pause'; % name
+data{1,2} = {'Pauses the measurement for specified time interval (seconds).'};
+
+data{2,1} = 'Wait for'; % name
+data{2,2} = {'Wait for PPMS parameter (Temperature/Field) to be stabilized.'};
+
+data{3,1} = 'While - do'; % name
+data{3,2} = ['Executes while loop - while PPMS parameter (Temperature/Field) is being stabilized. ',...
+    'Set parameter interval (dT,dH) in the settings panel.'];         
+
+set(hObject,'UserData',data);
+
+
+
+
+function edit34_Callback(hObject, eventdata, handles)
+% hObject    handle to edit34 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit34 as text
+%        str2double(get(hObject,'String')) returns contents of edit34 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit34_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit34 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in popupmenu22.
+function popupmenu22_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu22 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu22 contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu22
+
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu22_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu22 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
