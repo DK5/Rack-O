@@ -23,7 +23,7 @@ function varargout = MainFig3(varargin)
 % Edit the above text to modify the response to help MainFig
 
 
-% Last Modified by GUIDE v2.5 08-Aug-2016 12:47:42
+% Last Modified by GUIDE v2.5 08-Aug-2016 16:16:12
 
 
 % Begin initialization code - DO NOT EDIT
@@ -1319,8 +1319,8 @@ Options = get(handles.mnuScan,'UserData');
 methodFlag = get(handles.rdoSteps,'Value');
 ParameterStr = Options{choice,1};   % Parameter name
 unitStr = ['[',Options{choice,2},']'];  % unit
-indArr = 'kh'; % array of loop indices
-indStr = indArr(choice);
+indArr = {'Tind','Find'}; % array of loop indices
+indStr = indArr{choice};
 appInd = get(handles.mnuApproach,'value');
 appStr = num2str(appInd - 1);
 rateStr = get(handles.edtRateScan,'string');
@@ -1999,33 +1999,41 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in pushbutton47.
-function pushbutton47_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton47 (see GCBO)
+% --- Executes on button press in btnSaveMeas.
+function btnSaveMeas_Callback(hObject, eventdata, handles)
+% hObject    handle to btnSaveMeas (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+FileName = get(handles.edtSaveMeas,'String');  % get the desired filename
+% [FileName,dir] = uiputfile('*.mat','Save Measurements',FileName);
+dir = uigetdir('','Select Directory to Save Measurements');
+if ~dir
+%     errordlg('No directory was chosen');
+    return;
+end
+index = get(handles.CommandList,'value');
+comStr = ['Save file named ''',FileName,''' at directory ''',dir,''''];
+add_item_to_list_box(handles.CommandList,comStr,index);
+FileName = [dir,FileName];
+saveStr = 'eval([''save('','''''''',FileName,''.mat'','''''''','');''])';
+% saveStr = 'save(['''''''',FileName,''.mat'','''''''']);';
+FileNameStr = 'FileName = filenameReplace(FileName1,''T'',Temp(Tind),''H'',Fiel(Find));';
+add_command_str({['FileName1 = ''',FileName,''';    % original File Name'];...
+            [FileNameStr,'    % Replace file name <>'];saveStr},index);
+
+
+function edtSaveMeas_Callback(hObject, eventdata, handles)
+% hObject    handle to edtSaveMeas (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-
-% --- Executes on button press in pushbutton49.
-function pushbutton49_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton49 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-
-function edit33_Callback(hObject, eventdata, handles)
-% hObject    handle to edit33 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit33 as text
-%        str2double(get(hObject,'String')) returns contents of edit33 as a double
+% Hints: get(hObject,'String') returns contents of edtSaveMeas as text
+%        str2double(get(hObject,'String')) returns contents of edtSaveMeas as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit33_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit33 (see GCBO)
+function edtSaveMeas_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edtSaveMeas (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -2156,7 +2164,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-data = cell(3,2);
+data = cell(5,2);
 
 data{1,1} = 'Pause'; % name
 data{1,2} = {'Pauses the measurement for specified time interval (seconds).'};
@@ -2168,51 +2176,11 @@ data{3,1} = 'While - do'; % name
 data{3,2} = ['Executes while loop - while PPMS parameter (Temperature/Field) is being stabilized. ',...
     'Set parameter interval (dT,dH) in the settings panel.'];         
 
+data{4,1} = 'Fast Wait for'; % name
+data{4,2} = {'Fast, Wait for PPMS parameter (Temperature/Field) to be stabilized.'};
+
+data{5,1} = 'Fast While - do'; % name
+data{5,2} = ['Fast, Executes while loop - while PPMS parameter (Temperature/Field) is being stabilized. ',...
+            'Set parameter interval (dT,dH) in the settings panel.']; 
+
 set(hObject,'UserData',data);
-
-
-
-
-function edit34_Callback(hObject, eventdata, handles)
-% hObject    handle to edit34 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit34 as text
-%        str2double(get(hObject,'String')) returns contents of edit34 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit34_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit34 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in popupmenu22.
-function popupmenu22_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu22 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu22 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu22
-
-
-% --- Executes during object creation, after setting all properties.
-function popupmenu22_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu22 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
