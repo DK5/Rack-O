@@ -23,7 +23,7 @@ function varargout = MainFig3(varargin)
 % Edit the above text to modify the response to help MainFig
 
 
-% Last Modified by GUIDE v2.5 09-Aug-2016 13:45:48
+% Last Modified by GUIDE v2.5 09-Aug-2016 16:31:22
 
 
 % Begin initialization code - DO NOT EDIT
@@ -390,12 +390,44 @@ function CommandList_KeyPressFcn(hObject, eventdata, handles)
 key = eventdata.Key;
 switch lower(key)
     case 'delete'
-        btnDeleteLine_Callback(btnDeleteLine, eventdata, handles);    % call the pushbutton callback
+        btnDeleteLine_Callback(handles.btnDeleteLine, eventdata, handles);    % call the pushbutton callback
     case 'w'
         btnUp_Callback(handles.btnUp,eventdata,handles);
     case 's'
         btnDown_Callback(handles.btnDown,eventdata,handles);
+    case 'c'    % copy
+        copyind = get(hObject,'value');
+        listStr = get(hObject,'string');
+        len = length(listStr);	% number of lines
+        copyind(copyind==len) = [];     % don't copy end of program
+        cellCommands = getappdata(0,'cellCommands');	% get commands cell array
+        copyList = listStr(copyind);
+        copyCommands = cellCommands(copyind);
+        setappdata(0,'copyCommands',copyCommands);
+        setappdata(0,'copyList',copyList);
+    case 'v'    % paste
+        copyCommands = getappdata(0,'copyCommands');
+        copyList = getappdata(0,'copyList');
+        index = max(get(hObject,'value'));
+        allstring = get(hObject,'string');
+        allstring = [allstring(1:(index-1));copyList;allstring(index:end)];
+        try
+            allstring = cellTab(allstring);
+            set(handles.CommandList,'String',allstring);   % set new order
+            set(handles.CommandList,'Value',index-1+copyind);   % set selection to the moved line
+        catch
+    %         errordlg('End statement can''t be above its loop');
+        end
+        cellCommands = getappdata(0,'cellCommands');
+        cellCommands = [cellCommands(1:(index-1));copyCommands;cellCommands(index:end)];
+        try
+            cellCommands = cellTab(cellCommands);
+            setappdata(0,'cellCommands',cellCommands);
+        catch
+    %         errordlg('End statement can''t be above its loop');
+        end
 end
+
 
 
 % --- Executes during object creation, after setting all properties.
@@ -844,7 +876,7 @@ cellCommands = getappdata(0,'cellCommands');    % get commands cell array
 if ~isempty(find(index==1))
 %     errordlg('Top line in program cannot be moved up','Error 0x');
 elseif ~isempty(find(index==len))
-    errordlg('End of program cannot be moved','Error 0x');
+%     errordlg('End of program cannot be moved','Error 0x');
 else
     select = allstring(index);
     allstring(index) = [];
@@ -906,7 +938,7 @@ else
         cellCommands = cellTab(cellCommands);
         setappdata(0,'cellCommands',cellCommands);
     catch
-        errordlg('End statement can''t be above its loop');
+%         errordlg('End statement can''t be above its loop');
     end
 end
 
@@ -1006,9 +1038,6 @@ else
     set(handles.mnuConfigParam,'visible','off');
     set(handles.txtVoltSetUnit,'String',unit);
 end
-% Hints: contents = cellstr(get(hObject,'String')) returns mnuConfig contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from mnuConfig
-
 
 % --- Executes during object creation, after setting all properties.
 function mnuConfig_CreateFcn(hObject, eventdata, handles)
@@ -1026,18 +1055,31 @@ data = cell(4,3);
 data{1,1} = 'Compliance'; % name
 data{1,2} = 'compliance';  % function callback
 data{1,3} = 'V';             % units
+data{1,4} = 'Set compliance level of the Source-Meter.';             % hint
 
 data{2,1} = 'Terminal'; % name
 data{2,2} = 'terminal';  % function callback
 data{2,3} = {'Rear';'Front'};             % units
+data{2,4} = 'Set terminal of the Nano-Voltmeter.';             % hint
+ 
+% data{3,1} = 'Points'; % name
+% data{3,2} = 'xPointM';  % function callback
+% data{3,3} = {'2';'4'};             % units
 
-data{3,1} = 'Points'; % name
-data{3,2} = 'xPointM';  % function callback
-data{3,3} = {'2';'4'};             % units
+data{3,1} = 'Integration Time'; % name
+data{3,2} = 'IntegrationTime';	% function callback
+data{3,3} = 'sec';	% units
+data{3,4} = 'Set integration time of the Nano-Voltmeter.';             % hint
 
-data{4,1} = 'Integration Time'; % name
-data{4,2} = 'IntegrationTime';	% function callback
-data{4,3} = 'mS';	% units
+data{4,1} = 'Temperature Interval'; % name
+data{4,2} = 'dT =';	% function callback
+data{4,3} = '°K';	% units
+data{4,4} = 'Set interval of Temperature sensetivity, affects on fast wait4 and fast while-do.';             % hint
+
+data{5,1} = 'Field interval'; % name
+data{5,2} = 'dH = ';	% function callback
+data{5,3} = 'Oe';	% units
+data{5,4} = 'Set terminal of the Nano-Voltmeter.';             % hint
 
 set(hObject,'UserData',data);
 
@@ -1046,13 +1088,12 @@ function btnConfig_Callback(hObject, eventdata, handles)
 % hObject    handle to btnConfig (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-funcFlag = get(handles.mnuConfig,'Value');  % Choice
+choice = get(handles.mnuConfig,'Value');  % Choice
 Options = get(handles.mnuConfig,'UserData');% get data from menu
 
-unit = Options{funcFlag,3};
+unit = Options{choice,3};
 if iscell(unit)
     setValue = get(handles.mnuConfigParam,'String');
-    choice = get(handles.mnuConfigParam,'value');
     setValue = setValue{choice};
     unit = '';
 else
@@ -1060,10 +1101,10 @@ else
 end
 
 % add item to sequence
-commandLine = ['Set ',Options{funcFlag,1},' to ',setValue,unit];
+commandLine = ['Set ',Options{choice,1},' to ',setValue,'[',unit,']'];
 index = get(handles.CommandList,'Value');
 add_item_to_list_box(handles.CommandList,commandLine,index);
-functionStr = [Options{funcFlag,2},'(nv_obj,',setValue,');    % ',commandLine];
+functionStr = [Options{choice,2},'(nv_obj,',setValue,');    % ',commandLine];
 add_command_str(functionStr,index);
 
 
@@ -2209,3 +2250,15 @@ add_item_to_list_box(handles.CommandList,['Send mail to ',mailAd,' ; Subject: ',
 sendStr = {['mailContent = strrep(''',mailContent,''',''/\'',char(13));'] ;['SendGmailPPMS(''',mailAd,''',''',mailSub,''',mailContent);']};
 add_command_str(sendStr,index);
 
+
+
+% --- Executes on selection change in CommandList.
+function CommandList_Callback(hObject, eventdata, handles)
+% hObject    handle to CommandList (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+hintStr = {'Keyboard Shortcuts:';'  Del - delete';'  ''w'' - move up';'  ''s'' - move down';...
+    '  ''c'' - copy';'  ''v'' - paste'};
+set(handles.txtHint,'string',hintStr);
+% Hints: contents = cellstr(get(hObject,'String')) returns CommandList contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from CommandList
