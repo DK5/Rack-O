@@ -23,7 +23,7 @@ function varargout = MainFig3(varargin)
 % Edit the above text to modify the response to help MainFig
 
 
-% Last Modified by GUIDE v2.5 08-Aug-2016 16:16:12
+% Last Modified by GUIDE v2.5 09-Aug-2016 13:45:48
 
 
 % Begin initialization code - DO NOT EDIT
@@ -2005,6 +2005,7 @@ function btnSaveMeas_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 FileName = get(handles.edtSaveMeas,'String');  % get the desired filename
+strrep(FileName,'.mat','');
 % [FileName,dir] = uiputfile('*.mat','Save Measurements',FileName);
 dir = uigetdir('','Select Directory to Save Measurements');
 if ~dir
@@ -2012,7 +2013,7 @@ if ~dir
     return;
 end
 index = get(handles.CommandList,'value');
-comStr = ['Save file named ''',FileName,''' at directory ''',dir,''''];
+comStr = ['Save file named ''',FileName,'.mat',''' at directory ''',dir,''''];
 add_item_to_list_box(handles.CommandList,comStr,index);
 FileName = [dir,FileName];
 saveStr = 'eval([''save('','''''''',FileName,''.mat'','''''''','');''])';
@@ -2184,3 +2185,27 @@ data{5,2} = ['Fast, Executes while loop - while PPMS parameter (Temperature/Fiel
             'Set parameter interval (dT,dH) in the settings panel.']; 
 
 set(hObject,'UserData',data);
+
+
+% --- Executes on button press in btnSendMail.
+function btnSendMail_Callback(hObject, eventdata, handles)
+% hObject    handle to btnSendMail (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+uiwait(mailGUI);  % open and wait for channel  selection
+try
+    mailAd = getappdata(0,'mailAd');
+    mailSub = strtrim(getappdata(0,'mailSub'));
+    mailContent = getappdata(0,'mailContent');
+catch
+    errordlg('Mail Window interrupted');
+    return;
+end
+cellContent = cellstr(mailContent);
+mailContent = strjoin(cellContent','/\');
+index = get(handles.CommandList,'value');
+add_item_to_list_box(handles.CommandList,['Send mail to ',mailAd,' ; Subject: ',mailSub],index);
+% sendStr = ['SendGmailPPMS(''',mailAd,''',''',mailSub,''',''',mailContent,''');'];
+sendStr = {['mailContent = strrep(''',mailContent,''',''/\'',char(13));'] ;['SendGmailPPMS(''',mailAd,''',''',mailSub,''',mailContent);']};
+add_command_str(sendStr,index);
+
