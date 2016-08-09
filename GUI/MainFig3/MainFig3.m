@@ -360,7 +360,7 @@ for ind = 1:length(index)
 end
 strings(index) = [];
 strings = cellTab(strings);	% add TABs
-set(h,'value',min(min(ind)+1,length(strings))); 
+set(h,'value',min(min(index),length(strings))); 
 set(h,'string',strings); 
 
 
@@ -1029,6 +1029,8 @@ function mnuConfig_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 choice = get(hObject,'Value');
 data = get(hObject,'UserData');
+set(handles.txtHint,'string',data{choice,4});    % set hint in window
+set(handles.edtVoltSet,'string',data{choice,5});
 unit = data{choice,3};
 if iscell(unit)
     set(handles.mnuConfigParam,'visible','on');
@@ -1050,36 +1052,40 @@ function mnuConfig_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-data = cell(4,3);
+data = cell(4,5);
 
 data{1,1} = 'Compliance'; % name
-data{1,2} = 'compliance';  % function callback
+data{1,2} = 'compliance(sm_obj,<>);';  % function callback
 data{1,3} = 'V';             % units
 data{1,4} = 'Set compliance level of the Source-Meter.';             % hint
+data{1,5} = '2';
 
 data{2,1} = 'Terminal'; % name
-data{2,2} = 'terminal';  % function callback
+data{2,2} = 'terminal(nv_obj,<>);';  % function callback
 data{2,3} = {'Rear';'Front'};             % units
 data{2,4} = 'Set terminal of the Nano-Voltmeter.';             % hint
- 
+data{2,5} = ''; 
 % data{3,1} = 'Points'; % name
 % data{3,2} = 'xPointM';  % function callback
 % data{3,3} = {'2';'4'};             % units
 
 data{3,1} = 'Integration Time'; % name
-data{3,2} = 'IntegrationTime';	% function callback
+data{3,2} = 'IntegrationTime(nv_obj,<>);';	% function callback
 data{3,3} = 'sec';	% units
 data{3,4} = 'Set integration time of the Nano-Voltmeter.';             % hint
+data{3,5} = '0.2';
 
 data{4,1} = 'Temperature Interval'; % name
-data{4,2} = 'dT =';	% function callback
+data{4,2} = 'dT = <>;';	% function callback
 data{4,3} = '°K';	% units
 data{4,4} = 'Set interval of Temperature sensetivity, affects on fast wait4 and fast while-do.';             % hint
+data{4,5} = '0.1';
 
 data{5,1} = 'Field interval'; % name
-data{5,2} = 'dH = ';	% function callback
+data{5,2} = 'dH = <>;';	% function callback
 data{5,3} = 'Oe';	% units
-data{5,4} = 'Set terminal of the Nano-Voltmeter.';             % hint
+data{5,4} = 'Set interval of Field sensetivity, affects on fast wait4 and fast while-do.';             % hint
+data{5,5} = '1';
 
 set(hObject,'UserData',data);
 
@@ -1093,18 +1099,24 @@ Options = get(handles.mnuConfig,'UserData');% get data from menu
 
 unit = Options{choice,3};
 if iscell(unit)
+    paramFlag = get(handles.mnuConfigParam,'Value');
     setValue = get(handles.mnuConfigParam,'String');
-    setValue = setValue{choice};
+    setValue = setValue{paramFlag};
+    if ischar(num2str(setValue))
+        setValue = ['''',setValue,''''];
+    end
     unit = '';
 else
     setValue = get(handles.edtVoltSet,'String');
+    unit = ['[',unit,']'];
 end
 
 % add item to sequence
-commandLine = ['Set ',Options{choice,1},' to ',setValue,'[',unit,']'];
+commandLine = ['Set ',Options{choice,1},' to ',setValue,unit];
 index = get(handles.CommandList,'Value');
 add_item_to_list_box(handles.CommandList,commandLine,index);
-functionStr = [Options{choice,2},'(nv_obj,',setValue,');    % ',commandLine];
+functionStr = [strrep(Options{choice,2},'<>',setValue),'    % ', commandLine];
+% functionStr = [Options{choice,2},'(nv_obj,',setValue,');    % ',commandLine];
 add_command_str(functionStr,index);
 
 
@@ -1590,14 +1602,14 @@ data{2,6} = [0, 10];    % default values
 data{3,1} = 'Current'; % name
 data{3,2} = 'uA';       % units
 data{3,3} = 'current';	% function callback
-data{3,4} = 'cs_obj';	% object
+data{3,4} = 'sm_obj';	% object
 data{3,5} = 'Apply current (micro-Ampere) from the Source-Meter';	% hint
 data{3,6} = [1, 0];    % default values
 
 data{4,1} = 'Voltage'; % name
 data{4,2} = 'V';       % units
 data{4,3} = 'voltage';     % function callback
-data{4,4} = 'cs_obj';	% object
+data{4,4} = 'sm_obj';	% object
 data{4,5} = 'Apply voltage (Volt) from the Source-Meter';	% hint
 data{4,6} = [1, 0];    % default values
 
@@ -1658,7 +1670,7 @@ switch paramflag
         add_item_to_list_box(handles.CommandList,commandStr,index);
         % update commands in script
         state = get(handles.tglSM,'string');
-        functionStr = [funcName,'(cs_obj,','',state,'',',',targetStr,');'];
+        functionStr = [funcName,'(sm_obj,','',state,'',',',targetStr,');'];
         add_command_str([functionStr,'    % ',commandStr],index);
 end
 
@@ -1802,7 +1814,7 @@ data{2,6} = [0, 1000, 10];   % default values - initVal, target, rate
 data{3,1} = 'Current'; % name
 data{3,2} = 'uA';       % units
 data{3,3} = 'current';	% function callback
-data{3,4} = 'cs_obj';	% object
+data{3,4} = 'sm_obj';	% object
 data{3,5} = {'Scan (loop) on current values (micro-Amps).',...  % hint
              '    Spacing - diffrence of current in each iteration.',...
              '    Steps   - number of currents to be scanned.','';...
@@ -1821,7 +1833,7 @@ data{3,6} = [-1, 1, 1];   % default values - initVal, target, rate
 data{4,1} = 'Voltage'; % name
 data{4,2} = 'V';       % units
 data{4,3} = 'voltage';     % function callback
-data{4,4} = 'cs_obj';	% object
+data{4,4} = 'sm_obj';	% object
 data{4,5} = {'Scan (loop) on voltage values (Volts).',...  % hint
              '    Spacing - diffrence of voltage in each iteration.',...
              '    Steps - number of voltages to be scanned.','';... 
@@ -2012,7 +2024,7 @@ function btnPPMSdata_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 index = get(handles.CommandList,'value');
 add_item_to_list_box(handles.CommandList,'Read PPMS data',index);
-add_command_str({'[data] = ReadPPMSdata(PPMSobj,[1,2]);    % PPMS data';...
+add_command_str({'[data] = ReadPPMSdata(PPMS_obj,[1,2]);    % PPMS data';...
             'T(end+1)=data(1);';'H(end+1)=data(2);'},index);
 
 
@@ -2117,7 +2129,12 @@ function mnuWait4param_Callback(hObject, eventdata, handles)
 % hObject    handle to mnuWait4param (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+choice = get(hObject,'value');
+waitind = get(handles.mnuWait,'value');
+if waitind==5 || waitind ==6
+    set(handles.mnuConfig,'value',choice+3);
+    mnuConfig_Callback(handles.mnuConfig,eventdata,handles);
+end
 % Hints: contents = cellstr(get(hObject,'String')) returns mnuWait4param contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from mnuWait4param
 
@@ -2171,10 +2188,10 @@ switch choice
         add_item_to_list_box(handles.CommandList,'end',index+1);
         % update commands in script
         ind = num2str(get(handles.mnuWait4param,'value'));
-        whileStr = {'[Status, StatusTXT] = ReadPPMSstatus(PPMSobj);    % Read status';...
+        whileStr = {'[Status, StatusTXT] = ReadPPMSstatus(PPMS_obj);    % Read status';...
                     ['while Status(',ind,')~=1 && Status(',ind,')~=4    % while ',Options{paramflag},' not stable']};
         add_command_str(whileStr,index);
-        endStr = {'[Status, StatusTXT] = ReadPPMSstatus(PPMSobj);    % Read status';'end'};
+        endStr = {'[Status, StatusTXT] = ReadPPMSstatus(PPMS_obj);    % Read status';'end'};
         add_command_str(endStr,index+1);
 end
 
@@ -2192,6 +2209,9 @@ switch choice
         set(handles.mnuWait4param,'visible','off');
     case {2,3}
         set(handles.mnuWait4param,'visible','on');
+    case{4,5}
+        set(handles.mnuWait4param,'visible','on');
+        mnuWait4param_Callback(handles.mnuWait4param,eventdata,handles);
 end
 
 % --- Executes during object creation, after setting all properties.
