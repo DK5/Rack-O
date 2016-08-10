@@ -2316,6 +2316,7 @@ set(handles.txtHint,'string',hintStr);
 % Hints: contents = cellstr(get(hObject,'String')) returns CommandList contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from CommandList
 
+
 % --- Executes on button press in btnAllo.
 function btnAllo_Callback(hObject, eventdata, handles)
 index = get(handles.CommandList,'value');
