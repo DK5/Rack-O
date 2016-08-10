@@ -1,6 +1,9 @@
 function [ newName ] = filenameReplace( filename, varargin )
 %UNTITLED3 Summary of this function goes here
 %   Detailed explanation goes here
+if nargin==2
+    varargin = varargin{1};
+end
 
 if isempty(varargin)
     newName = filename;
