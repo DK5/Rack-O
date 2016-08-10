@@ -23,7 +23,7 @@ function varargout = MainFig3(varargin)
 % Edit the above text to modify the response to help MainFig
 
 
-% Last Modified by GUIDE v2.5 09-Aug-2016 16:31:22
+% Last Modified by GUIDE v2.5 10-Aug-2016 14:09:46
 
 
 % Begin initialization code - DO NOT EDIT
@@ -393,7 +393,7 @@ switch lower(key)
         btnDeleteLine_Callback(handles.btnDeleteLine, eventdata, handles);    % call the pushbutton callback
     case 'w'
         btnUp_Callback(handles.btnUp,eventdata,handles);
-    case 's'
+    case 'd'
         btnDown_Callback(handles.btnDown,eventdata,handles);
     case 'c'    % copy
         copyind = get(hObject,'value');
@@ -1070,10 +1070,10 @@ data{2,5} = '';
 % data{3,3} = {'2';'4'};             % units
 
 data{3,1} = 'Integration Time'; % name
-data{3,2} = 'IntegrationTime(nv_obj,<>);';	% function callback
+data{3,2} = 'IntegrationTime(nv_obj,<>); Tintegration = <>;';	% function callback
 data{3,3} = 'sec';	% units
 data{3,4} = 'Set integration time of the Nano-Voltmeter.';             % hint
-data{3,5} = '0.2';
+data{3,5} = '0.02';
 
 data{4,1} = 'Temperature Interval'; % name
 data{4,2} = 'dT = <>;';	% function callback
@@ -1360,8 +1360,10 @@ switch routine
             'dV(end+1*(s==1),s) = Vd(2);    % span/2 current, differential voltage  (dV/2)';...
             'dR(end+1*(s==1),s) = Vd(2)/Id(2);  % differential resistance'},index);
     case 4  % continous measurement
-        add_item_to_list_box(handles.CommandList,'Measure Voltage continously',index);
-        add_command_str('Vread = VcontMeas(nv_obj, Tread, Tintegration);    % Measure Voltage continously',index);
+        Tread = initValStr; Tintegration = targetValStr;
+        commandStr = ['Measure Voltage continously over ',Tread,'[sec] , integration time: ',Tintegration,'[sec]'];
+        add_item_to_list_box(handles.CommandList,commandStr,index);
+        add_command_str(['Vcont = VcontMeas(nv_obj,',Tread,',',Tintegration,');    % ',commandStr],index);
 end
 
 
@@ -1797,7 +1799,8 @@ data{1,5} = {'Scan (loop) on Temperature values (Kelvin) in PPMS.',...  % hint
              '    Steps - number of temperatures to be scanned.',...
              '    Rate - approaching rate in each iteration.',...
              'Approaching options:',...
-             '    Fast Settle - .','    No Overshoot - .'};
+             '    Fast Settle - oscillating aroud target tepmerature, while decaying the oscillation magnitude (feedback loop).',...
+             '    No Overshoot - slowly reaching target temperature, while not passing it.'};
 data{1,6} = [300, 10, 4];   % default values - initVal, target, rate
 
 data{2,1} = 'Field'; % name
@@ -1809,7 +1812,10 @@ data{2,5} = {'Scan (loop) on Field values (Oersted) in PPMS.',...  % hint
              '    Steps - number of fields to be scanned.',...
              '    Rate - approaching rate in each iteration.',...
              'Approaching options:',...
-             '    Linear - .','   No Overshoot - .','    Oscillate - .'};
+             '    Linear - the magnetic field ramps linearly to the new field,.',...
+             '    No Overshoot - ensures that the magnetic field does not overshoot past the target field.',...
+             '    Oscillate - oscillates the magnetic field about the final value through a series of decreasing amplitude oscillations.',...
+             };
 data{2,6} = [0, 1000, 10];   % default values - initVal, target, rate
 
 data{3,1} = 'Current'; % name
@@ -1903,6 +1909,7 @@ function mnuApproach_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 options = get(handles.mnuScan,'userData');
 paramflag = get(handles.mnuScan,'value');
+unit = options{paramflag,2};
 hints = options{paramflag,5};
 if paramflag==3 || paramflag==4
     routine = get(hObject,'value');
@@ -1918,14 +1925,34 @@ if paramflag==3 || paramflag==4
         set(handles.edtStep,'enable','off');
         set(handles.btnSetup,'visible','on');
         set(handles.edtInitVal,'string','0');
-    elseif routine == 4        % continuos
-        set(handles.txtRateScan,'string','Time interval:');
+        set(handles.txt_MethodUnit,'Enable','off');
+    elseif routine == 4        % continous
+        set(handles.btnScan,'string','Measure');
+%         set(handles.txtRateScan,'string','Time interval:');
+%         set(handles.mnuConfig,'value',3);
+%         mnuConfig_Callback(handles.mnuConfig,eventdata,handles);
+        unit = 'sec';
+        set(handles.txtRateScan,'Enable','off');
+        set(handles.edtRateScan,'Enable','off');
+        set(handles.txtInitVal,'string','Time interval:');
+        set(handles.txtTarVal,'string','Integration Time:');
+        set(handles.rdoSteps,'enable','off');
+        set(handles.rdoSpace,'enable','off');
+        set(handles.edtStep,'enable','off');
+        set(handles.btnSetup,'visible','on');
+        set(handles.edtInitVal,'string','2');
+        set(handles.edtTargetVal,'string','0.02');
+        set(handles.btnSetup,'visible','off');
+        set(handles.txtRateScan,'Enable','off');
+        set(handles.edtRateScan,'Enable','off');
+        set(handles.txt_MethodUnit,'Enable','off');
     else
         set(handles.txtRateScan,'Enable','off');
         set(handles.edtRateScan,'Enable','off');
         set(handles.rdoSteps,'enable','on');
         set(handles.rdoSpace,'enable','on');
         set(handles.edtStep,'enable','on');
+        set(handles.txt_MethodUnit,'Enable','on');
         switch routine
             case 1  % Normal scan
                 set(handles.btnScan,'string','scan');
@@ -1948,6 +1975,8 @@ if paramflag==3 || paramflag==4
                 end  
         end  
     end
+    set(handles.txt_initValUnit,'string',unit);
+    set(handles.txt_finalValUnit,'string',unit);
 end
 % Hints: contents = cellstr(get(hObject,'String')) returns mnuApproach contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from mnuApproach
@@ -2075,6 +2104,9 @@ saveStr = 'eval([''save('','''''''',FileName,''.mat'','''''''','');''])';
 FileNameStr = 'FileName = filenameReplace(FileName1,''T'',Temp(Tind),''H'',Fiel(Find));';
 add_command_str({['FileName1 = ''',FileName,''';    % original File Name'];...
             [FileNameStr,'    % Replace file name <>'];saveStr},index);
+set(handles.CommandList,'value',1);
+btnAllo_Callback(handles.btnAllo,eventdata,handles);
+set(handles.CommandList,'value',index);
 
 
 function edtSaveMeas_Callback(hObject, eventdata, handles)
@@ -2283,3 +2315,15 @@ hintStr = {'Keyboard Shortcuts:';'  Del - delete';'  ''w'' - move up';'  ''s'' -
 set(handles.txtHint,'string',hintStr);
 % Hints: contents = cellstr(get(hObject,'String')) returns CommandList contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from CommandList
+
+% --- Executes on button press in btnAllo.
+function btnAllo_Callback(hObject, eventdata, handles)
+index = get(handles.CommandList,'value');
+add_item_to_list_box(handles.CommandList,'Data Allocation',index);
+add_command_str({'T = []; H = [];    % PPMS data preallocation';...
+                 'I = []; V = [];    % IV measurement data preallocation';...
+                 'dV = []; dI = []; dR = []; % Delta measurement data preallocation';...
+                 'Vcont = [];        % V continous';},index);
+% hObject    handle to btnAllo (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
