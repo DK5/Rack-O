@@ -1310,7 +1310,8 @@ switch routine
                 functionStr = ['[Idata,Vdata] = executeIVspan(nv_obj, sm_obj,','''',ParameterStr(1),'''',...
                     ',',initValStr,',',targetValStr,',',methodVal,');   % ', commandStr];
                 add_command_str({functionStr;'I{end+1*(s==1),s} = Idata;     % IV current';...
-                                    'V{end+1*(s==1),s} = Vdata;     % IV voltage'},index);
+                                    'V{end+1*(s==1),s} = Vdata;     % IV voltage';...
+                                    '%  dR{end+1*(s==1),s} = diff(Vdata)./diff(Idata);    % differential Resistance'},index);
             end
         else
             methodStr = 'spacing';
@@ -2131,7 +2132,7 @@ function mnuWait4param_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 choice = get(hObject,'value');
 waitind = get(handles.mnuWait,'value');
-if waitind==5 || waitind ==6
+if waitind==4 || waitind ==5
     set(handles.mnuConfig,'value',choice+3);
     mnuConfig_Callback(handles.mnuConfig,eventdata,handles);
 end
