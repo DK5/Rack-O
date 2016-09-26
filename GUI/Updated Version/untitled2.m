@@ -59,7 +59,7 @@ function untitled2_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 
 %CONNECT TO PPMS
-PPMSObj= GPcon(15,0);
+% PPMSObj= GPcon(15,0);
 % setappdata(0,'PPMS','PPMSObj');
 %timer
 mainTimer=timer;
