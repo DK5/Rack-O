@@ -21,7 +21,7 @@ axis square;
 for i = limits(1:end-1)
     for j = (i+1):max(limits-1)
         % Apply Current
-        switchCurrent(switch_obj,'on', i, j);  % Switches between legs i and j
+        switchCurrent (switch_obj,'on', i, j);  % Switches between legs i and j
         current(cs_obj,'on',1e-3);              % Apply current 
         
         % Square Coordinates
