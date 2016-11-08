@@ -91,26 +91,26 @@ end
 
 %CONNECT TO devices
 try 
-    handles.PPMS_obj= GPcon(15,2);
+    handles.PPMS_obj= GPcon(15,0);
 %     PPMS_obj = GPcon(15,0);
 %     setappdata(0,'PPMS_obj',PPMS_obj);
 catch
     errordlg('Failed to initialize connection to PPMS!','Error 0x007');
 end
 try
-    handles.switcher_obj = GPcon(5,2);
+    handles.switcher_obj = GPcon(5,0);
 %     setappdata(0,'handles.switcher_obj',handles.switcher_obj);
 catch
     errordlg('Failed to initialize connection to switcher!','Error 0x009');
 end
 try
-    handles.sc_obj=GPcon(23,2);
+    handles.sc_obj=GPcon(23,0);
 %     setappdata(0,'handles.sc_obj',handles.sc_obj);
 catch
     errordlg('Failed to initialize connection to SourceMeter!','Error 0x010');
 end
 try
-    handles.nV_obj=GPcon(6,2);
+    handles.nV_obj=GPcon(6,0);
 %     setappdata(0,'handles.nV_obj',handles.nV_obj);
 catch
     errordlg('Failed to initialize connection to nanoVoltmeter!','Error 0x011');
