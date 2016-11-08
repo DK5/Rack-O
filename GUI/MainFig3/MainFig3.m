@@ -60,61 +60,42 @@ function MainFig_OpeningFcn(hObject, ~, handles, varargin)
 % Choose default command line output for MainFig
 handles.output = hObject;
 
-%CLOSE DEVICES before opening them (just in case)
-try
-    try
-        fclose(handles.PPMS_obj);
-%         PPMS_obj = getappdata(0,'PPMS_obj');
-%         fclose(PPMS_obj);
-        
-    end
-%     handles = rmfield(handles, 'PPMS_obj');
-end
-try
-    try
-        fclose(handles.switcher_obj);
-    end
-%     handles = rmfield(handles, 'switcher_obj');
-end
-try
-    try
-        fclose(handles.sc_obj);
-    end
-%     handles = rmfield(handles, 'sc_obj');
-end
-try
-    try
-        fclose(handles.nV_obj);
-    end
-%     handles = rmfield(handles, 'nV_obj');
+% connect to objects
+devlist = {'Couldn''t connect to the following devices:'}; ind = 2;
+try     % PPMS
+    handles.PPMS_obj = GPcon(15,2);
+catch
+%     errordlg('Couldn''t connect to the PPMS','Connection Error');
+    devlist{ind,1} = '    - PPMS'; ind = ind + 1;
 end
 
-%CONNECT TO devices
-try 
-    handles.PPMS_obj= GPcon(15,2);
-%     PPMS_obj = GPcon(15,0);
-%     setappdata(0,'PPMS_obj',PPMS_obj);
+try     % NanoVoltmeter
+    handles.nV_obj = GPcon(6,2);
 catch
-    errordlg('Failed to initialize connection to PPMS!','Error 0x007');
+%     errordlg('Couldn''t connect to the NanoVoltmeter','Connection Error');
+    devlist{ind,1} = '    - NanoVoltmeter'; ind = ind + 1;
 end
-try
-    handles.switcher_obj = GPcon(5,2);
-%     setappdata(0,'handles.switcher_obj',handles.switcher_obj);
+
+try     % Current Source
+    handles.sc_obj = GPcon(23,2);
 catch
-    errordlg('Failed to initialize connection to switcher!','Error 0x009');
+%     errordlg('Couldn''t connect to the Current Source','Connection Error');
+    devlist{ind,1} = '    - Current Source'; ind = ind + 1;
 end
-try
-    handles.sc_obj=GPcon(23,2);
-%     setappdata(0,'handles.sc_obj',handles.sc_obj);
+
+try     % switcher
+   handles.switcher_obj = GPcon(5,2);
 catch
-    errordlg('Failed to initialize connection to SourceMeter!','Error 0x010');
+%     errordlg('Couldn''t connect to the Switcher','Connection Error');
+    devlist{ind,1} = '    - Switcher'; ind = ind + 1;
 end
-try
-    handles.nV_obj=GPcon(6,2);
-%     setappdata(0,'handles.nV_obj',handles.nV_obj);
-catch
-    errordlg('Failed to initialize connection to nanoVoltmeter!','Error 0x011');
+
+if ind > 2
+    errh = errordlg(devlist,'Connection Error');
+    uiwait(errh);
 end
+
+
 setappdata(0,'handles',handles)
 %timer
 mainTimer = timer;
