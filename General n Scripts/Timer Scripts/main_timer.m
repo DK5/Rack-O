@@ -4,9 +4,9 @@
 % csobj = GPcon(10,2);	% current source object
 % swicher = GPcon(12);    % switcher object
 % lockin = GPcon(12);     % lock-in object
-
+clear;
 %%  Open File
-filename = 'TimerTest.txt';
+filename = 'TimerTestSinSlowHalf.txt';
 
 %%  Innitialization of DATA
 exec = 5;
@@ -14,8 +14,8 @@ ppms_ex = 5;	% PPMS executions
 k_ex = 30;      % keithley executions
 % rows = number of executions
 % 6 colomns: 1-time, 2-temp, 3-field, 4-volt1, 5- volt2, 6-current
-kData = NaN(k_ex,6);
-PPMS_data = NaN(ppms_ex,6);
+kData = NaN(k_ex,4);
+pData = NaN(ppms_ex,3);
 
 %%	Decleration of keithleys' timer
 k_timer = timer;
@@ -39,7 +39,7 @@ ppms_timer.StartFcn = 'pData = NaN(ppms_ex,3); p = 1';	% reset PPMS data & index
 %     ['[PPMS_data(p,2),PPMS_data(p,3),PPMS_data(p,1)]'...
 %      ' = pActivity(PPMSobj);',...
 %      'p = p+1;'];
-ppms_timer.TimerFcn = 'pData(p,2:3) = p*(5:6); pData(p,1) = toc; pause(0.3); p=p+1';
+ppms_timer.TimerFcn = 'pData(p,2:3) = (5:6)*sin(-0.5*toc); pData(p,1) = toc; pause(0.8); p=p+1';
 ppms_timer.TasksToExecute = ppms_ex;
 
 %%  Operation
@@ -58,7 +58,7 @@ stop(ppms_timer);
 kData(isnan(kData(:,1)),:) = [];    % delete all NaN values where there is no time stamp
 klen = size(kData,1);               % get kData rows size
 
-PPMS_data(isnan(pData(:,1)),:) = [];% delete all NaN values where there is no time stamp
+pData(isnan(pData(:,1)),:) = [];% delete all NaN values where there is no time stamp
 ppms_len = size(pData,1);           % get kData rows size
 
 rawData = NaN(klen+ppms_len,6);         % generate raw data which will contain ppms & kData
@@ -83,7 +83,7 @@ rawData((klen+1):end,1:3) = pData;    % insert PPMS data (time&values)
 sortData = sortrows(rawData,1); % sort by time (1st col) and get sorted rows indices
 
 %%  Interpolating
-interpData = sortData;
+interpData = InterpBlock(sortData);
 
 %%	Write data to the end of the file
 dlmwrite(filename,interpData,'-append','delimiter','\t','newline','pc','precision',7);
@@ -91,7 +91,8 @@ dlmwrite(filename,interpData,'-append','delimiter','\t','newline','pc','precisio
 %%  Reset Workspace
 clearvars k p kData pData
 end
-
+clc;
 %% Delete Timers
 delete(timerfind) % delete all timers
 winopen(filename);
+allData = importdata(filename);
