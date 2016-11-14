@@ -1,7 +1,8 @@
-function SampleCheck(switch_obj,cs_obj)
+function SampleCheck(switch_obj,cs_obj,I)
 % This function goes over all the permutation of the sample connections and
 % checks for cuts.
-
+openAllCH (switch_obj)
+pause(1/50)
 % Axis Properties
 limits = 3:15;
 label = num2str((limits-1)','%02d');
@@ -22,7 +23,8 @@ for i = limits(1:end-1)
     for j = (i+1):max(limits-1)
         % Apply Current
         switchCurrent (switch_obj,'on', i, j);  % Switches between legs i and j
-        current(cs_obj,'on',1e-3);              % Apply current 
+        pause(1/50)
+%         current(cs_obj,'on',100e-6);              % Apply current 
         
         % Square Coordinates
         x1 = [i i+1 i+1 i] + 0.5;
@@ -31,7 +33,7 @@ for i = limits(1:end-1)
         y2 = x1;
         
         % Compliance
-        if cutShort(cs_obj)                     % Short
+        if cutShort(cs_obj,I)                     % Short
             patch(x1,y1,'green');
             patch(x2,y2,'green');
         else                                    % Cut
@@ -40,7 +42,6 @@ for i = limits(1:end-1)
         end
         drawnow
         % Turn off current
-        current( cs_obj,'off',0.01 );       
         switchCurrent (switch_obj,'off', i, j);
         
     end

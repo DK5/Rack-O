@@ -1,4 +1,4 @@
-function A=SampleCheckCont(switch_obj,cs_obj)
+function A=SampleCheckCont(switch_obj,cs_obj,V)
 % This function goes over all the permutation of the sample connections and
 % checks for cuts.
 
@@ -22,7 +22,6 @@ limits = 3:15;
 % axis([min(limits) max(limits) min(limits) max(limits)] + 0.5);
 % axis square;
 
-currentValue=1e3;
 % Channel Checking
 p=0;
 t=0;
@@ -31,8 +30,7 @@ for i = limits(1:end-1)
     for j = (i+1):max(limits-1)
         % Apply Current
         switchCurrent (switch_obj,'on', i, j);  % Switches between legs i and j
-        current(cs_obj,'on',currentValue);              % Apply current 
-        
+        pause(1/50);
         % Square Coordinates
         x1 = [i i+1 i+1 i] + 0.5;
         y1 = [j j j+1 j+1] + 0.5;
@@ -40,8 +38,18 @@ for i = limits(1:end-1)
         y2 = x1;
         
         % Compliance
-        [ isShort,res ]=cutShort(cs_obj);
-        A(i,j)=res;
+%         current( cs_obj , 'on' , I );
+%         pause(1/50);
+%         [ res ] = oneShot( cs_obj , 'c' );
+%         current( cs_obj , 'off' , I );
+
+        voltage( cs_obj , 'on' , V)
+        pause(1/1);
+        [ Imeasured ] = oneShot( cs_obj , 'c' );
+        voltage( cs_obj , 'off' , V)
+        R=V/Imeasured;
+        
+        A(i,j)=R;
         t(p+1)=toc;
         tAVG=mean(diff(t));
         clc
@@ -60,7 +68,6 @@ for i = limits(1:end-1)
        
 %         drawnow
         % Turn off current
-        current( cs_obj,'off',currentValue );       
         switchCurrent (switch_obj,'off', i, j);
         
     end
