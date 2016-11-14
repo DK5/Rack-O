@@ -1,4 +1,4 @@
-function [Idata,Vdata] = executeIVspan(nv_obj,sm_obj,mode,center,span,points,DIRE)
+function [Idata,Vdata,TimeSig] = executeIVspan(nv_obj,sm_obj,mode,center,span,points,DIRE)
 % executeIV(nv_obj,sm_obj,mode,minP,maxP,stepP) executes IV measuring
 % routine, by specified values
 %   nv_obj - nano-Voltmeter object
@@ -76,4 +76,4 @@ data = query(sm_obj,':TRACe:DATA?');      % Read data from buffer
 data = str2double(strsplit(data,','));  % Export readings to vector
 data = reshape(data,5,[])';               % Make measured data a table/matrix
 Idata = data(:,2);                            % Measured current
-% TimeSig=data(:,4);                      % Time signiture from the begening of the measurement
+TimeSig=data(:,4);                      % Time signiture from the begening of the measurement
