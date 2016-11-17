@@ -4,9 +4,9 @@
 % approach is 0 Linear, 1 No overshoot, 2 Oscillate
 % mode is 0 persistant, 1 driven
 
-function FIELD(PPMSobj,H,rate,approach,mode)
+function FIELD(PPMSobj,H,rate,approach,modeF)
 try
-    Cmd=['FIELD ',num2str(H),' ',num2str(rate),' ',num2str(approach),' ',num2str(mode)];
+    Cmd=['FIELD ',num2str(H),' ',num2str(rate),' ',num2str(approach),' ',num2str(modeF)];
     fprintf(PPMSobj, Cmd);
 catch
     disp('Error')

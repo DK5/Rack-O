@@ -23,7 +23,7 @@ function varargout = MainFig3(varargin)
 % Edit the above text to modify the response to help MainFig
 
 
-% Last Modified by GUIDE v2.5 10-Nov-2016 17:06:28
+% Last Modified by GUIDE v2.5 17-Nov-2016 16:41:34
 
 
 % Begin initialization code - DO NOT EDIT
@@ -59,11 +59,14 @@ function MainFig_OpeningFcn(hObject, ~, handles, varargin)
 
 % Choose default command line output for MainFig
 handles.output = hObject;
+GPdis;
 
 % connect to objects
 devlist = {'Couldn''t connect to the following devices:'}; ind = 2;
 try     % PPMS
     PPMS_obj = GPcon(15,0);
+    handles.PPMS_obj = PPMS_obj;
+    guidata(hObject,handles);
     setappdata(0,'PPMS',PPMS_obj);
     %timer
     mainTimer = timer;
@@ -198,7 +201,8 @@ elseif(rate>187)
     set(handles.mf_rate_edit,'String',187);
     return
 end
-FIELD(handles.PPMS_obj,StopField,rate,approach,mode);
+modeF = get(handles.mf_magnet_mode_popup,'value') - 1; 
+FIELD(handles.PPMS_obj,StopField,rate,approach,modeF);
 
 
 function txt_destination_field_Callback(hObject, eventdata, handles)
@@ -516,7 +520,7 @@ cla(handles.axes1);                                   % Reset Graph
 
 set(handles.H_text_status,'String', '0');
 set(handles.temp_text_status,'String', '---');        % Reset Live Data feed
-set(handles.helium_level_text_status,'String', '---');
+set(handles.helium_level_status,'String', '---');
 set(handles.pressure_text_status,'String', '---');
 
 
@@ -660,7 +664,7 @@ function chamber_mode_popup_Callback(hObject, eventdata, handles)
 %WHEN TIME'S COME: ADD THESE LINES:
 contents = get(hObject,'string');
 action = contents{get(hObject,'Value')}; %id of selceted action
-CHAMBER(PPMS_obj,action-1);
+CHAMBER(handles.PPMS_obj,action-1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1875,6 +1879,11 @@ end
 
 % --- Executes on button press in tglPower.
 function tglPower_Callback(hObject, eventdata, handles)
+state = get(hObject,'value');
+if state
+    PPMS = getappdata(0,'PPMS');
+    Shutdown(PPMS);
+end
 % hObject    handle to tglPower (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2419,7 +2428,8 @@ output.ChamberQ=ChamberQ(PPMSObj);
 output.Pressure=ReadPPMSdata(PPMSObj,19);
 output.Temp=ReadPPMSdata(PPMSObj,1);
 output.Field=ReadPPMSdata(PPMSObj,2);
-%output.Helium=also get helium level
+output.Helium=HeliumLevel(PPMSObj);
+
 %Done readind data, now printing
 %Magnetic field
 set(handles.mf_target_status,'String', num2str(output.FieldQ{1}));
@@ -2437,6 +2447,5 @@ set(handles.pressure_text_status,'String', num2str(output.Pressure));
 %Chamber Status
 set(handles.chamber_mode_status,'String', output.ChamberQ);
 %Helium
-%set(handles.helium_level_status,'String', num2str(output.Helium));
-guidata(hObject, handles);  %update data
+set(handles.helium_level_status,'String', num2str(output.Helium));
 %se tu
