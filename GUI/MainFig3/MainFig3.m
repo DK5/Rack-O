@@ -63,28 +63,40 @@ handles.output = hObject;
 % connect to objects
 devlist = {'Couldn''t connect to the following devices:'}; ind = 2;
 try     % PPMS
-    handles.PPMS_obj = GPcon(15,2);
+    PPMS_obj = GPcon(15,0);
+    setappdata(0,'PPMS',PPMS_obj);
+    %timer
+    mainTimer = timer;
+    mainTimer.Name = 'Main GUI Timer';
+    mainTimer.ExecutionMode = 'fixedRate';
+    mainTimer.Period = 0.5;
+    mainTimer.TimerFcn = @(~,~) timer_function(PPMS_obj,handles);
+    mainTimer.StartDelay = 1.5;
+    start(mainTimer);
 catch
 %     errordlg('Couldn''t connect to the PPMS','Connection Error');
     devlist{ind,1} = '    - PPMS'; ind = ind + 1;
 end
 
 try     % NanoVoltmeter
-    handles.nV_obj = GPcon(6,2);
+    nV_obj = GPcon(6,0);
+    setappdata(0,'nV_obj',nV_obj);
 catch
 %     errordlg('Couldn''t connect to the NanoVoltmeter','Connection Error');
     devlist{ind,1} = '    - NanoVoltmeter'; ind = ind + 1;
 end
 
 try     % Current Source
-    handles.sc_obj = GPcon(23,2);
+    sc_obj = GPcon(23,0);
+    setappdata(0,'sc_obj',sc_obj);
 catch
 %     errordlg('Couldn''t connect to the Current Source','Connection Error');
     devlist{ind,1} = '    - Current Source'; ind = ind + 1;
 end
 
 try     % switcher
-   handles.switcher_obj = GPcon(5,2);
+   switcher_obj = GPcon(5,0);
+   setappdata(0,'switcher_obj',switcher_obj);
 catch
 %     errordlg('Couldn''t connect to the Switcher','Connection Error');
     devlist{ind,1} = '    - Switcher'; ind = ind + 1;
@@ -95,16 +107,6 @@ if ind > 2
     uiwait(errh);
 end
 
-
-setappdata(0,'handles',handles)
-%timer
-mainTimer = timer;
-mainTimer.Name = 'Main GUI Timer';
-mainTimer.ExecutionMode = 'fixedRate';
-mainTimer.Period = 0.5;
-mainTimer.TimerFcn = 'timer_function';
-mainTimer.StartDelay = 1.5;
-start(mainTimer);
 
 % Create cell array to store all commands
 % every action on CommandList will be also on this cell array
@@ -786,30 +788,31 @@ selection = questdlg('Are you sure you want to quit?',...
       'Yes','No','Yes'); 
    switch selection, 
       case 'Yes',
-        try
-            try
-                fclose(handles.PPMS_obj)
-            end
-%             handles = rmfield(handles, 'PPMS_obj');
-        end
-        try
-            try
-                fclose(handles.switcher_obj)
-            end
-%             handles = rmfield(handles, 'switcher_obj');
-        end
-        try
-            try
-                fclose(handles.sc_obj)
-            end
-%             handles = rmfield(handles, 'sc_obj');
-        end
-        try
-            try
-                fclose(handles.nV_obj)
-            end
-%             handles = rmfield(handles, 'nV_obj');
-        end
+%         try
+%             try
+%                 fclose(handles.PPMS_obj)
+%             end
+% %             handles = rmfield(handles, 'PPMS_obj');
+%         end
+%         try
+%             try
+%                 fclose(handles.switcher_obj)
+%             end
+% %             handles = rmfield(handles, 'switcher_obj');
+%         end
+%         try
+%             try
+%                 fclose(handles.sc_obj)
+%             end
+% %             handles = rmfield(handles, 'sc_obj');
+%         end
+%         try
+%             try
+%                 fclose(handles.nV_obj)
+%             end
+% %             handles = rmfield(handles, 'nV_obj');
+%         end
+          GPdis
           delete(hObject);
       case 'No'
       return 
@@ -841,8 +844,10 @@ function sample_chk_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to sample_chk_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-CheckMatrix(getappdata(0,'handles.switcher_obj'),getappdata(0,'handles.sc_obj')); %should be changed to samplecheck
-
+% CheckMatrix(getappdata(0,'handles.switcher_obj'),getappdata(0,'handles.sc_obj')); %should be changed to samplecheck
+switcher = getappdata(0,'switcher_obj');
+scobj = getappdata(0,'sc_obj');
+SampleCheck(switcher,scobj,10);
 
 % --- Executes on button press in btnUp.
 function btnUp_Callback(hObject, eventdata, handles)
@@ -2394,3 +2399,44 @@ function txt_Stop_field_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+function [output]=timer_function(PPMSObj,handles)
+%Function that contains all Live Data functions for pulling information
+%about the ppms.
+% Function will return a structure with 6 fields:
+% output.Pressure - will contain the current pressure in the chamber
+% output.TempQ - will contain QUERY INFORMATION (set, rate and approach) regarding the temprature
+% output.Temp - will contain current temprature via ReadPPMSData
+% output.FieldQ - will contain QUERY INFORMATION (set, rate, approach and MagnetMode) regarding the magnetic field
+% output.Field - will contain current magnetic field via ReadPPMSData
+% output.ChamberQ - will contain QUERY information about current chamber valving status
+
+%Queries
+output.TempQ=TempQ(PPMSObj);
+output.FieldQ=FieldQ(PPMSObj);
+output.ChamberQ=ChamberQ(PPMSObj);
+%Data
+output.Pressure=ReadPPMSdata(PPMSObj,19);
+output.Temp=ReadPPMSdata(PPMSObj,1);
+output.Field=ReadPPMSdata(PPMSObj,2);
+%output.Helium=also get helium level
+%Done readind data, now printing
+%Magnetic field
+set(handles.mf_target_status,'String', num2str(output.FieldQ{1}));
+set(handles.mf_rate_status,'String', num2str(output.FieldQ{2}));
+set(handles.mf_approach_status,'String', output.FieldQ{3});
+set(handles.mf_magnet_mode_status,'String', output.FieldQ{4});
+set(handles.H_text_status,'String', num2str(output.Field));
+%Temp
+set(handles.temp_text_status,'String', num2str(output.Temp));
+set(handles.temp_target_status,'String', num2str(output.TempQ{1}));
+set(handles.temp_rate_status,'String', num2str(output.TempQ{2}));
+set(handles.temp_approach_status,'String', output.TempQ{1});
+%Pressure
+set(handles.pressure_text_status,'String', num2str(output.Pressure));
+%Chamber Status
+set(handles.chamber_mode_status,'String', output.ChamberQ);
+%Helium
+%set(handles.helium_level_status,'String', num2str(output.Helium));
+guidata(hObject, handles);  %update data
+%se tu

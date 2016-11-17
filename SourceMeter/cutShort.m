@@ -3,10 +3,10 @@ function [ isShort,res ] = cutShort( cs_obj, I )
 % Select the current I (in uA) you want to apply.
 current( cs_obj , 'on' , I );
 pause(1/5)
-res = abs(1e6*oneShot(cs_obj,'c'));    
-% res = oneShot(cs_obj,'r');  
-res=res/I;
-if  res > 0.98
+% res = abs(1e6*oneShot(cs_obj,'c'));    
+res = oneShot(cs_obj,'r');  
+% res=ress/I;
+if  res < 1e8
         isShort = 1;
     else
         isShort = 0;

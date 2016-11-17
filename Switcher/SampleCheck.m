@@ -7,7 +7,7 @@ pause(1/50)
 limits = 3:15;
 label = num2str((limits-1)','%02d');
 fontSize = 14;
-
+figure(30);
 set(gca,'XAxisLocation','top');
 set(gca,'YDir','reverse');
 set(gca,'XTick',(limits)');

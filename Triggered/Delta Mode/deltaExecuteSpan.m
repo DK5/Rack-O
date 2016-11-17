@@ -54,7 +54,8 @@ command=command';
 execute(sm_obj,command);
 
 %% Turn OFF source
-wait4OPC(sm_obj);
+% wait4OPC(sm_obj);
+pause(3);
 execute(sm_obj,{':OUTP OFF'});          % Turn off source
 
 %% Read data NanoVoltMeter
